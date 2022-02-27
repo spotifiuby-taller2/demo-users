@@ -1,0 +1,34 @@
+{
+  "name": "demo-users",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main/App.js",
+  "scripts": {
+    "test": "mocha --require mocha-suppress-logs",
+    "start": "nodemon src/main/App.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "0.21.1",
+    "body-parser": "1.19.0",
+    "chai": "4.3.4",
+    "cors": "2.8.5",
+    "crypto-js": "4.0.0",
+    "dotenv": "8.2.0",
+    "expect": "27.0.6",
+    "express": "4.17.1",
+    "fetch-mock": "9.11.0",
+    "mocha": "8.4.0",
+    "node-fetch": "2.6.1",
+    "node-html-parser": "4.1.0",
+    "nodemailer": "6.6.3",
+    "nodemailer-sendgrid-transport": "0.2.0",
+    "pg": "8.6.0",
+    "rewire": "5.0.0",
+    "sequelize": "6.6.5",
+    "sequelize-mock": "0.10.2",
+    "ws": "7.5.2"
+  }
+}
