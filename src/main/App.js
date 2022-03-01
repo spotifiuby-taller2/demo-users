@@ -1,16 +1,21 @@
-import cors from 'cors';
-import express from 'express';
-import bodyParser from "body-parser";
-import { database } from '../database/database';
-import { SignUpService } from '../services/SignUpService'
-import * as Constants from "../others/constants"
+const database = require('../database/database');
+const { SignUpService } = require('../services/SignUpService');
+const Constants = require('../others/constants');
+const cors = require('cors');
+const express = require('express');
+const bodyParser = require("body-parser");
 
 class App {
   constructor() {
     this.app = express();
-    this.app.use( cors() );
-    this.app.use(bodyParser.json());
-    this.service = new SignUpService();
+
+    this.app
+        .use( cors() );
+
+    this.app
+        .use( bodyParser.json() );
+
+    this.signUpService = new SignUpService();
   }
 
   async syncDB() {
@@ -19,22 +24,26 @@ class App {
     // the db is dropped it first if it already existed
     await database.sync( {force: false} );
 
-    this.app.listen(process.env
-                           .NODE_DOCKER_PORT, () => {
-      console.log(`Listening on port ${process.env
-                                              .NODE_DOCKER_PORT}`)
+    this.app
+        .listen(Constants.NODE_DOCKER_PORT, () => {
+      console.log(`Listening on port ${Constants.NODE_DOCKER_PORT}`)
     } );
   }
 
   defineEvents() {
-    this.app.get(Constants.signUpUrl, this.service
-                                          .handleSignUp()
-                                          .bind(this));
+    this.signUpService
+        .defineEvents(this.app);
   }
 }
 
 const main = new App();
 
-main.syncDB().then( () => {
-  main.defineEvents();
-} );
+main.syncDB()
+    .then( () => {
+      main.defineEvents();
+      }
+    ).catch( (error) => {
+      console.log("=========");
+      console.log(error);
+    });
+

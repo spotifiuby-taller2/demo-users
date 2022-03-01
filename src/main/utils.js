@@ -5,6 +5,6 @@ function setBodyResponse(res, status, res_body) {
   res.status(status).json(res_body);
 }
 
-export {
+module.exports = {
   setBodyResponse
 }

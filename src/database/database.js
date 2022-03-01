@@ -1,10 +1,7 @@
-import Sequelize from 'sequelize';
+const Sequelize = require('sequelize');
+const Constants = require("../others/constants");
 
-const DATABASE_URL = `${process.env.DB}://${process.env.POSTGRES_USER}` +
-                     `:${process.env.POSTGRES_PASSWORD}@${process.env.DB_CONTAINER_NAME}`
-                     `:${process.env.DB_PORT}/${process.env.POSTGRES_DB}`;
-
-const database = new Sequelize(DATABASE_URL, {
+const database = new Sequelize(Constants.DATABASE_URL, {
   dialect: 'postgres',
   logging: false,
   operatorsAliases: Sequelize.Op,
@@ -19,6 +16,4 @@ const database = new Sequelize(DATABASE_URL, {
   dialectOptions: {},
 } );
 
-export {
-  database
-};
+module.exports = database;

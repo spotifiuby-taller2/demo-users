@@ -8,8 +8,8 @@ node_modules
 
 # misc
 .idea
-src/others/credentials.js
 .DS_Store
+.env
 
 npm-debug.log*
 yarn-debug.log*

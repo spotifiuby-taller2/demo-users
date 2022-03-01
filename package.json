@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/main/App.js",
-  "scripts": {
-    "test": "mocha --require mocha-suppress-logs",
-    "start": "nodemon src/main/App.js"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "test": "mocha --require mocha-suppress-logs",
+    "startdev": "NODE_ENV=development nodemon src/main/App.js",
+    "start": "node src/main/App.js"
+  },
   "dependencies": {
     "axios": "0.21.1",
     "body-parser": "1.19.0",
@@ -20,15 +21,24 @@
     "expect": "27.0.6",
     "express": "4.17.1",
     "fetch-mock": "9.11.0",
+    "firebase": "9.6.7",
     "mocha": "8.4.0",
-    "node-fetch": "2.6.1",
     "node-html-parser": "4.1.0",
     "nodemailer": "6.6.3",
-    "nodemailer-sendgrid-transport": "0.2.0",
-    "pg": "8.6.0",
+    "pg": "8.7.3",
+    "pg-hstore": "2.3.4",
     "rewire": "5.0.0",
     "sequelize": "6.6.5",
     "sequelize-mock": "0.10.2",
     "ws": "7.5.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "node",
+      "node/mocha"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "7.11.0"
   }
 }
