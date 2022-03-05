@@ -1,4 +1,4 @@
-const database = require('../database/database');
+const database = require('../data/database');
 const { SignUpService } = require('../services/SignUpService');
 const Constants = require('../others/constants');
 const cors = require('cors');
@@ -22,7 +22,7 @@ class App {
     // "sync()" creates the database table for our model(s),
     // if we make .sync({force: true}),
     // the db is dropped it first if it already existed
-    await database.sync( {force: false} );
+    await database.sync( {force: true} );
 
     this.app
         .listen(Constants.NODE_DOCKER_PORT, () => {
@@ -41,9 +41,7 @@ const main = new App();
 main.syncDB()
     .then( () => {
       main.defineEvents();
-      }
-    ).catch( (error) => {
-      console.log("=========");
+      } )
+    .catch( (error) => {
       console.log(error);
-    });
-
+    }) ;
