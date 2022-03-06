@@ -22,7 +22,7 @@ class App {
     // "sync()" creates the database table for our model(s),
     // if we make .sync({force: true}),
     // the db is dropped it first if it already existed
-    await database.sync( {force: true} );
+    await database.sync( {force: false} );
 
     this.app
         .listen(Constants.NODE_DOCKER_PORT, () => {

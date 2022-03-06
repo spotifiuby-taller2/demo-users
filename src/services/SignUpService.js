@@ -18,7 +18,7 @@ class SignUpService {
   }
 
   async createVerifiedUser(req,
-                          res) {
+                           res) {
       console.log(constants.SIGN_UP_END_URL + '/:userId');
 
       const userId = req.params
@@ -44,7 +44,6 @@ class SignUpService {
                   const user = response.user;
 
                   const responseBody = {
-                      uid: user.uid,
                       token: user.accessToken
                   }
 
@@ -69,7 +68,7 @@ class SignUpService {
   }
 
   async handleSignUp(req,
-                    res) {
+                     res) {
     console.log(constants.SIGN_UP_URL);
 
     const { email, password } = req.body;
@@ -81,7 +80,7 @@ class SignUpService {
     await NonActivatedUsers.create( {
         id: id,
         email: email,
-        password: password
+        password: utils.getBcryptOf(password)
     } ).catch(error => {
         utils.setErrorResponse(error,
                                res);
@@ -91,7 +90,7 @@ class SignUpService {
         return;
     }
 
-    const signUpUrl = `${constants.USERS_HOST}${constants.SIGN_UP_END_URL}/${id}`;
+    const signUpUrl = `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`;
 
     try {
         sendConfirmationEmail(email, signUpUrl);

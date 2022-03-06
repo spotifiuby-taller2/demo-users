@@ -20,18 +20,24 @@ function setErrorResponse(error, res) {
       .json(responseBody);
 }
 
+function replaceAll(str,
+                    toReplace,
+                    newStr) {
+  return str.split(toReplace)
+            .join(newStr)
+}
 
-function getSHAOf(toHash) {
-  return crypto.createHmac('SHA256', toHash)
-               .digest('hex');
+function getBcryptOf(toHash) {
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(toHash, salt);
 }
 
 // Sync = blocks the event loop
 function getHashOf(toHash) {
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(toHash, salt);
   // Edge case: slashes cannot be used in URLs items.
-  return hash.replace("/", "a");
+  return replaceAll( getBcryptOf(toHash),
+                     "/",
+                     "a" );
 }
 
 function getId() {
@@ -43,8 +49,8 @@ function getId() {
 
 module.exports = {
   getId,
-  getHashOf,
-  getSHAOf,
+  getBcryptOf,
   setErrorResponse,
-  setBodyResponse
+  setBodyResponse,
+  replaceAll
 }
