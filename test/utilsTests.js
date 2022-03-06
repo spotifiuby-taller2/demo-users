@@ -1,5 +1,5 @@
 const assert = require('assert');
-import { replaceAll } from "../src/others/utils";
+const { replaceAll } = require("../src/others/utils");
 
 describe('utils tests', function() {
     it('replaceAll works', async function() {
