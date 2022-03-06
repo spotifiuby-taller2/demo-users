@@ -77,6 +77,18 @@ class SignUpService {
 
     const id = utils.getId();
 
+    const user = await Users.findOne({
+                                      where: {
+                                        email: email
+                                      }
+                                    } );
+
+    if (user !== null) {
+        utils.setErrorResponse("User already exists.",
+                                res);
+        return;
+    }
+
     await NonActivatedUsers.create( {
         id: id,
         email: email,
