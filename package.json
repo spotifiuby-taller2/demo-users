@@ -7,9 +7,10 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "mocha --require mocha-suppress-logs",
-    "startdev": "NODE_ENV=development nodemon src/main/App.js",
-    "start": "node src/main/App.js"
+    "test": "MY_ENV=testing mocha --require mocha-suppress-logs",
+    "startdev": "MY_ENV=dev nodemon src/main/App.js",
+    "startdocker": "MY_ENV= node src/main/App.js",
+    "start": "MY_ENV=.production node src/main/App.js"
   },
   "dependencies": {
     "axios": "0.21.1",

@@ -5,13 +5,20 @@ on: [push]
 jobs:
   tests:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v2
-      - uses: codecov/codecov-action@v2
-      
+
+      - name: Use Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: '14.x'
+
+      - name: Install dependencies
+          run: npm install
+
       - name: tests
-        run: mocha --require mocha-suppress-logs
+        run: npm test
 
       - name: status
         run: echo "Status ${{ job.status }}."
