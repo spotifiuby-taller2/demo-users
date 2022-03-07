@@ -34,9 +34,17 @@ const JSON_HEADER = {
   'Content-Type': 'application/json'
 }
 
-/* Parsed from docker-compose.yml */
-const NODE_DOCKER_PORT = process.env
-                                .NODE_DOCKER_PORT;
+let nodePort;
+
+if (process.env
+           .PORT === undefined) {
+  nodePort = process.env
+                    .NODE_DOCKER_PORT;
+} else {
+  // Heroku
+  nodePort = process.env
+                    .PORT;
+}
 
 const RESET_DATABASE = false;
 
@@ -50,6 +58,7 @@ if (process.env.DATABASE_URL === undefined) {
       .concat(`:${process.env.DB_PORT}`)
       .concat(`/${process.env.POSTGRES_DB}`);
 } else {
+  // Heroku
   databaseUrl = process.env.DATABASE_URL;
 }
 
@@ -72,7 +81,7 @@ module.exports = {
   SIGN_IN_URL,
   SIGN_UP_END_URL,
   JSON_HEADER,
-  NODE_DOCKER_PORT,
+  nodePort,
   FIREBASE_CONFIG,
   databaseUrl,
   BACKOFFICE_HOST,

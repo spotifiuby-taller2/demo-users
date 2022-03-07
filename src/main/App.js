@@ -27,8 +27,8 @@ class App {
     } );
 
     this.app
-        .listen(constants.NODE_DOCKER_PORT, () => {
-      console.log(`Listening on port ${constants.NODE_DOCKER_PORT}`)
+        .listen(constants.nodePort, () => {
+      console.log(`Listening on port ${constants.nodePort}`)
     } );
   }
 
