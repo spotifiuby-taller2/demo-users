@@ -1,14 +1,14 @@
 name: deploy
 
-needs: tests
-
 on:
   push:
     branches:
       - master
 
 jobs:
-  tests:
+  deploy:
+    needs: tests
+
     runs-on: ubuntu-latest
 
     steps:
