@@ -38,7 +38,7 @@ const JSON_HEADER = {
 const NODE_DOCKER_PORT = process.env
                                 .NODE_DOCKER_PORT;
 
-const RESET_DATABASE = false;
+const RESET_DATABASE = true;
 
 let databaseUrl;
 
