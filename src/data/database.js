@@ -12,7 +12,9 @@ const database = new Sequelize(constants.databaseUrl, {
     timestamp: false
   },
 
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false
+  },
 
   pool: {
     max: 100,
@@ -21,9 +23,7 @@ const database = new Sequelize(constants.databaseUrl, {
     acquire: 1000000
   },
 
-  dialectOptions: {
-    ssl: true
-  },
+  dialectOptions: {},
 } );
 
 module.exports = database;
