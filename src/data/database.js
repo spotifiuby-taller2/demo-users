@@ -23,7 +23,12 @@ const database = new Sequelize(constants.databaseUrl, {
     acquire: 1000000
   },
 
-  dialectOptions: {},
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  },
 } );
 
 module.exports = database;
