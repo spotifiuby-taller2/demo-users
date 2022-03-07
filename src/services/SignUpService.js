@@ -109,7 +109,7 @@ class SignUpService {
 
         utils.setBodyResponse(res,
                               200,
-                              "Mail sent");
+                              "Correo enviado");
     } catch(error) {
         utils.setErrorResponse(error,
                               res);
