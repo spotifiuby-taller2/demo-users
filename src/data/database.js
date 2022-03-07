@@ -1,11 +1,13 @@
 const Sequelize = require('sequelize');
-const Constants = require("../others/constants");
+const constants = require("../others/constants");
 
-const database = new Sequelize(Constants.DATABASE_URL, {
+const database = new Sequelize(constants.databaseUrl, {
   dialect: 'postgres',
   logging: false,
   operatorsAliases: Sequelize.Op,
-  define: { timestamp: false },
+  define: {
+    timestamp: false
+  },
   ssl: true,
   pool: {
     max: 100,

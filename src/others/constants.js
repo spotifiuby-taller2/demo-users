@@ -3,6 +3,18 @@ require('dotenv').config( {
                       .MY_ENV}`
 } );
 
+const MAX_STR_LEN = 254;
+const FIREBASE_MAX_LEN = 36;
+const BCRYPT_LEN = 60;
+const SHA_LEN = 64;
+
+const MIN_STR_LEN = 2;
+const MIN_PASS_LEN = 8;
+const DATE_FORMAT = "YYYY M D H:mm:ss";
+const TIMEZONE = "America/Buenos_Aires";
+const SYMBOL_MAX_LEN = 10;
+const TIMESTAMP_MAX_LEN = 30;
+
 /* Frontend hosts */
 const BACKOFFICE_HOST = process.env
                                .BACKOFFICE_HOST;
@@ -26,6 +38,23 @@ const JSON_HEADER = {
 const NODE_DOCKER_PORT = process.env
                                 .NODE_DOCKER_PORT;
 
+const RESET_DATABASE = false;
+
+let databaseUrl;
+
+if (process.env.DATABASE_URL === undefined) {
+  databaseUrl = `${process.env.DB}`
+      .concat(`://${process.env.POSTGRES_USER}`)
+      .concat(`:${process.env.POSTGRES_PASSWORD}`)
+      .concat(`@${process.env.DB_CONTAINER_NAME}`)
+      .concat(`:${process.env.DB_PORT}`)
+      .concat(`/${process.env.POSTGRES_DB}`);
+} else {
+  databaseUrl = process.env.DATABASE_URL;
+}
+
+const SENDGRID_API_KEY = "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";
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDlFbw1n3eqg7ogdwGuiTetV6isK4Uhqno",
   authDomain: "fir-firebase-acc6b.firebaseapp.com",
@@ -34,24 +63,6 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "296878360901",
   appId: "1:296878360901:web:7987ce42ec0a406b1f162c"
 };
-
-const DATABASE_URL = `${process.env.DB}://${process.env.POSTGRES_USER}`
-        .concat(`:${process.env.POSTGRES_PASSWORD}@${process.env.DB_CONTAINER_NAME}`)
-        .concat(`:${process.env.DB_PORT}/${process.env.POSTGRES_DB}`);
-
-const SENDGRID_API_KEY = "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";
-
-const MAX_STR_LEN = 254;
-const FIREBASE_MAX_LEN = 36;
-const BCRYPT_LEN = 60;
-const SHA_LEN = 64;
-
-const MIN_STR_LEN = 2;
-const MIN_PASS_LEN = 8;
-const DATE_FORMAT = "YYYY M D H:mm:ss";
-const TIMEZONE = "America/Buenos_Aires";
-const SYMBOL_MAX_LEN = 10;
-const TIMESTAMP_MAX_LEN = 30;
 
 module.exports = {
   SHA_LEN,
@@ -63,7 +74,7 @@ module.exports = {
   JSON_HEADER,
   NODE_DOCKER_PORT,
   FIREBASE_CONFIG,
-  DATABASE_URL,
+  databaseUrl,
   BACKOFFICE_HOST,
   MAX_STR_LEN,
   FIREBASE_MAX_LEN,
@@ -74,5 +85,6 @@ module.exports = {
   TIMEZONE,
   SYMBOL_MAX_LEN,
   TIMESTAMP_MAX_LEN,
-  SENDGRID_API_KEY
+  SENDGRID_API_KEY,
+  RESET_DATABASE
 }

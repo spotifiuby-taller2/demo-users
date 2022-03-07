@@ -1,6 +1,6 @@
 const database = require('../data/database');
 const { SignUpService } = require('../services/SignUpService');
-const Constants = require('../others/constants');
+const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require("body-parser");
@@ -22,11 +22,13 @@ class App {
     // "sync()" creates the database table for our model(s),
     // if we make .sync({force: true}),
     // the db is dropped it first if it already existed
-    await database.sync( {force: false} );
+    await database.sync( {
+        force: constants.RESET_DATABASE
+    } );
 
     this.app
-        .listen(Constants.NODE_DOCKER_PORT, () => {
-      console.log(`Listening on port ${Constants.NODE_DOCKER_PORT}`)
+        .listen(constants.NODE_DOCKER_PORT, () => {
+      console.log(`Listening on port ${constants.NODE_DOCKER_PORT}`)
     } );
   }
 

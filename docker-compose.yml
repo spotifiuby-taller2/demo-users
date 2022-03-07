@@ -28,8 +28,6 @@ services:
       context: .
       dockerfile: Dockerfile_ws
     container_name: ${NODE_CONTAINER_NAME}
-    environment:
-      - DATABASE_URL=${DB}://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_CONTAINER_NAME}:${DB_PORT}/${POSTGRES_DB}
     ports:
       - ${NODE_LOCAL_PORT}:${NODE_DOCKER_PORT}
     depends_on:
