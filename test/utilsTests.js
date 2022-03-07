@@ -6,7 +6,7 @@ describe('utils tests', function() {
         assert.strictEqual( replaceAll( '$2b$/Q/hola.',
                                          "/",
                                          "a"),
-                            '$2b$aQaholax.'
+                            '$2b$aQahola.'
         )
     });
 
