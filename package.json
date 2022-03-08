@@ -11,7 +11,7 @@
     "start": "MY_ENV=.production node src/main/App.js",
     "startdocker": "MY_ENV= node src/main/App.js",
     "startdev": "MY_ENV=.development nodemon src/main/App.js",
-    "test": "MY_ENV=testing mocha --require mocha-suppress-logs"
+    "test": "MY_ENV=.development mocha --require mocha-suppress-logs"
   },
 
   "dependencies": {
