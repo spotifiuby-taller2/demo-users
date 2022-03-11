@@ -13,6 +13,7 @@ async function runMigrations() {
                                    'isAdmin', {
                                       type: Sequelize.BOOLEAN,
                                       allowNull: false,
+                                      defaultValue: false
                                     } )
                         .catch(error => {
                           console.log( error.toString() );
@@ -22,6 +23,7 @@ async function runMigrations() {
                                     'isBlocked', {
                                         type: Sequelize.BOOLEAN,
                                         allowNull: false,
+                                        defaultValue: false
                                     } )
                         .catch(error => {
                             console.log( error.toString() );
