@@ -4,6 +4,7 @@ const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require("body-parser");
+const { runMigrations } = require("../data/migrations");
 
 class App {
   constructor() {
@@ -19,9 +20,13 @@ class App {
   }
 
   async syncDB() {
+    if (! constants.isDevelopment) {
+        await runMigrations();
+    }
+
     // "sync()" creates the database table for our model(s),
     // if we make .sync({force: true}),
-    // the db is dropped it first if it already existed
+    // the db is dropped first if it is already existed
     await database.sync( {
         force: constants.RESET_DATABASE
     } );

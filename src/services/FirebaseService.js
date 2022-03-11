@@ -1,9 +1,15 @@
 const firebase = require('firebase/app');
-const Constants = require('../others/constants');
+const firebaseAuth = require("firebase/auth");
+const constants = require('../others/constants');
 
 // Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-const Firebase = firebase.initializeApp(Constants.FIREBASE_CONFIG);
+const Firebase = firebase.initializeApp(constants.firebaseConfig);
 
-module.exports = Firebase;
+const auth = firebaseAuth.getAuth(Firebase);
+
+module.exports = {
+    Firebase,
+    auth
+};

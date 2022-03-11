@@ -48,32 +48,84 @@ if (process.env
 
 const RESET_DATABASE = false;
 
+const isDevelopment = process.env.DATABASE_URL === undefined;
 let databaseUrl;
+let firebaseConfig;
 
-if (process.env.DATABASE_URL === undefined) {
+const DB_DIALECT="postgres";
+let DB_USER;
+let DB_PASSWORD;
+let DB_HOST;
+let DB_PORT;
+let POSTGRES_DB;
+
+if (isDevelopment) {
+  DB_USER = process.env.POSTGRES_USER;
+  DB_PASSWORD = process.env.POSTGRES_PASSWORD;
+  DB_HOST = process.env.DB_CONTAINER_NAME;
+  DB_PORT = process.env.DB_PORT;
+  POSTGRES_DB = process.env.POSTGRES_DB;
+
   databaseUrl = `${process.env.DB}`
-      .concat(`://${process.env.POSTGRES_USER}`)
-      .concat(`:${process.env.POSTGRES_PASSWORD}`)
-      .concat(`@${process.env.DB_CONTAINER_NAME}`)
-      .concat(`:${process.env.DB_PORT}`)
-      .concat(`/${process.env.POSTGRES_DB}`);
+      .concat(`://${DB_USER}`)
+      .concat(`:${DB_PASSWORD}`)
+      .concat(`@${DB_HOST}`)
+      .concat(`:${DB_PORT}`)
+      .concat(`/${POSTGRES_DB}`);
+
+  firebaseConfig = {
+    apiKey: "AIzaSyDlFbw1n3eqg7ogdwGuiTetV6isK4Uhqno",
+    authDomain: "fir-firebase-acc6b.firebaseapp.com",
+    projectId: "fir-firebase-acc6b",
+    storageBucket: "fir-firebase-acc6b.appspot.com",
+    messagingSenderId: "296878360901",
+    appId: "1:296878360901:web:7987ce42ec0a406b1f162c"
+  };
 } else {
   // Heroku
+  // DATABASE_URL=${DB}://${POSTGRES_USER}:${POSTGRES_PASSWORD}
+  //              @${DB_CONTAINER_NAME}:${DB_PORT}/${POSTGRES_DB}
   databaseUrl = process.env.DATABASE_URL;
+
+  // ONLY use it on migrations (they may change)
+  DB_USER = databaseUrl.split("@")[0]
+                       .split("://")[0]
+                       .split(":")[0];
+
+  DB_PASSWORD = databaseUrl.split("@")[0]
+                           .split("://")[0]
+                           .split(":")[1];
+
+  DB_HOST = databaseUrl.split("@")[1]
+                       .split(":")[0];
+
+  DB_PORT = databaseUrl.split("@")[1]
+                       .split(":")[1]
+                       .split("/")[0];
+
+  POSTGRES_DB = databaseUrl.split("@")[1]
+                           .split(":")[1]
+                           .split("/")[1];
+
+  firebaseConfig = {
+    apiKey: "AIzaSyCnDa9J7DKKtNv5crxZ4NrRGcW5c7nZTAg",
+    authDomain: "fir-firebase-2-9eb22.firebaseapp.com",
+    projectId: "fir-firebase-2-9eb22",
+    storageBucket: "fir-firebase-2-9eb22.appspot.com",
+    messagingSenderId: "701624425016",
+    appId: "1:701624425016:web:6cb2157c5a2c0a34e1a4cd"
+  };
 }
 
 const SENDGRID_API_KEY = "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";
 
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDlFbw1n3eqg7ogdwGuiTetV6isK4Uhqno",
-  authDomain: "fir-firebase-acc6b.firebaseapp.com",
-  projectId: "fir-firebase-acc6b",
-  storageBucket: "fir-firebase-acc6b.appspot.com",
-  messagingSenderId: "296878360901",
-  appId: "1:296878360901:web:7987ce42ec0a406b1f162c"
-};
-
 module.exports = {
+  DB_USER,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+  POSTGRES_DB,
+  DB_DIALECT,
   SHA_LEN,
   SIGN_UP_URL,
   USERS_HOST,
@@ -82,7 +134,7 @@ module.exports = {
   SIGN_UP_END_URL,
   JSON_HEADER,
   nodePort,
-  FIREBASE_CONFIG,
+  firebaseConfig,
   databaseUrl,
   BACKOFFICE_HOST,
   MAX_STR_LEN,
@@ -95,5 +147,6 @@ module.exports = {
   SYMBOL_MAX_LEN,
   TIMESTAMP_MAX_LEN,
   SENDGRID_API_KEY,
-  RESET_DATABASE
+  RESET_DATABASE,
+  isDevelopment
 }

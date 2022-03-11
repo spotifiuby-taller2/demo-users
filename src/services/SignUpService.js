@@ -1,5 +1,5 @@
-const Firebase = require("../services/FirebaseService");
-const FirebaseAuth = require("firebase/auth");
+const {auth} = require("../services/FirebaseService");
+const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
@@ -35,9 +35,7 @@ class SignUpService {
           return;
       }
 
-      const auth = FirebaseAuth.getAuth(Firebase.Firebase);
-
-      FirebaseAuth.createUserWithEmailAndPassword(auth,
+      firebaseAuth.createUserWithEmailAndPassword(auth,
                                                   tempUser.email,
                                                   tempUser.password)
           .then(async function(response) {
@@ -72,8 +70,6 @@ class SignUpService {
     console.log(constants.SIGN_UP_URL);
 
     const { email, password } = req.body;
-
-    const auth = FirebaseAuth.getAuth(Firebase.Firebase);
 
     const id = utils.getId();
 

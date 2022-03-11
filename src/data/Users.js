@@ -22,6 +22,16 @@ const Users = database.define('users', {
         type: Sequelize.STRING(constants.SHA_LEN),
         allowNull: false,
         validate: { notEmpty: true }
+    },
+
+    isAdmin: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    },
+
+    isBlocked: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
     }
 } );
 

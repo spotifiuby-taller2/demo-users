@@ -6,14 +6,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-
   "scripts": {
     "start": "MY_ENV=.production node src/main/App.js",
     "startdocker": "MY_ENV= node src/main/App.js",
     "startdev": "MY_ENV=.development nodemon src/main/App.js",
     "test": "MY_ENV=.development mocha --require mocha-suppress-logs"
   },
-
   "dependencies": {
     "axios": "0.21.1",
     "bcrypt": "5.0.1",
@@ -35,17 +33,16 @@
     "pg-hstore": "2.3.4",
     "rewire": "5.0.0",
     "sequelize": "6.6.5",
+    "sequelize-cli": "^6.4.1",
     "sequelize-mock": "0.10.2",
     "ws": "7.5.2"
   },
-
   "eslintConfig": {
     "extends": [
       "node",
       "node/mocha"
     ]
   },
-
   "devDependencies": {
     "eslint": "7.11.0"
   }
