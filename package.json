@@ -10,7 +10,7 @@
     "start": "MY_ENV=.production node src/main/App.js",
     "startdocker": "MY_ENV= node src/main/App.js",
     "startdev": "MY_ENV=.development nodemon src/main/App.js",
-    "test": "MY_ENV=.development nyc --reporter=lcov --reporter=text-summary mocha"
+    "test": "MY_ENV=.development nyc --reporter=lcov --reporter=textgi mocha"
   },
   "dependencies": {
     "axios": "0.21.1",
