@@ -2,8 +2,10 @@
 
 node_modules
 build
+coverage
 
 .idea
+.nyc_output
 .DS_Store
 
 npm-debug.log*
