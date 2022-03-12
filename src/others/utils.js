@@ -1,4 +1,3 @@
-const constants = require("../others/constants");
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
 
@@ -47,10 +46,30 @@ function getId() {
   return getHashOf(base);
 }
 
+// Credits:
+// https://stackoverflow.com/questions/4816099/
+// chrome-sendrequest-error-typeerror-converting-circular-structure-to-json
+/*function antiRecursiveStringify (object){
+  let simpleObject = {};
+
+  for (let prop in object ){
+    if ( ! object.hasOwnProperty(prop)
+        || (typeof(object[prop]) == 'object')
+        || (typeof(object[prop]) == 'function') ) {
+      continue;
+    }
+    simpleObject[prop] = object[prop];
+  }
+
+  // returns cleaned up JSON
+  return JSON.stringify(simpleObject);
+} */
+
 module.exports = {
   getId,
   getBcryptOf,
   setErrorResponse,
   setBodyResponse,
-  replaceAll
+  replaceAll,
+  getHashOf
 }

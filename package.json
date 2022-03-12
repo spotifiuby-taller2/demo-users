@@ -10,7 +10,7 @@
     "start": "MY_ENV=.production node src/main/App.js",
     "startdocker": "MY_ENV= node src/main/App.js",
     "startdev": "MY_ENV=.development nodemon src/main/App.js",
-    "test": "MY_ENV=.development mocha --require mocha-suppress-logs"
+    "test": "MY_ENV=.development nyc --reporter=text mocha"
   },
   "dependencies": {
     "axios": "0.21.1",
@@ -24,16 +24,17 @@
     "express": "4.17.1",
     "fetch-mock": "9.11.0",
     "firebase": "9.6.7",
-    "mocha": "8.4.0",
-    "mocha-suppress-logs": "0.3.1",
+    "jest": "27.5.1",
+    "jest-when": "3.5.1",
+    "mocha": "^9.2.2",
     "node-html-parser": "4.1.0",
     "nodemailer": "6.6.3",
     "nodemailer-sendgrid-transport": "0.2.0",
+    "nyc": "15.1.0",
     "pg": "8.7.3",
     "pg-hstore": "2.3.4",
     "rewire": "5.0.0",
     "sequelize": "6.6.5",
-    "sequelize-cli": "^6.4.1",
     "sequelize-mock": "0.10.2",
     "ws": "7.5.2"
   },
