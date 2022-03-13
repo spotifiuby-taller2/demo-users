@@ -80,7 +80,7 @@ class SignUpService {
                                     } );
 
     if (user !== null) {
-        utils.setErrorResponse("User already exists.",
+        utils.setErrorResponse("Ya hay un usuario con ese mail.",
                                 res);
         return;
     }
@@ -113,4 +113,6 @@ class SignUpService {
   }
 }
 
-module.exports = { SignUpService };
+module.exports = {
+    SignUpService
+};
