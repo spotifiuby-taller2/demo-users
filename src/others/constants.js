@@ -10,10 +10,20 @@ const SHA_LEN = 64;
 
 const MIN_STR_LEN = 2;
 const MIN_PASS_LEN = 8;
-const DATE_FORMAT = "YYYY M D H:mm:ss.SSS";
+const DATE_FORMAT = "YYYY-M-D H:mm:ss.SS";
 const TIMEZONE = "America/Buenos_Aires";
 const SYMBOL_MAX_LEN = 10;
 const TIMESTAMP_MAX_LEN = 30;
+
+const JSON_HEADER = {
+  'Content-Type': 'application/json'
+}
+
+const LOG_LEVEL = process.env
+                         .LOG_LEVEL;
+
+const RESET_DATABASE = false;
+
 
 /* Frontend hosts */
 const BACKOFFICE_HOST = process.env
@@ -22,18 +32,18 @@ const BACKOFFICE_HOST = process.env
 const USERS_HOST = process.env
                           .USERS_HOST;
 
+
 /* Frontend paths */
 const HOME_URL = "/home";
+
 
 /* Backends paths */
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
 const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
 
-const JSON_HEADER = {
-  'Content-Type': 'application/json'
-}
 
+/* ====== Docker vs Development config ====== */
 let nodePort;
 
 if (process.env
@@ -46,8 +56,8 @@ if (process.env
                     .PORT;
 }
 
-const RESET_DATABASE = false;
 
+/* ====== Production vs Development config ====== */
 const isDevelopment = process.env.DATABASE_URL === undefined;
 let databaseUrl;
 let firebaseConfig;
@@ -148,5 +158,6 @@ module.exports = {
   TIMESTAMP_MAX_LEN,
   SENDGRID_API_KEY,
   RESET_DATABASE,
-  isDevelopment
+  isDevelopment,
+  LOG_LEVEL
 }

@@ -4,6 +4,7 @@ const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require("body-parser");
+const Logger = require("../services/Logger");
 const { runMigrations } = require("../data/migrations");
 
 class App {
@@ -33,8 +34,12 @@ class App {
 
     this.app
         .listen(constants.nodePort, () => {
-      console.log(`Listening on port ${constants.nodePort}`)
+      console.log(`Listening on port ${constants.nodePort}`);
     } );
+  }
+
+  defineLogLevel() {
+      Logger.setLevel(constants.LOG_LEVEL);
   }
 
   defineEvents() {
@@ -47,6 +52,7 @@ const main = new App();
 
 main.syncDB()
     .then( () => {
+      main.defineLogLevel();
       main.defineEvents();
       } )
     .catch( (error) => {

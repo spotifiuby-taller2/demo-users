@@ -49,7 +49,9 @@ class SignUpService {
                   await Users.create( {
                       id: user.uid,
                       email: tempUser.email,
-                      password: tempUser.password
+                      password: tempUser.password,
+                      isAdmin: true,
+                      isBlocked: false
                   } );
 
                   await NonActivatedUsers.destroy( {

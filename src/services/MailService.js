@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
+const Logger = require("./Logger");
 const { SENDGRID_API_KEY } = require("../others/constants");
 
 const config = {
@@ -36,7 +37,7 @@ function sendConfirmationEmail(email, link) {
         if (error)
             throw Error(error);
 
-        console.log("Mail sent.");
+        Logger.info("Mail envido.")
     } );
 }
 

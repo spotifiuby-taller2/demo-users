@@ -1,43 +1,41 @@
 const { DATE_FORMAT } = require("../others/constants");
 const { getDate } = require("../others/utils");
 const simple_node_logger = require('simple-node-logger');
+const path = require('path');
 
-const consoleLogger = simple_node_logger.createSimpleLogger( {
-    timestampFormat: DATE_FORMAT,
-} );
+const logFile = path.resolve(__dirname, "")
+                    .replace("src/services", "")
+                + "logs/" + getDate() + ".log";
 
+// If the file does not exists, it will be created.
 const fileLogger = simple_node_logger.createSimpleLogger( {
     timestampFormat: DATE_FORMAT,
-    logFilePath: '../../logs/' + getDate() + ".log",
+    logFilePath: logFile,
 } );
 
 const setLevel = (level) => {
     if (! ['debug', 'info', 'warn', 'error'].includes(level)) {
-        consoleLogger.setLevel('info');
         fileLogger.setLevel('info');
+        fileLogger.info("Nivel de logueo: info.");
     } else {
-        consoleLogger.setLevel(level);
         fileLogger.setLevel(level);
+        fileLogger.info("Nivel de logueo: " + level + ". ");
     }
 }
 
 const info = (message) => {
-    consoleLogger.info(message);
     fileLogger.info(message);
 }
 
 const debug = (message) => {
-    consoleLogger.debug(message);
     fileLogger.debug(message);
 }
 
 const warn = (message) => {
-    consoleLogger.warn(message);
     fileLogger.warn(message);
 }
 
 const error = (message) => {
-    consoleLogger.error(message);
     fileLogger.error(message);
 }
 
