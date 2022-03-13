@@ -22,7 +22,12 @@ const NonActivatedUsers = database.define('non_activated_users', {
         type: Sequelize.STRING(constants.SHA_LEN),
         allowNull: false,
         validate: { notEmpty: true }
-    }
+    },
+
+    isAdmin: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    },
 } );
 
 module.exports = NonActivatedUsers;

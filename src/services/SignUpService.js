@@ -50,7 +50,7 @@ class SignUpService {
                       id: user.uid,
                       email: tempUser.email,
                       password: tempUser.password,
-                      isAdmin: true,
+                      isAdmin: tempUser.isAdmin,
                       isBlocked: false
                   } );
 
@@ -74,7 +74,7 @@ class SignUpService {
                      res) {
     Logger.request(constants.SIGN_UP_URL + '/:userId');
 
-    const { email, password } = req.body;
+    const { email, password, link } = req.body;
 
     const id = utils.getId();
 
@@ -93,7 +93,8 @@ class SignUpService {
     await NonActivatedUsers.create( {
         id: id,
         email: email,
-        password: utils.getBcryptOf(password)
+        password: utils.getBcryptOf(password),
+        isAdmin: link === "web"
     } ).catch(error => {
         utils.setErrorResponse(error,
                                res);
