@@ -1,4 +1,4 @@
-# demo-users
+# users
 
 ### Instalación y configuración
 
