@@ -36,6 +36,7 @@
     "rewire": "5.0.0",
     "sequelize": "6.6.5",
     "sequelize-mock": "0.10.2",
+    "simple-node-logger": "^21.8.12",
     "ws": "7.5.2"
   },
   "eslintConfig": {

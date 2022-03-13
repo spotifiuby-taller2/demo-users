@@ -1,10 +1,10 @@
 const { replaceAll,
     setBodyResponse,
-    setErrorResponse,
-    getId } = require("../src/others/utils");
+    setErrorResponse } = require("../src/others/utils");
 const ResponseMock = require("./mocks/ResponseMock");
 const rewire = require("rewire");
 const assert = require('assert');
+const {DateMock} = require("./mocks/DateMock");
 
 it('replaceAll works', async function() {
     assert.strictEqual( replaceAll( '$2b$/Q/hola.',
@@ -60,4 +60,16 @@ it('getBcryptOf', () => {
         () => '222');
 
     assert.strictEqual( utilsFile.getBcryptOf("a") , '222');
+} );
+
+it('getDate', () => {
+    const utilsFile = rewire("../src/others/utils");
+
+    utilsFile.__set__({
+        'Date': DateMock
+    } );
+
+    console.log(  utilsFile.getDate() );
+
+    assert.strictEqual( utilsFile.getDate() , '222' );
 } );

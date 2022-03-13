@@ -4,6 +4,7 @@ const constants = require('../others/constants');
 const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
 const Users = require("../data/Users");
+const Logger = require("./Logger");
 const { sendConfirmationEmail } = require('../services/MailService');
 
 class SignUpService {
@@ -19,7 +20,7 @@ class SignUpService {
 
   async createVerifiedUser(req,
                            res) {
-      console.log(constants.SIGN_UP_END_URL + '/:userId');
+      Logger.request(constants.SIGN_UP_END_URL + '/:userId');
 
       const userId = req.params
                         .userId;
@@ -57,6 +58,8 @@ class SignUpService {
                       }
                   } )
 
+                  Logger.info("Usuario creado.")
+
                   res.status(200)
                      .json(responseBody);
               } )
@@ -67,7 +70,7 @@ class SignUpService {
 
   async handleSignUp(req,
                      res) {
-    console.log(constants.SIGN_UP_URL);
+    Logger.request(constants.SIGN_UP_URL + '/:userId');
 
     const { email, password } = req.body;
 

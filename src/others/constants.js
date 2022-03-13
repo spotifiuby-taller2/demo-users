@@ -10,7 +10,7 @@ const SHA_LEN = 64;
 
 const MIN_STR_LEN = 2;
 const MIN_PASS_LEN = 8;
-const DATE_FORMAT = "YYYY M D H:mm:ss";
+const DATE_FORMAT = "YYYY M D H:mm:ss.SSS";
 const TIMEZONE = "America/Buenos_Aires";
 const SYMBOL_MAX_LEN = 10;
 const TIMESTAMP_MAX_LEN = 30;

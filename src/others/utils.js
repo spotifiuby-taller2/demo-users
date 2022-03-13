@@ -19,6 +19,11 @@ function setErrorResponse(error, res) {
       .json(responseBody);
 }
 
+function getDate() {
+  return new Date().toISOString()
+                   .substr(0, 10);
+}
+
 function replaceAll(str,
                     toReplace,
                     newStr) {
@@ -71,5 +76,6 @@ module.exports = {
   setErrorResponse,
   setBodyResponse,
   replaceAll,
-  getHashOf
+  getHashOf,
+  getDate
 }
