@@ -6,6 +6,11 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const Logger = require("../services/Logger");
 const { runMigrations } = require("../data/migrations");
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const { swaggerConfig } = require('../../swaggerConfig');
+
+const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
 class App {
   constructor() {
@@ -16,6 +21,10 @@ class App {
 
     this.app
         .use( bodyParser.json() );
+
+    this.app.use( '/api-docs',
+                  swaggerUi.serve,
+                  swaggerUi.setup(swaggerDoc) );
 
     this.signUpService = new SignUpService();
   }

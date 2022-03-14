@@ -1,22 +1,21 @@
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
 
-function setBodyResponse(res,
+function setBodyResponse(responseBody,
                          status,
-                         res_body) {
-  // console.log(`Response status: ${status}\n` +
-  //  `\tResponse body: ${JSON.stringify(res_body)}`);
+                         res) {
   res.status(status)
-     .json(res_body);
+     .json(responseBody);
 }
 
-function setErrorResponse(error, res) {
+function setErrorResponse(error,
+                          status,
+                          res) {
   const responseBody = {
     error: error.toString()
   }
 
-  res.status(400)
-      .json(responseBody);
+  setBodyResponse(responseBody, status, res);
 }
 
 function getDate() {

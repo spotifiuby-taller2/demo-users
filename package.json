@@ -37,6 +37,8 @@
     "sequelize": "6.6.5",
     "sequelize-mock": "0.10.2",
     "simple-node-logger": "21.8.12",
+    "swagger-jsdoc": "5.0.0",
+    "swagger-ui-express": "4.3.0",
     "ws": "7.5.2"
   },
   "eslintConfig": {

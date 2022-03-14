@@ -9,14 +9,124 @@ const { sendConfirmationEmail } = require('../services/MailService');
 
 class SignUpService {
     defineEvents(app) {
+    /**
+    * @swagger
+    * /signup:
+    *   post:
+    *    summary: Sign up
+    *
+    *    description: Allow sign up.
+    *
+    *    parameters:
+    *         - name: "email"
+    *           in: body
+    *           type: "string"
+    *           required: true
+    *
+    *         - name: "password"
+    *           in: body
+    *           type: "string"
+    *           required: true
+    *
+    *         - name: "link"
+    *           in: body
+    *           type: "string"
+    *           required: true
+    *
+    *    responses:
+    *         "201":
+    *           description: "Mail to verify email sent."
+    *
+    *         "401":
+    *           description: "Mail already registered."
+    *
+    *         "501":
+    *           description: "Could not save user temporarily."
+    */
     app.post( constants.SIGN_UP_URL,
               this.handleSignUp
                   .bind(this) );
 
+    /**
+    * @swagger
+    * /signup/end/:userId:
+    *   get:
+    *    summary: Sign up end
+    *
+    *    description: Validate an email and create the user.
+    *
+    *    parameters:
+    *         - name: "userId"
+    *           in: path
+    *           type: "string"
+    *           required: true
+    *
+    *    responses:
+    *         "201":
+    *           description: "User created."
+    *
+    *         "401":
+    *           description: "Invalid confirmation link."
+    *
+    *         "501":
+    *           description: "Error creating user."
+    */
     app.get( constants.SIGN_UP_END_URL + '/:userId',
              this.createVerifiedUser
                  .bind(this) );
   }
+
+  async handleSignUp(req,
+                       res) {
+        Logger.request(constants.SIGN_UP_URL + '/:userId');
+
+        const { email, password, link } = req.body;
+
+        const id = utils.getId();
+
+        const user = await Users.findOne({
+            where: {
+                email: email
+            }
+        } );
+
+        if (user !== null) {
+            utils.setErrorResponse("Ya hay un usuario con ese mail.",
+                401,
+                res);
+            return;
+        }
+
+        await NonActivatedUsers.create( {
+            id: id,
+            email: email,
+            password: utils.getBcryptOf(password),
+            isAdmin: link === "web"
+        } ).catch(error => {
+            Logger.error("No se pudo crear el usuario temporal " +  error.toString());
+
+            utils.setErrorResponse(error,
+                501,
+                res);
+        } );
+
+        if (res.statusCode >= 400) {
+            return;
+        }
+
+        const signUpUrl = `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`;
+
+        try {
+            sendConfirmationEmail(email, signUpUrl);
+
+            utils.setBodyResponse(res,
+                200,
+                "Correo enviado");
+        } catch(error) {
+            utils.setErrorResponse(error,
+                res);
+        }
+    }
 
   async createVerifiedUser(req,
                            res) {
@@ -32,7 +142,9 @@ class SignUpService {
       } );
 
       if (tempUser === null) {
-          utils.setErrorResponse("Link de confirmación inválido.", res);
+          utils.setErrorResponse("Link de confirmación inválido.",
+                                 401,
+                                 res);
           return;
       }
 
@@ -62,61 +174,16 @@ class SignUpService {
 
                   Logger.info("Usuario creado.")
 
-                  res.status(200)
+                  res.status(201)
                      .json(responseBody);
               } )
           .catch(error => {
-              utils.setErrorResponse(error, res);
+              utils.setErrorResponse(error,
+                                     501,
+                                     res);
           } );
   }
 
-  async handleSignUp(req,
-                     res) {
-    Logger.request(constants.SIGN_UP_URL + '/:userId');
-
-    const { email, password, link } = req.body;
-
-    const id = utils.getId();
-
-    const user = await Users.findOne({
-                                      where: {
-                                        email: email
-                                      }
-                                    } );
-
-    if (user !== null) {
-        utils.setErrorResponse("Ya hay un usuario con ese mail.",
-                                res);
-        return;
-    }
-
-    await NonActivatedUsers.create( {
-        id: id,
-        email: email,
-        password: utils.getBcryptOf(password),
-        isAdmin: link === "web"
-    } ).catch(error => {
-        utils.setErrorResponse(error,
-                               res);
-    } );
-
-    if (res.statusCode === 400) {
-        return;
-    }
-
-    const signUpUrl = `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`;
-
-    try {
-        sendConfirmationEmail(email, signUpUrl);
-
-        utils.setBodyResponse(res,
-                              200,
-                              "Correo enviado");
-    } catch(error) {
-        utils.setErrorResponse(error,
-                              res);
-    }
-  }
 }
 
 module.exports = {
