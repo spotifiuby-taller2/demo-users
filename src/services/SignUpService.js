@@ -8,7 +8,7 @@ const Logger = require("./Logger");
 const { sendConfirmationEmail } = require('../services/MailService');
 
 class SignUpService {
-    defineEvents(app) {
+  defineEvents(app) {
     /**
     * @swagger
     * /signup:
@@ -78,9 +78,11 @@ class SignUpService {
 
   async handleSignUp(req,
                        res) {
-        Logger.request(constants.SIGN_UP_URL + '/:userId');
+        Logger.request(constants.SIGN_UP_URL);
 
         const { email, password, link } = req.body;
+
+        const isAdmin = link === "web";
 
         const id = utils.getId();
 
@@ -91,7 +93,7 @@ class SignUpService {
         } );
 
         if (user !== null) {
-            utils.setErrorResponse("Ya hay un usuario con ese mail.",
+            utils.setErrorResponse("Ya hay un usuario con ese mail",
                 401,
                 res);
             return;
@@ -101,7 +103,7 @@ class SignUpService {
             id: id,
             email: email,
             password: utils.getBcryptOf(password),
-            isAdmin: link === "web"
+            isAdmin: isAdmin
         } ).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
@@ -114,16 +116,22 @@ class SignUpService {
             return;
         }
 
-        const signUpUrl = `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`;
 
         try {
-            sendConfirmationEmail(email, signUpUrl);
+            if (isAdmin) {
+                sendConfirmationEmail(email,
+                    `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
+            } else {
+                sendConfirmationEmail(email,
+                    `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
+            }
 
-            utils.setBodyResponse(res,
-                200,
-                "Correo enviado");
+            utils.setBodyResponse({result: "Correo enviado"},
+                201,
+                res);
         } catch(error) {
             utils.setErrorResponse(error,
+                501,
                 res);
         }
     }
@@ -142,7 +150,7 @@ class SignUpService {
       } );
 
       if (tempUser === null) {
-          utils.setErrorResponse("Link de confirmación inválido.",
+          utils.setErrorResponse("Link de confirmación inválido",
                                  401,
                                  res);
           return;
@@ -151,28 +159,28 @@ class SignUpService {
       firebaseAuth.createUserWithEmailAndPassword(auth,
                                                   tempUser.email,
                                                   tempUser.password)
-          .then(async function(response) {
+          .then((response) => {
                   const user = response.user;
 
                   const responseBody = {
                       token: user.accessToken
                   }
 
-                  await Users.create( {
+                  Users.create( {
                       id: user.uid,
                       email: tempUser.email,
                       password: tempUser.password,
                       isAdmin: tempUser.isAdmin,
                       isBlocked: false
-                  } );
+                  } ).then();
 
-                  await NonActivatedUsers.destroy( {
+                  NonActivatedUsers.destroy( {
                       where: {
                           id : userId
                       }
-                  } )
+                  } ).then();
 
-                  Logger.info("Usuario creado.")
+                  Logger.info("Usuario creado");
 
                   res.status(201)
                      .json(responseBody);
@@ -183,9 +191,6 @@ class SignUpService {
                                      res);
           } );
   }
-
 }
 
-module.exports = {
-    SignUpService
-};
+module.exports = SignUpService;

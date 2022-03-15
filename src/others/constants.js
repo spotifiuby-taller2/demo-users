@@ -29,6 +29,9 @@ const RESET_DATABASE = false;
 const BACKOFFICE_HOST = process.env
                                .BACKOFFICE_HOST;
 
+const AUTH_FRONT = process.env
+                          .AUTH_FRONT;
+
 const USERS_HOST = process.env
                           .USERS_HOST;
 
@@ -58,7 +61,7 @@ if (process.env
 
 
 /* ====== Production vs Development config ====== */
-const isDevelopment = process.env.DATABASE_URL === undefined;
+const isDevelopment = process.env.PRODUCTION === undefined;
 let databaseUrl;
 let firebaseConfig;
 
@@ -70,18 +73,23 @@ let DB_PORT;
 let POSTGRES_DB;
 
 if (isDevelopment) {
-  DB_USER = process.env.POSTGRES_USER;
-  DB_PASSWORD = process.env.POSTGRES_PASSWORD;
-  DB_HOST = process.env.DB_CONTAINER_NAME;
-  DB_PORT = process.env.DB_PORT;
-  POSTGRES_DB = process.env.POSTGRES_DB;
 
-  databaseUrl = `${process.env.DB}`
-      .concat(`://${DB_USER}`)
-      .concat(`:${DB_PASSWORD}`)
-      .concat(`@${DB_HOST}`)
-      .concat(`:${DB_PORT}`)
-      .concat(`/${POSTGRES_DB}`);
+  if (process.env.DATABASE_URL === undefined) {
+    DB_USER = process.env.POSTGRES_USER;
+    DB_PASSWORD = process.env.POSTGRES_PASSWORD;
+    DB_HOST = process.env.DB_CONTAINER_NAME;
+    DB_PORT = process.env.DB_PORT;
+    POSTGRES_DB = process.env.POSTGRES_DB;
+
+    databaseUrl = `${process.env.DB}`
+        .concat(`://${DB_USER}`)
+        .concat(`:${DB_PASSWORD}`)
+        .concat(`@${DB_HOST}`)
+        .concat(`:${DB_PORT}`)
+        .concat(`/${POSTGRES_DB}`);
+  } else {
+    databaseUrl = process.env.DATABASE_URL;
+  }
 
   firebaseConfig = {
     apiKey: "AIzaSyDlFbw1n3eqg7ogdwGuiTetV6isK4Uhqno",
@@ -129,6 +137,8 @@ if (isDevelopment) {
 
 const SENDGRID_API_KEY = "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";
 
+const BASE_SALT = '$2b$10$sfW8rHWvJcda/4cMOq.p5.';
+
 module.exports = {
   DB_USER,
   DB_PASSWORD,
@@ -159,5 +169,7 @@ module.exports = {
   SENDGRID_API_KEY,
   RESET_DATABASE,
   isDevelopment,
-  LOG_LEVEL
+  LOG_LEVEL,
+  BASE_SALT,
+  AUTH_FRONT
 }

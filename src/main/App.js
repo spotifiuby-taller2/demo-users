@@ -1,5 +1,5 @@
 const database = require('../data/database');
-const { SignUpService } = require('../services/SignUpService');
+const SignUpService = require('../services/SignUpService');
 const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');

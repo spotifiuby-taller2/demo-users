@@ -10,13 +10,14 @@
     "start": "MY_ENV=.production LOG_LEVEL=debug node src/main/App.js",
     "startdocker": "MY_ENV= LOG_LEVEL=debug node src/main/App.js",
     "startdev": "MY_ENV=.development LOG_LEVEL=debug nodemon src/main/App.js",
-    "test": "MY_ENV=.development LOG_LEVEL=debug nyc --reporter=lcov --reporter=text mocha"
+    "test": "MY_ENV=.test LOG_LEVEL=debug nyc --reporter=lcov --reporter=text mocha --exit"
   },
   "dependencies": {
     "axios": "0.21.1",
     "bcrypt": "5.0.1",
     "body-parser": "1.19.0",
-    "chai": "4.3.4",
+    "chai": "4.3.6",
+    "chai-http": "4.3.0",
     "cors": "2.8.5",
     "crypto-js": "4.0.0",
     "dotenv": "8.2.0",
@@ -37,6 +38,7 @@
     "sequelize": "6.6.5",
     "sequelize-mock": "0.10.2",
     "simple-node-logger": "21.8.12",
+    "sqlite3": "5.0.2",
     "swagger-jsdoc": "5.0.0",
     "swagger-ui-express": "4.3.0",
     "ws": "7.5.2"

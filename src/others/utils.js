@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
+const { BASE_SALT } = require("../others/constants");
 
 function setBodyResponse(responseBody,
                          status,
@@ -31,8 +32,7 @@ function replaceAll(str,
 }
 
 function getBcryptOf(toHash) {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(toHash, salt);
+  return bcrypt.hashSync(toHash, BASE_SALT);
 }
 
 // Sync = blocks the event loop
