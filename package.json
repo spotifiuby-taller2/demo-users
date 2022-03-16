@@ -8,25 +8,19 @@
   "license": "ISC",
   "scripts": {
     "start": "MY_ENV=.production LOG_LEVEL=debug node src/main/App.js",
-    "startdocker": "MY_ENV= node LOG_LEVEL=debug src/main/App.js",
+    "startdocker": "MY_ENV= LOG_LEVEL=debug node src/main/App.js",
     "startdev": "MY_ENV=.development LOG_LEVEL=debug nodemon src/main/App.js",
-    "test": "MY_ENV=.development nyc LOG_LEVEL=debug --reporter=lcov --reporter=text mocha"
+    "test": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
     "axios": "0.21.1",
     "bcrypt": "5.0.1",
     "body-parser": "1.19.0",
-    "chai": "4.3.4",
     "cors": "2.8.5",
     "crypto-js": "4.0.0",
     "dotenv": "8.2.0",
-    "expect": "27.0.6",
     "express": "4.17.1",
-    "fetch-mock": "9.11.0",
     "firebase": "9.6.7",
-    "jest": "27.5.1",
-    "jest-when": "3.5.1",
-    "mocha": "9.2.2",
     "node-html-parser": "4.1.0",
     "nodemailer": "6.6.3",
     "nodemailer-sendgrid-transport": "0.2.0",
@@ -47,6 +41,12 @@
     ]
   },
   "devDependencies": {
-    "eslint": "7.11.0"
+    "eslint": "7.11.0",
+    "jest": "27.5.1",
+    "jest-when": "3.5.1",
+    "mocha": "9.2.2",
+    "fetch-mock": "9.11.0",
+    "chai": "4.3.4",
+    "expect": "27.0.6"
   }
 }
