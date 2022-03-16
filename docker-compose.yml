@@ -10,9 +10,7 @@ networks:
 
 services:
   db_psql:
-    build:
-      context: .
-      dockerfile: Dockerfile_db
+    image: postgres:13
     container_name: ${DB_CONTAINER_NAME}
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -26,16 +24,11 @@ services:
       - "5432:5432"
 
   ws_node:
-    build:
-      context: .
-      dockerfile: Dockerfile_ws
+    build: .
     container_name: ${NODE_CONTAINER_NAME}
     ports:
       - ${NODE_LOCAL_PORT}:${NODE_DOCKER_PORT}
     depends_on:
       - db_psql
-    volumes:
-      - .:${APP_DIRECTORY}
-      - node_modules:${APP_DIRECTORY}${MODULES_DIRECTORY}
     networks:
       - my-network
