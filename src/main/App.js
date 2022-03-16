@@ -8,7 +8,7 @@ const Logger = require("../services/Logger");
 const { runMigrations } = require("../data/migrations");
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const { swaggerConfig } = require('../../swaggerConfig');
+const { swaggerConfig } = require('./swaggerConfig');
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
