@@ -33,12 +33,18 @@ function sendConfirmationEmail(email, link) {
         }
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error)
-            throw Error(error);
+    const error = transporter.sendMail(mailOptions)
+                            .then( (response) => {
+                                Logger.info(response);
+                                Logger.info("Mail envido.");
+                            } )
+                            .catch( (error) => {
+                                return error
+                            } );
 
-        Logger.info("Mail envido.")
-    } );
+    if (error !== undefined) {
+        throw new Error();
+    }
 }
 
 module.exports = {

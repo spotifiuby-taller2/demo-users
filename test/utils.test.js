@@ -1,6 +1,7 @@
 const { replaceAll,
     setBodyResponse,
-    setErrorResponse } = require("../src/others/utils");
+    setErrorResponse,
+    areAnyUndefined } = require("../src/others/utils");
 const ResponseMock = require("./mocks/ResponseMock");
 const rewire = require("rewire");
 const assert = require('assert');
@@ -75,4 +76,9 @@ it('getDate', () => {
     utilsFile.__set__({
         'Date': Date
     } );
+} );
+
+it('areAnyUndefined', () => {
+    assert.strictEqual( areAnyUndefined(["", "a"]) , true );
+    assert.strictEqual( areAnyUndefined(["a", "b"]) , false );
 } );

@@ -5,6 +5,7 @@ const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
+const { areAnyUndefined } = require("../others/utils");
 const { sendConfirmationEmail } = require('../services/MailService');
 
 class SignUpService {
@@ -42,6 +43,12 @@ class SignUpService {
     *
     *         "501":
     *           description: "Could not save user temporarily."
+    *
+    *         "502":
+    *           description: "Empty required field."
+    *
+    *         "503":
+    *           description: "Password too short."
     */
     app.post( constants.SIGN_UP_URL,
               this.handleSignUp
@@ -84,6 +91,23 @@ class SignUpService {
 
         const isAdmin = link === "web";
 
+        if ( areAnyUndefined([email, password]) ) {
+            utils.setErrorResponse("Por favor complete todos los campos.",
+                                    502,
+                                    res);
+
+            return;
+        }
+
+        if ( password.length < constants.MIN_PASS_LEN ) {
+              utils.setErrorResponse("La contraseña debe tener al menos "
+                                     + constants.MIN_PASS_LEN + " caracteres.",
+                  503,
+                  res);
+
+              return;
+         }
+
         const id = utils.getId();
 
         const user = await Users.findOne({
@@ -116,7 +140,6 @@ class SignUpService {
             return;
         }
 
-
         try {
             if (isAdmin) {
                 sendConfirmationEmail(email,
@@ -130,7 +153,7 @@ class SignUpService {
                 201,
                 res);
         } catch(error) {
-            utils.setErrorResponse(error,
+            utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
                 501,
                 res);
         }

@@ -31,11 +31,11 @@ function replaceAll(str,
             .join(newStr)
 }
 
+// Sync = blocks the event loop
 function getBcryptOf(toHash) {
   return bcrypt.hashSync(toHash, BASE_SALT);
 }
 
-// Sync = blocks the event loop
 function getHashOf(toHash) {
   // Edge case: slashes cannot be used in URLs items.
   return replaceAll( getBcryptOf(toHash),
@@ -69,6 +69,13 @@ function getId() {
   return JSON.stringify(simpleObject);
 } */
 
+function areAnyUndefined(list) {
+  return list.filter( (element) => {
+    return element === undefined
+           || element.length === 0
+  } ).length > 0;
+}
+
 module.exports = {
   getId,
   getBcryptOf,
@@ -76,5 +83,6 @@ module.exports = {
   setBodyResponse,
   replaceAll,
   getHashOf,
-  getDate
+  getDate,
+  areAnyUndefined
 }
