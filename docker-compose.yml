@@ -22,6 +22,8 @@ services:
       - postgres_data:${POSTRGRES_DATA}
     networks:
       - my-network
+    ports:
+      - "5432:5432"
 
   ws_node:
     build:

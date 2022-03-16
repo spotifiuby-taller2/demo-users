@@ -12,9 +12,9 @@ const database = new Sequelize(constants.databaseUrl, {
     timestamp: false
   },
 
-  ssl: {
+  ssl: (process.env.MY_ENV === '.production') ? {
     rejectUnauthorized: false
-  },
+  } : false,
 
   pool: {
     max: 100,
@@ -24,10 +24,10 @@ const database = new Sequelize(constants.databaseUrl, {
   },
 
   dialectOptions: {
-    ssl: {
+    ssl: (process.env.MY_ENV === '.production') ? {
       require: true,
       rejectUnauthorized: false
-    }
+    } : false
   },
 } );
 
