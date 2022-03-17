@@ -49,6 +49,9 @@ class SignUpService {
     *
     *         "503":
     *           description: "Password too short."
+    *
+    *         "504":
+    *           description: "Could not send email."
     */
     app.post( constants.SIGN_UP_URL,
               this.handleSignUp
@@ -131,7 +134,7 @@ class SignUpService {
         } ).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
-            utils.setErrorResponse(error,
+            utils.setErrorResponse("Error al crear la cuenta.",
                 501,
                 res);
         } );
@@ -154,7 +157,7 @@ class SignUpService {
                 res);
         } catch(error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-                501,
+                504,
                 res);
         }
     }
