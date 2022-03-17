@@ -3,7 +3,7 @@
 node_modules
 build
 coverage
-logs
+logs/*
 
 .idea
 .nyc_output

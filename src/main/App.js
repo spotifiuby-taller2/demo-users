@@ -1,5 +1,6 @@
 const database = require('../data/database');
 const SignUpService = require('../services/SignUpService');
+const SignInService = require('../services/SignInService');
 const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
@@ -27,6 +28,7 @@ class App {
                   swaggerUi.setup(swaggerDoc) );
 
     this.signUpService = new SignUpService();
+    this.signInService = new SignInService();
   }
 
   async syncDB() {
@@ -53,6 +55,9 @@ class App {
 
   defineEvents() {
     this.signUpService
+        .defineEvents(this.app);
+
+    this.signInService
         .defineEvents(this.app);
   }
 }
