@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "MY_ENV=.production LOG_LEVEL=debug node src/main/App.js",
+    "start": "MY_ENV=.production LOG_LEVEL=debug DD_ENV=prod DD_LOGS_INJECTION=true DD_RUNTIME_METRICS_ENABLED=true node --require dd-trace/init src/main/App.js",
     "startdocker": "MY_ENV= LOG_LEVEL=debug node src/main/App.js",
     "startdev": "MY_ENV=.development LOG_LEVEL=debug nodemon src/main/App.js",
     "test": "MY_ENV=.test LOG_LEVEL=debug nyc --reporter=lcov --reporter=text mocha --exit"
@@ -18,13 +18,14 @@
     "body-parser": "1.19.0",
     "cors": "2.8.5",
     "crypto-js": "4.0.0",
+    "dd-trace": "^2.3.1",
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "firebase": "9.6.7",
     "node-html-parser": "4.1.0",
     "nodemailer": "6.6.3",
     "nodemailer-sendgrid-transport": "0.2.0",
-    "nodemon": "^2.0.15",
+    "nodemon": "2.0.15",
     "nyc": "15.1.0",
     "pg": "8.7.3",
     "pg-hstore": "2.3.4",
@@ -49,7 +50,7 @@
     "jest-when": "3.5.1",
     "mocha": "9.2.2",
     "fetch-mock": "9.11.0",
-    "chai": "4.3.4",
+    "chai": "4.3.6",
     "chai-http": "4.3.0",
     "expect": "27.0.6"
   }

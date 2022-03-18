@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - develop
 
 jobs:
   tests:
@@ -18,7 +19,7 @@ jobs:
             node-version: '14.x'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: tests
         run: npm test

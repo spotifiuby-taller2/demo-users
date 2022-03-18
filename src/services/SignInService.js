@@ -9,9 +9,12 @@ const { Sequelize, Op } = require("sequelize");
 
 
 async function sigInWithOutGoogle(req, res){
+    
     const { email, password, link } = req.body;
 
     const isAdmin = link === "web";
+
+    const hashedPassword = utils.getBcryptOf(password);
 
         
     if ( areAnyUndefined([email, password]) ) {
@@ -33,11 +36,30 @@ async function sigInWithOutGoogle(req, res){
         return;
     }
 
-    utils.setBodyResponse(`Usuario ${email} encontrado, puede entrar en la aplicación`,
+    if (user.isAdmin && ! isAdmin) {
+        utils.setErrorResponse("Usuario no autorizado.",
+            403,
+            res);
+        return;
+    }
+
+    const response = await firebaseAuth.signInWithEmailAndPassword(auth,
+        email,
+        hashedPassword);
+
+    if (response.user === undefined) {
+        utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
+            402,
+            res);
+
+        return;
+    }
+    utils.setBodyResponse(
+        {
+token: response.user.accessToken},
         201,
         res);
-
-}
+    }
 
 async function sigInWithGoogle(req, res){
     const { email, password, link } = req.body;
@@ -94,11 +116,13 @@ class SignUpService {
     *           description: "User exists."
     * 
     *         "401":
-    *           descritption: "Empty fields"
+    *           descritption: "Empty fields."
     * 
     *         "402":
-    *           descritption: "User not exists"
+    *           descritption: "User not exists."
     *
+    *         "403":
+    *           description: "Not admin."
     */
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
@@ -119,7 +143,25 @@ class SignUpService {
 
         
 
-    }
+      const response = await firebaseAuth.signInWithEmailAndPassword(auth,
+                                                                      email,
+                                                                      hashedPassword);
+
+      if (response.user === undefined) {
+          utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
+                                  402,
+                                  res);
+
+          return;
+      }
+
+      utils.setBodyResponse({
+              token: response.user
+                             .accessToken
+          },
+          201,
+          res);
+  }
 
 }
 

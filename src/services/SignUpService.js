@@ -41,16 +41,22 @@ class SignUpService {
     *         "401":
     *           description: "Mail already registered."
     *
+    *         "402":
+    *           description: "Empty required field."
+    *
+    *         "403":
+    *           description: "Password too short."
+    *
+    *         "405":
+    *           description: "Mail already sent."
+    *
     *         "501":
     *           description: "Could not save user temporarily."
     *
     *         "502":
-    *           description: "Empty required field."
+    *           description: "Could not create account."
     *
     *         "503":
-    *           description: "Password too short."
-    *
-    *         "504":
     *           description: "Could not send email."
     */
     app.post( constants.SIGN_UP_URL,
@@ -96,7 +102,7 @@ class SignUpService {
 
         if ( areAnyUndefined([email, password]) ) {
             utils.setErrorResponse("Por favor complete todos los campos.",
-                                    502,
+                                    402,
                                     res);
 
             return;
@@ -105,7 +111,7 @@ class SignUpService {
         if ( password.length < constants.MIN_PASS_LEN ) {
               utils.setErrorResponse("La contraseña debe tener al menos "
                                      + constants.MIN_PASS_LEN + " caracteres.",
-                  503,
+                  403,
                   res);
 
               return;
@@ -126,6 +132,20 @@ class SignUpService {
             return;
         }
 
+      const nonUser = await NonActivatedUsers.findOne({
+          where: {
+              email: email
+          }
+      } );
+
+      if (nonUser !== null) {
+          utils.setErrorResponse("Ya hay un usuario con ese mail pendiente de confirmación",
+              405,
+              res);
+
+          return;
+      }
+
         await NonActivatedUsers.create( {
             id: id,
             email: email,
@@ -135,7 +155,7 @@ class SignUpService {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
             utils.setErrorResponse("Error al crear la cuenta.",
-                501,
+                502,
                 res);
         } );
 
@@ -145,19 +165,21 @@ class SignUpService {
 
         try {
             if (isAdmin) {
-                sendConfirmationEmail(email,
+                await sendConfirmationEmail(email,
                     `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
             } else {
-                sendConfirmationEmail(email,
+                await sendConfirmationEmail(email,
                     `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
             }
+
+            Logger.info("Correo enviado");
 
             utils.setBodyResponse({result: "Correo enviado"},
                 201,
                 res);
         } catch(error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-                504,
+                503,
                 res);
         }
     }
