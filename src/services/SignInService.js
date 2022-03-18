@@ -1,4 +1,4 @@
-const {auth} = require("../services/FirebaseService");
+const {auth, Firebase} = require("../services/FirebaseService");
 const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
@@ -6,6 +6,62 @@ const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { Sequelize, Op } = require("sequelize");
+
+
+async function sigInWithOutGoogle(req, res){
+    const { email, password, link } = req.body;
+
+    const isAdmin = link === "web";
+
+        
+    if ( areAnyUndefined([email, password]) ) {
+        utils.setErrorResponse("Por favor complete todos los campos.", 401, res);
+        return;
+    }
+
+    const user = await Users.findOne({
+        where: {
+            [Op.and]:
+                [{email: email}, {password: utils.getBcryptOf(password)}]
+        }
+    });
+
+    if (user === null) {
+        utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
+                402,
+                res);
+        return;
+    }
+
+    utils.setBodyResponse(`Usuario ${email} encontrado, puede entrar en la aplicación`,
+        201,
+        res);
+
+}
+
+async function sigInWithGoogle(req, res){
+    const { email, password, link } = req.body;
+
+    const isAdmin = link === "web";
+
+    const credential = Firebase.auth.GoogleAuthProvider.credential( //Set the tokens to Firebase
+        result.idToken,
+        result.accessToken
+    );
+    
+    Firebase.auth()
+        .signInWithCredential(credential)
+        .catch((error) => {
+            console.log(error);
+        });
+    
+    utils.setBodyResponse(`Usuario ${email} encontrado, puede entrar en la aplicación`,
+          201, 
+          res);
+}
+
+
+
 
 class SignUpService {
   defineEvents(app) {
@@ -50,38 +106,18 @@ class SignUpService {
 
   }
 
-  async handleSignIn(req,
-                       res) {
+  async handleSignIn(req, res)
+   {
         Logger.request(constants.SIGN_IN_URL);
 
-        const { email, password, link } = req.body;
-
-        const isAdmin = link === "web";
+        if ( req.body.firebase ){
+            await sigInWithGoogle(req, res);
+        }
+        else{
+            await sigInWithOutGoogle(req, res);
+        }
 
         
-        if ( areAnyUndefined([email, password]) ) {
-            utils.setErrorResponse("Por favor complete todos los campos.",
-                                    401,
-                                    res);
-
-            return;
-        }
-
-        const user = await Users.findOne({
-            where: {
-                [Op.and]:
-                    [{email: email}, {password: utils.getBcryptOf(password)}]
-            }
-        });
-
-        if (user === null) {
-            utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
-                402,
-                res);
-            return;
-        }
-
-        utils.setBodyResponse(`Usuario ${email} encontrado, puede entrar en la aplicación`, 201, res);
 
     }
 
