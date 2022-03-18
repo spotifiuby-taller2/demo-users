@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "MY_ENV=.production LOG_LEVEL=debug node src/main/App.js",
+    "start": "MY_ENV=.production LOG_LEVEL=debug DD_ENV=prod DD_LOGS_INJECTION=true DD_RUNTIME_METRICS_ENABLED= true node --require dd-trace/init src/main/App.js",
     "startdocker": "MY_ENV= LOG_LEVEL=debug node src/main/App.js",
     "startdev": "MY_ENV=.development LOG_LEVEL=debug nodemon src/main/App.js",
     "test": "MY_ENV=.test LOG_LEVEL=debug nyc --reporter=lcov --reporter=text mocha --exit"
