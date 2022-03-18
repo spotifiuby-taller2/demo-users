@@ -11,7 +11,7 @@ const config = {
 
 const transporter = nodemailer.createTransport( sgTransport(config) );
 
-function sendConfirmationEmail(email, link) {
+async function sendConfirmationEmail(email, link) {
     const mailOptions = {
         from: 'cuentadetaller2@gmail.com',
 
@@ -33,16 +33,9 @@ function sendConfirmationEmail(email, link) {
         }
     };
 
-    const error = transporter.sendMail(mailOptions)
-                            .then( (response) => {
-                                Logger.info(response);
-                                Logger.info("Mail envido.");
-                            } )
-                            .catch( (error) => {
-                                return error
-                            } );
+    const response = await transporter.sendMail(mailOptions);
 
-    if (error !== undefined) {
+    if (response.message === undefined) {
         throw new Error();
     }
 }
