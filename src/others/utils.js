@@ -1,22 +1,27 @@
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
+const { BASE_SALT } = require("../others/constants");
 
-function setBodyResponse(res,
+function setBodyResponse(responseBody,
                          status,
-                         res_body) {
-  // console.log(`Response status: ${status}\n` +
-  //  `\tResponse body: ${JSON.stringify(res_body)}`);
+                         res) {
   res.status(status)
-     .json(res_body);
+     .json(responseBody);
 }
 
-function setErrorResponse(error, res) {
+function setErrorResponse(error,
+                          status,
+                          res) {
   const responseBody = {
     error: error.toString()
   }
 
-  res.status(400)
-      .json(responseBody);
+  setBodyResponse(responseBody, status, res);
+}
+
+function getDate() {
+  return new Date().toISOString()
+                   .substr(0, 10);
 }
 
 function replaceAll(str,
@@ -26,12 +31,11 @@ function replaceAll(str,
             .join(newStr)
 }
 
+// Sync = blocks the event loop
 function getBcryptOf(toHash) {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(toHash, salt);
+  return bcrypt.hashSync(toHash, BASE_SALT);
 }
 
-// Sync = blocks the event loop
 function getHashOf(toHash) {
   // Edge case: slashes cannot be used in URLs items.
   return replaceAll( getBcryptOf(toHash),
@@ -65,11 +69,20 @@ function getId() {
   return JSON.stringify(simpleObject);
 } */
 
+function areAnyUndefined(list) {
+  return list.filter( (element) => {
+    return element === undefined
+           || element.length === 0
+  } ).length > 0;
+}
+
 module.exports = {
   getId,
   getBcryptOf,
   setErrorResponse,
   setBodyResponse,
   replaceAll,
-  getHashOf
+  getHashOf,
+  getDate,
+  areAnyUndefined
 }

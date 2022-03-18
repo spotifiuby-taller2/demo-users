@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
+const Logger = require("./Logger");
 const { SENDGRID_API_KEY } = require("../others/constants");
 
 const config = {
@@ -10,7 +11,7 @@ const config = {
 
 const transporter = nodemailer.createTransport( sgTransport(config) );
 
-function sendConfirmationEmail(email, link) {
+async function sendConfirmationEmail(email, link) {
     const mailOptions = {
         from: 'cuentadetaller2@gmail.com',
 
@@ -32,12 +33,11 @@ function sendConfirmationEmail(email, link) {
         }
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error)
-            throw Error(error);
+    const response = await transporter.sendMail(mailOptions);
 
-        console.log("Mail sent.");
-    } );
+    if (response.message === undefined) {
+        throw new Error();
+    }
 }
 
 module.exports = {
