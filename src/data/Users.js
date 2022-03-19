@@ -32,6 +32,11 @@ const Users = database.define('users', {
     isBlocked: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
+    },
+
+    isExternal: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
     }
 } );
 

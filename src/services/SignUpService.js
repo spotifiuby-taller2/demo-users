@@ -47,6 +47,9 @@ class SignUpService {
     *         "403":
     *           description: "Password too short."
     *
+    *         "404":
+    *           description: "User already signed in as external."
+    * 
     *         "405":
     *           description: "Mail already sent."
     *
@@ -128,6 +131,13 @@ class SignUpService {
         if (user !== null) {
             utils.setErrorResponse("Ya hay un usuario con ese mail",
                 401,
+                res);
+            return;
+        }
+
+        if (user.isExternal){
+            utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
+                404,
                 res);
             return;
         }

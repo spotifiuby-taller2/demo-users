@@ -1,11 +1,12 @@
-const {auth, Firebase} = require("../services/FirebaseService");
-const firebaseAuth = require("firebase/auth");
+const {auth} = require("../services/FirebaseService");
+const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
+const Users = require("../data/Users");
 
 
 async function sigInWithOutGoogle(req, res){
@@ -56,36 +57,60 @@ async function sigInWithOutGoogle(req, res){
     }
     utils.setBodyResponse(
         {
-token: response.user.accessToken},
-        201,
-        res);
+            token: response.user.accessToken},
+            201,
+            res);
     }
 
 async function sigInWithGoogle(req, res){
-    const { email, password, link } = req.body;
+
+    const {token, link } = req.body;
 
     const isAdmin = link === "web";
 
-    const credential = Firebase.auth.GoogleAuthProvider.credential( //Set the tokens to Firebase
-        result.idToken,
-        result.accessToken
-    );
+    const credential = GoogleAuthProvider.credential(token.idToken,token.accessToken);
+
+    const auth = getAuth();
     
-    Firebase.auth()
-        .signInWithCredential(credential)
-        .catch((error) => {
-            console.log(error);
-        });
-    
-    utils.setBodyResponse(`Usuario ${email} encontrado, puede entrar en la aplicación`,
-          201, 
-          res);
+
+    signInWithCredential(auth, credential)
+    .then(()=>{
+        Users.create( {
+            id: utils.getId(),
+            email: token.user.email,
+            password: utils.getHashOf(token.idToken),
+            isAdmin: isAdmin,
+            isBlocked: false,
+            isExternal: true
+        } );
+    })
+    .catch((error) => {
+        utils.setErrorResponse("Las credenciales recibidas son invalidad",
+            404,
+            res);
+        return;
+    });
+
+    const user = await Users.findOne({
+        where: {
+            email: token.user.email
+        }
+    });
+
+    if (user === null) {
+        
+    }
+
+    utils.setBodyResponse(
+        {token: credential.accessToken},
+        201, 
+        res);
 }
 
 
 
 
-class SignUpService {
+class SignInService {
   defineEvents(app) {
     /**
     * @swagger
@@ -123,6 +148,9 @@ class SignUpService {
     *
     *         "403":
     *           description: "Not admin."
+    * 
+    *         "404":
+    *           description: "wrong credentials"
     */
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
@@ -141,28 +169,8 @@ class SignUpService {
             await sigInWithOutGoogle(req, res);
         }
 
-        
-
-      const response = await firebaseAuth.signInWithEmailAndPassword(auth,
-                                                                      email,
-                                                                      hashedPassword);
-
-      if (response.user === undefined) {
-          utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
-                                  402,
-                                  res);
-
-          return;
-      }
-
-      utils.setBodyResponse({
-              token: response.user
-                             .accessToken
-          },
-          201,
-          res);
-  }
+   }        
 
 }
 
-module.exports = SignUpService;
+module.exports = SignInService;
