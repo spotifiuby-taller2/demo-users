@@ -2,7 +2,6 @@ const {auth} = require("../services/FirebaseService");
 const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
-const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
@@ -55,41 +54,34 @@ async function sigInWithOutGoogle(req, res){
 
         return;
     }
-    utils.setBodyResponse(
-        {
-            token: response.user.accessToken},
+
+    utils.setBodyResponse({token: response.user.accessToken},
             201,
             res);
     }
 
-async function sigInWithGoogle(req, res){
-
+async function sigInWithGoogle(req, res) {
     const {token, link } = req.body;
 
     const isAdmin = link === "web";
 
-    const credential = GoogleAuthProvider.credential(token.idToken,token.accessToken);
+    const credential = GoogleAuthProvider.credential(token.idToken,
+                                                    token.accessToken);
 
     const auth = getAuth();
-    
 
     signInWithCredential(auth, credential)
     .then(()=>{
-        Users.create( {
-            id: utils.getId(),
-            email: token.user.email,
-            password: utils.getHashOf(token.idToken),
-            isAdmin: isAdmin,
-            isBlocked: false,
-            isExternal: true
-        } );
     })
     .catch((error) => {
-        utils.setErrorResponse("Las credenciales recibidas son invalidad",
+        utils.setErrorResponse("Las credenciales recibidas son invalidas",
             404,
             res);
-        return;
     });
+
+    if (res.status > 400) {
+        return;
+    }
 
     const user = await Users.findOne({
         where: {
@@ -98,7 +90,14 @@ async function sigInWithGoogle(req, res){
     });
 
     if (user === null) {
-        
+        await Users.create( {
+            id: utils.getId(),
+            email: token.user.email,
+            password: utils.getHashOf(token.idToken),
+            isAdmin: isAdmin,
+            isBlocked: false,
+            isExternal: true
+        } );
     }
 
     utils.setBodyResponse(
@@ -106,9 +105,6 @@ async function sigInWithGoogle(req, res){
         201, 
         res);
 }
-
-
-
 
 class SignInService {
   defineEvents(app) {
@@ -168,7 +164,6 @@ class SignInService {
         else{
             await sigInWithOutGoogle(req, res);
         }
-
    }        
 
 }

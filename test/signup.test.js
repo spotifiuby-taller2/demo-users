@@ -62,7 +62,7 @@ describe('SignUpService tests : ', () => {
                     done();
                 });
     } );
-/*
+
     it("get " + constants.SIGN_UP_END_URL + '/111', (done) => {
         const anId = 111;
 
@@ -93,8 +93,6 @@ describe('SignUpService tests : ', () => {
                  done();
              });
     } );
-    */
-
 } );
 
 after(async () => {
