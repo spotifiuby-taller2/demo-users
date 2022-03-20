@@ -169,7 +169,7 @@ class SignUpService {
         } ).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
-            utils.setErrorResponse("Error al crear la cuenta.",
+            utils.setErrorResponse("Error al intentar crear la cuenta.",
                 502,
                 res);
         } );
@@ -189,7 +189,7 @@ class SignUpService {
 
             Logger.info("Correo enviado");
 
-            utils.setBodyResponse({result: "Correo enviado"},
+            utils.setBodyResponse({result: "Correo enviado a tu cuenta."},
                                     201,
                                     res);
         } catch(error) {

@@ -35,7 +35,6 @@ const AUTH_FRONT = process.env
 const USERS_HOST = process.env
                           .USERS_HOST;
 
-
 /* Frontend paths */
 const HOME_URL = "/home";
 
@@ -44,6 +43,7 @@ const HOME_URL = "/home";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
 const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
+const FORGOT_PASSWORD_URL = "/forgotpassword";
 
 
 /* ====== Docker vs Development config ====== */
@@ -171,5 +171,6 @@ module.exports = {
   isDevelopment,
   LOG_LEVEL,
   BASE_SALT,
-  AUTH_FRONT
+  AUTH_FRONT,
+  FORGOT_PASSWORD_URL
 }

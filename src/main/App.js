@@ -9,6 +9,7 @@ const Logger = require("../services/Logger");
 const { runMigrations } = require("../data/migrations");
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const ForgotPassword = require("../services/ForgotPassword");
 const { swaggerConfig } = require('./swaggerConfig');
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
@@ -29,6 +30,7 @@ class App {
 
     this.signUpService = new SignUpService();
     this.signInService = new SignInService();
+    this.forgotPassword = new ForgotPassword();
   }
 
   async syncDB() {
@@ -58,6 +60,9 @@ class App {
         .defineEvents(this.app);
 
     this.signInService
+        .defineEvents(this.app);
+
+    this.forgotPassword
         .defineEvents(this.app);
   }
 }

@@ -25,7 +25,8 @@ async function sigInWithOutGoogle(req, res){
     const user = await Users.findOne({
         where: {
             [Op.and]:
-                [{email: email}, {password: utils.getBcryptOf(password)}]
+                [{email: email},
+                 {password: utils.getBcryptOf(password)}]
         }
     });
 

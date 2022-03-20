@@ -11,16 +11,17 @@ const config = {
 
 const transporter = nodemailer.createTransport( sgTransport(config) );
 
-async function sendConfirmationEmail(email, link) {
+async function sendEmail(email,
+                         subject,
+                         body) {
     const mailOptions = {
         from: 'cuentadetaller2@gmail.com',
 
         to: email,
 
-        subject: 'Confirmación de cuenta',
+        subject: subject,
 
-        html: `Para confirmar tu cuenta, por favor accedé a este link: `
-              + `<a clicktracking=off href=${link}> este link </a>`,
+        html: body,
 
         trackingSettings: {
             clickTracking: {
@@ -40,6 +41,29 @@ async function sendConfirmationEmail(email, link) {
     }
 }
 
+async function sendConfirmationEmail(email,
+                                     link) {
+    const body = `
+    Para confirmar tu cuenta, por favor accedé a este link: `
+    + `<a clicktracking=off href=${link}> este link </a>`;
+
+    await sendEmail(email,
+              'Confirmación de cuenta',
+              body);
+}
+
+async function sendPasswordRecoveryEmail(email,
+                                         link) {
+    const body = `
+    Para recrear tu contraseña, por favor accedé a este link: `
+        + `<a clicktracking=off href=${link}> este link </a>`;
+
+    await sendEmail(email,
+            'Reestablecer contraseña',
+            body);
+}
+
 module.exports = {
-    sendConfirmationEmail
+    sendConfirmationEmail,
+    sendPasswordRecoveryEmail
 };
