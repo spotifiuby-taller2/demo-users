@@ -28,6 +28,11 @@ const NonActivatedUsers = database.define('non_activated_users', {
         type: Sequelize.BOOLEAN,
         allowNull: false,
     },
+
+    isExternal: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    }
 } );
 
 module.exports = NonActivatedUsers;

@@ -99,7 +99,10 @@ class SignUpService {
                        res) {
         Logger.request(constants.SIGN_UP_URL);
 
-        const { email, password, link } = req.body;
+        const { email,
+                password,
+                link,
+                isExternal } = req.body;
 
         const isAdmin = link === "web";
 
@@ -129,16 +132,17 @@ class SignUpService {
         } );
 
         if (user !== null) {
-            utils.setErrorResponse("Ya hay un usuario con ese mail",
-                401,
-                res);
-            return;
-        }
+         if (user.isExternal) {
+             utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
+                 404,
+                 res);
+         }
 
-        if (user.isExternal){
-            utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
-                404,
-                res);
+         else {
+             utils.setErrorResponse("Ya hay un usuario con ese mail",
+                 401,
+                 res);
+         }
             return;
         }
 
@@ -160,7 +164,8 @@ class SignUpService {
             id: id,
             email: email,
             password: utils.getBcryptOf(password),
-            isAdmin: isAdmin
+            isAdmin: isAdmin,
+            isExternal: isExternal
         } ).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
@@ -185,12 +190,12 @@ class SignUpService {
             Logger.info("Correo enviado");
 
             utils.setBodyResponse({result: "Correo enviado"},
-                201,
-                res);
+                                    201,
+                                    res);
         } catch(error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-                503,
-                res);
+                                    503,
+                                    res);
         }
     }
 
@@ -229,7 +234,8 @@ class SignUpService {
                       email: tempUser.email,
                       password: tempUser.password,
                       isAdmin: tempUser.isAdmin,
-                      isBlocked: false
+                      isBlocked: false,
+                      isExternal: tempUser.isExternal
                   } ).then();
 
                   NonActivatedUsers.destroy( {
@@ -244,6 +250,8 @@ class SignUpService {
                      .json(responseBody);
               } )
           .catch(error => {
+              Logger.error(error.toString());
+
               utils.setErrorResponse(error,
                                      501,
                                      res);
