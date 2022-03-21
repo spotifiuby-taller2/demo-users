@@ -71,7 +71,7 @@ async function sigInWithGoogle(req, res) {
     let uid;
     const auth = getAuth();
 
-    await signInWithCredential(auth, credential)
+    signInWithCredential(auth, credential)
     .then((res)=>{
         uid = res.user.uid;
     })
