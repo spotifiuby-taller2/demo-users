@@ -71,7 +71,7 @@ async function sigInWithGoogle(req, res) {
     let uid;
     const auth = getAuth();
 
-    const userFirebase = await signInWithCredential(auth, credential)
+    await signInWithCredential(auth, credential)
     .then((res)=>{
         uid = res.user.uid;
     })
@@ -80,8 +80,6 @@ async function sigInWithGoogle(req, res) {
             404,
             res);
     });
-
-    console.log(userFirebase);
 
     if (res.status > 400) {
         return;
