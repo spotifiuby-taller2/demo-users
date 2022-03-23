@@ -70,11 +70,12 @@ async function sigInWithGoogle(req, res) {
 
     const credential = GoogleAuthProvider.credential(token.idToken,
                                                     token.accessToken);
-
+    let uid;
     const auth = getAuth();
 
     signInWithCredential(auth, credential)
-    .then(()=>{
+    .then((res)=>{
+        uid = res.user.uid;
     })
     .catch((error) => {
         utils.setErrorResponse("Las credenciales recibidas son invalidas",
@@ -94,9 +95,9 @@ async function sigInWithGoogle(req, res) {
 
     if (user === null) {
         await Users.create( {
-            id: utils.getId(),
+            id: uid,
             email: token.user.email,
-            password: utils.getHashOf(token.idToken),
+            password: utils.getHashOf(token.user.email),
             isAdmin: isAdmin,
             isBlocked: false,
             isExternal: true
