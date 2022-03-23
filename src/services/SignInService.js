@@ -6,7 +6,7 @@ const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
 const Users = require("../data/Users");
-
+const firebaseAuth = require("firebase/auth");
 
 async function sigInWithOutGoogle(req, res){
     
@@ -46,7 +46,9 @@ async function sigInWithOutGoogle(req, res){
 
     const response = await firebaseAuth.signInWithEmailAndPassword(auth,
         email,
-        hashedPassword);
+        hashedPassword).catch((error) => {
+            return error.toString()
+        } );
 
     if (response.user === undefined) {
         utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",

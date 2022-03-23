@@ -1,15 +1,15 @@
-const firebase = require('firebase/app');
-const firebaseAuth = require("firebase/auth");
+const admin = require('firebase-admin');
 const constants = require('../others/constants');
 
 // Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-const Firebase = firebase.initializeApp(constants.firebaseConfig);
+admin.initializeApp({
+    credential: admin.credential.cert(constants.firebaseJson)
+});
 
-const auth = firebaseAuth.getAuth(Firebase);
+const auth = admin.auth();
 
 module.exports = {
-    Firebase,
     auth
 };

@@ -5,6 +5,7 @@
   "main": "src/main/App.js",
   "keywords": [],
   "author": "",
+  "type": "commonjs",
   "license": "ISC",
   "scripts": {
     "start": "MY_ENV=.production LOG_LEVEL=debug DD_ENV=prod DD_LOGS_INJECTION=true DD_RUNTIME_METRICS_ENABLED=true node --require dd-trace/init src/main/App.js",
@@ -22,6 +23,7 @@
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "firebase": "9.6.7",
+    "firebase-admin": "^10.0.2",
     "node-html-parser": "4.1.0",
     "nodemailer": "6.6.3",
     "nodemailer-sendgrid-transport": "0.2.0",
