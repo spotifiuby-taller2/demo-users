@@ -1,5 +1,6 @@
 const Users = require("../src/data/Users");
 const NonActivatedUsers = require("../src/data/NonActivatedUsers");
+const database = require('../src/data/database');
 const constants = require('../src/others/constants');
 const LoggerMock = require('./mocks/LoggerMock');
 const FirebaseMock = require('./mocks/FirebaseMock');
@@ -25,14 +26,20 @@ SignUpService.__set__("Logger",
                       LoggerMock);
 
 // Mock firebase
-SignUpService.__set__("firebaseAuth",
+SignUpService.__set__("auth",
                       FirebaseMock);
+
+database.sync( {
+    force: constants.RESET_DATABASE
+} ).then();
+
+const server = app.listen(3000, () => {});
 
 // Define endpoints for the mocked server
 new SignUpService().defineEvents(app);
 
 describe('SignUpService tests : ', function() {
-    /*
+
     it("post /signup", function(done) {
         // Mock database
         if ( constants.databaseUrl
@@ -47,7 +54,8 @@ describe('SignUpService tests : ', function() {
         const requestBody = {
             email: "cuentadetaller2@gmail.com",
             password: "lkdfj983jfmerljkf3qomdsfasd",
-            link: "web"
+            link: "web",
+            isExternal: false
         };
 
         chai.request(app)
@@ -57,12 +65,14 @@ describe('SignUpService tests : ', function() {
             .end((err, res) => {
                     assert.strictEqual(res.body
                                           .result,
-                                     'Correo enviado');
+                                     'Correo enviado a tu cuenta.');
                     done();
                 });
     } );
 
-    it("get " + constants.SIGN_UP_END_URL + '/111', (done) => {
+    /*
+    it("get " + constants.SIGN_UP_END_URL
+              + '/111', (done) => {
         const anId = 111;
 
         // Mock database
@@ -79,6 +89,7 @@ describe('SignUpService tests : ', function() {
                 email: "email@email.com",
                 password: "fjdkladlfad",
                 isAdmin: true,
+                isExternal: false
             } ).then();
         }
 
@@ -94,3 +105,6 @@ describe('SignUpService tests : ', function() {
     } ); */
 } );
 
+after(async () => {
+    server.close();
+});

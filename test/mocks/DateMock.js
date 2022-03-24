@@ -4,7 +4,15 @@ class DateMock {
     }
 
     toISOString() {
-        return '222';
+        return '222T';
+    }
+
+    getHours() {
+        return 0;
+    }
+
+    setHours(hours) {
+        return;
     }
 }
 

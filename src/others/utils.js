@@ -24,6 +24,16 @@ function getDate() {
                    .substr(0, 10);
 }
 
+function getDateTimePlus(plusHours) {
+  const now = new Date();
+  now.setHours(now.getHours() + plusHours);
+  const dateInfo = now.toISOString()
+                      .split('T');
+  const dateNow = dateInfo[0];
+  const timeNow = dateInfo[1].substr(0, 5).split(':').join('');
+  return [dateNow, timeNow];
+}
+
 function replaceAll(str,
                     toReplace,
                     newStr) {
@@ -84,5 +94,6 @@ module.exports = {
   replaceAll,
   getHashOf,
   getDate,
-  areAnyUndefined
+  areAnyUndefined,
+  getDateTimePlus
 }

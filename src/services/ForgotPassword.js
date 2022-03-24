@@ -116,11 +116,9 @@ class ForgotPassword {
             return;
         }
 
-        const hashedPassword = utils.getBcryptOf(password);
-
         const response = await auth.updateUser(user.id, {
                                                 email: user.email,
-                                                password: hashedPassword
+                                                password: password
                                             })
                                                 .catch(function(error) {
                                                     return { error: error.toString() };

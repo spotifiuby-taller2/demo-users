@@ -61,7 +61,8 @@ if (process.env
 
 
 /* ====== Production vs Development config ====== */
-const isDevelopment = process.env.PRODUCTION === undefined;
+const isDevelopment = process.env
+                             .PRODUCTION === undefined;
 let databaseUrl;
 let firebaseConfig;
 

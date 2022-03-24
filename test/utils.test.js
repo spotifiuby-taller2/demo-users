@@ -7,78 +7,96 @@ const rewire = require("rewire");
 const assert = require('assert');
 const {DateMock} = require("./mocks/DateMock");
 
-it('replaceAll works', async function() {
-    assert.strictEqual( replaceAll( '$2b$/Q/hola.',
-                                    "/",
-                                    "a"),
-                      '$2b$aQahola.');
-});
 
-it('setResponse mock', async function() {
-    let res = new ResponseMock();
+describe('Utils tests : ', function() {
 
-    setBodyResponse("",
-                    200,
-                    res);
+    it('replaceAll works', async function () {
+        assert.strictEqual(replaceAll('$2b$/Q/hola.',
+            "/",
+            "a"),
+            '$2b$aQahola.');
+    });
 
-    assert.strictEqual( res.getStatus(), 200);
-});
+    it('setResponse mock', async function () {
+        let res = new ResponseMock();
 
-it('setErrorResponse mock', async function() {
-    let res = new ResponseMock();
+        setBodyResponse("",
+            200,
+            res);
 
-    setErrorResponse("",
-                    401,
-                    res);
+        assert.strictEqual(res.getStatus(), 200);
+    });
 
-    assert.strictEqual( res.getStatus(), 401);
-} );
+    it('setErrorResponse mock', async function () {
+        let res = new ResponseMock();
 
-it('getId', () => {
-    const utilsFile = rewire("../src/others/utils");
+        setErrorResponse("",
+            401,
+            res);
 
-    utilsFile.__set__('getHashOf',
-                      () => '123');
+        assert.strictEqual(res.getStatus(), 401);
+    });
 
-    assert.strictEqual( utilsFile.getId() , '123');
-} );
+    it('getId', () => {
+        const utilsFile = rewire("../src/others/utils");
 
-it('getHashOf', () => {
-    const utilsFile = rewire("../src/others/utils");
+        utilsFile.__set__('getHashOf',
+            () => '123');
 
-    utilsFile.__set__('replaceAll',
-                      () => '1234');
+        assert.strictEqual(utilsFile.getId(), '123');
+    });
 
-    assert.strictEqual( utilsFile.getHashOf("a") , '1234');
-} );
+    it('getHashOf', () => {
+        const utilsFile = rewire("../src/others/utils");
 
-it('getBcryptOf', () => {
-    const utilsFile = rewire("../src/others/utils");
+        utilsFile.__set__('replaceAll',
+                         () => '1234');
 
-    utilsFile.__set__('bcrypt.genSaltSync',
-                      () => '222');
+        assert.strictEqual(utilsFile.getHashOf("a"), '1234');
+    });
 
-    utilsFile.__set__('bcrypt.hashSync',
-                      () => '222');
+    it('getBcryptOf', () => {
+        const utilsFile = rewire("../src/others/utils");
 
-    assert.strictEqual( utilsFile.getBcryptOf("a") , '222');
-} );
+        utilsFile.__set__('bcrypt.genSaltSync',
+            () => '222');
 
-it('getDate', () => {
-    const utilsFile = rewire("../src/others/utils");
+        utilsFile.__set__('bcrypt.hashSync',
+            () => '222');
 
-    utilsFile.__set__({
-        'Date': DateMock
+        assert.strictEqual(utilsFile.getBcryptOf("a"), '222');
+    });
+
+    it('getDate', () => {
+        const utilsFile = rewire("../src/others/utils");
+
+        utilsFile.__set__({
+            'Date': DateMock
+        });
+
+        assert.strictEqual(utilsFile.getDate(),
+                          '222T');
+    });
+
+    it('areAnyUndefined', () => {
+        assert.strictEqual(areAnyUndefined(["", "a"]), true);
+        assert.strictEqual(areAnyUndefined(["a", "b"]), false);
+    });
+
+    it('getDateTimeOk', () => {
+        const utilsFile = rewire("../src/others/utils");
+
+        utilsFile.__set__({
+            'Date': DateMock
+        });
+
+        const result = utilsFile.getDateTimePlus(0);
+
+        assert.strictEqual(result[0],
+            '222');
+
+        assert.strictEqual(result[1],
+                           '');
     } );
 
-    assert.strictEqual( utilsFile.getDate() , '222' );
-
-    utilsFile.__set__({
-        'Date': Date
-    } );
-} );
-
-it('areAnyUndefined', () => {
-    assert.strictEqual( areAnyUndefined(["", "a"]) , true );
-    assert.strictEqual( areAnyUndefined(["a", "b"]) , false );
 } );

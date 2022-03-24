@@ -1,6 +1,7 @@
-const createUserWithEmailAndPassword = (auth,
-                                        email,
-                                        password) => {
+const createUser = (email,
+                    emailVerified,
+                    password,
+                    disabled) => {
     return new Promise( () => {
         return {
             user: {
@@ -8,10 +9,9 @@ const createUserWithEmailAndPassword = (auth,
                 accessToken: "token"
             }
         }
-
     } );
 }
 
 module.exports = {
-    createUserWithEmailAndPassword
+    createUser
 }

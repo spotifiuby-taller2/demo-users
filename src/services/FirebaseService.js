@@ -5,7 +5,8 @@ const constants = require('../others/constants');
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 admin.initializeApp({
-    credential: admin.credential.cert(constants.firebaseJson)
+    credential: admin.credential
+                     .cert(constants.firebaseJson)
 });
 
 const auth = admin.auth();

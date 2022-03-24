@@ -92,7 +92,7 @@ class SignUpService {
   }
 
   async handleSignUp(req,
-                       res) {
+                     res) {
         Logger.request(constants.SIGN_UP_URL);
 
         const { email,
@@ -102,7 +102,8 @@ class SignUpService {
 
         const isAdmin = link === "web";
 
-        if ( areAnyUndefined([email, password]) ) {
+        if ( areAnyUndefined([email,
+                              password]) ) {
             utils.setErrorResponse("Por favor complete todos los campos.",
                                     412,
                                     res);
@@ -150,9 +151,10 @@ class SignUpService {
         await NonActivatedUsers.create( {
             id: id,
             email: email,
-            password: utils.getBcryptOf(password),
+            password: password,
             isAdmin: isAdmin,
             isExternal: isExternal
+
         } ).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
@@ -226,9 +228,8 @@ class SignUpService {
           return;
       }
 
-
       const responseBody = {
-          token: response.accessToken
+          status: "ok"
       }
 
       await Users.create( {
@@ -250,7 +251,6 @@ class SignUpService {
 
       res.status(201)
          .json(responseBody);
-
   }
 }
 

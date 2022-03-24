@@ -1,24 +1,25 @@
 const {auth} = require("../services/FirebaseService");
-const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
-const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
 const Users = require("../data/Users");
-const firebaseAuth = require("firebase/auth");
 
-async function sigInWithOutGoogle(req, res){
-    
-    const { email, password, link } = req.body;
+async function sigInWithOutGoogle(req, res) {
+    const { email,
+            password,
+            idToken,
+            link } = req.body;
 
     const isAdmin = link === "web";
 
-    const hashedPassword = utils.getBcryptOf(password);
+    const response = await auth.verifyIdToken(idToken);
 
-        
-    if ( areAnyUndefined([email, password]) ) {
-        utils.setErrorResponse("Por favor complete todos los campos.", 401, res);
+    if (response.user_id === undefined) {
+        utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
+            412,
+            res);
+
         return;
     }
 
@@ -26,64 +27,45 @@ async function sigInWithOutGoogle(req, res){
         where: {
             [Op.and]:
                 [{email: email},
-                 {password: utils.getBcryptOf(password)}]
+                 {password: password},
+                 {id: response.user_id}]
         }
     });
 
-    if (user === null) {
+    if (user === undefined) {
         utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
-                402,
-                res);
+            412,
+            res);
+
         return;
     }
 
     if (user.isAdmin && ! isAdmin) {
         utils.setErrorResponse("Usuario no autorizado.",
-            403,
+            413,
             res);
         return;
     }
 
-    const response = await firebaseAuth.signInWithEmailAndPassword(auth,
-        email,
-        hashedPassword).catch((error) => {
-            return error.toString()
-        } );
-
-    if (response.user === undefined) {
-        utils.setErrorResponse("No se encontro ningun usuario con ese mail y/ o contraseña",
-            402,
-            res);
-
-        return;
+    const responseBody = {
+        status: "ok"
     }
 
-    utils.setBodyResponse({token: response.user.accessToken},
+    utils.setBodyResponse(responseBody,
             201,
             res);
-    }
+}
 
 async function sigInWithGoogle(req, res) {
-    const {token, link } = req.body;
+    const { token } = req.body;
 
-    const isAdmin = link === "web";
+    const response = await auth.verifyIdToken(token.idToken);
 
-    const credential = GoogleAuthProvider.credential(token.idToken,
-                                                    token.accessToken);
-    let uid;
-    const auth = getAuth();
-
-    signInWithCredential(auth, credential)
-    .then((res)=>{
-        uid = res.user.uid;
-    })
-    .catch((error) => {
-        utils.setErrorResponse("Las credenciales recibidas son invalidas",
-            404,
+    if (response.user_id === undefined) {
+        utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
+            412,
             res);
-    });
 
-    if (res.status > 400) {
         return;
     }
 
@@ -94,18 +76,20 @@ async function sigInWithGoogle(req, res) {
     });
 
     if (user === null) {
-        await Users.create( {
+        await Users.create({
             id: uid,
-            email: token.user.email,
-            password: utils.getHashOf(token.user.email),
-            isAdmin: isAdmin,
+            email: token.user
+                .email,
+            password: utils.getHashOf(token.user
+                .email),
+            isAdmin: false,
             isBlocked: false,
             isExternal: true
-        } );
+        });
     }
 
     utils.setBodyResponse(
-        {token: credential.accessToken},
+        {status: "ok"},
         201, 
         res);
 }
@@ -139,18 +123,12 @@ class SignInService {
     *    responses:
     *         "201":
     *           description: "User exists."
-    * 
-    *         "401":
-    *           descritption: "Empty fields."
-    * 
-    *         "402":
+
+    *         "412":
     *           descritption: "User not exists."
     *
-    *         "403":
+    *         "413":
     *           description: "Not admin."
-    * 
-    *         "404":
-    *           description: "wrong credentials"
     */
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
