@@ -1,5 +1,6 @@
 const {auth} = require("../services/FirebaseService");
 const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
+const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
@@ -7,6 +8,85 @@ const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
+async function signInWithBiometric(req, res){
+    const { email, password, link } = req.body;
+
+    const isAdmin = link === "web";
+
+    let accessToken = undefined;
+
+    const hashedPassword = utils.getBcryptOf(password);
+
+    const user = await Users.findOne({
+        where: {
+            [Op.and]:
+                [{email: email},
+                 {password: hashedPassword}]
+        }
+    });
+
+    if (user === null) {
+        
+        firebaseAuth.createUserWithEmailAndPassword(auth,
+            email,
+            hashedPassword)
+        .then((response) => {
+        
+            accessToken = response.user.accessToken;
+
+            Users.create( {
+                id: response.user.uid,
+                email: email,
+                password: hashedPassword,
+                isAdmin: isAdmin,
+                isBlocked: false,
+                isExternal: true
+            } )
+            .catch(error => {
+    
+                utils.setErrorResponse("Error al intentar crear la cuenta.",
+                    502,
+                    res);
+            });
+
+        })
+        .catch(error =>{
+            console.log(error);
+        });
+    }
+
+    else if (user.isAdmin && ! isAdmin) {
+        utils.setErrorResponse("Usuario no autorizado.",
+            403,
+            res);
+        return;
+    }
+
+    if (accessToken !== undefined)
+        utils.setBodyResponse({token: accessToken},
+            201,
+            res);
+        return;
+
+    const response = await firebaseAuth.signInWithEmailAndPassword(auth,
+        email,
+        hashedPassword)
+        .catch(error => {
+                utils.setErrorResponse("Error al intentar inicializar la cuenta.",
+                    502,
+                    res);
+            }
+        );
+
+    if (res.statusCode >= 400) {
+        return;
+    }
+    
+
+    utils.setBodyResponse({token: response.user.accessToken},
+            201,
+            res);
+}
 
 async function sigInWithOutGoogle(req, res){
     
@@ -160,8 +240,11 @@ class SignInService {
    {
         Logger.request(constants.SIGN_IN_URL);
 
-        if ( req.body.firebase ){
+        if ( req.body.signin === 'google' ){
             await sigInWithGoogle(req, res);
+        }
+        else if ( req.body.signin === 'biometric' ){
+            await signInWithBiometric(req, res);
         }
         else{
             await sigInWithOutGoogle(req, res);
