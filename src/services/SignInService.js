@@ -1,6 +1,4 @@
 const {auth} = require("../services/FirebaseService");
-const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
-const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
@@ -14,44 +12,45 @@ async function signInWithBiometric(req, res){
 
     let accessToken = undefined;
 
-    const hashedPassword = utils.getBcryptOf(password);
-
     const user = await Users.findOne({
         where: {
             [Op.and]:
                 [{email: email},
-                 {password: hashedPassword}]
+                 {password: password}]
         }
     });
 
     if (user === null) {
-
-        firebaseAuth.createUserWithEmailAndPassword(auth,
-            email,
-            hashedPassword)
-        .then((response) => {
-
-            accessToken = response.user.accessToken;
-
-            Users.create( {
-                id: response.user.uid,
-                email: email,
-                password: hashedPassword,
-                isAdmin: isAdmin,
-                isBlocked: false,
-                isExternal: true
-            } )
+        const response = await auth.createUser( {
+            email: email,
+            emailVerified: true,
+            password: password,
+            disabled: false
+        } )
             .catch(error => {
+                return { error: error.toString() }
+            } );
 
-                utils.setErrorResponse("Error al intentar crear la cuenta.",
-                    502,
-                    res);
-            });
+        if (response.error !== undefined) {
+            Logger.error(error.toString());
 
-        })
-        .catch(error =>{
-            console.log(error);
-        });
+            utils.setErrorResponse(error,
+                511,
+                res);
+
+            return;
+        }
+
+       accessToken = response.user.accessToken;
+
+       await Users.create( {
+           id: response.user.uid,
+           email: email,
+           password: hashedPassword,
+           isAdmin: isAdmin,
+           isBlocked: false,
+           isExternal: true
+       } )
     }
 
     else if (user.isAdmin && ! isAdmin) {
@@ -67,22 +66,11 @@ async function signInWithBiometric(req, res){
             res);
         return;
 
-    const response = await firebaseAuth.signInWithEmailAndPassword(auth,
-        email,
-        hashedPassword)
-        .catch(error => {
-                utils.setErrorResponse("Error al intentar inicializar la cuenta.",
-                    502,
-                    res);
-            }
-        );
-
-    if (res.statusCode >= 400) {
-        return;
+    const responseBody = {
+        status: "ok"
     }
 
-
-    utils.setBodyResponse({token: response.user.accessToken},
+    utils.setBodyResponse(responseBody,
             201,
             res);
 }
