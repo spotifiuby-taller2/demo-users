@@ -5,6 +5,9 @@ const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
 const Users = require("../data/Users");
+const RecoveryRequests = require("../data/RecoveryRequest");
+const {getDateTimeFromDatabaseTimestamp} = require("../others/utils");
+const {getDateTimeMinus} = require("../others/utils");
 const {sendPasswordRecoveryEmail} = require("./MailService");
 
 class ForgotPassword {
@@ -43,6 +46,9 @@ class ForgotPassword {
     *
     *         "414":
     *           description: "Unauthorized"
+    *
+    *         "511":
+    *           description: "Database error."
     */
     app.post( constants.FORGOT_PASSWORD_URL,
               this.handleForgotPassword
@@ -93,6 +99,42 @@ class ForgotPassword {
         const password = req.body
                             .password;
 
+        const user = await Users.findOne( {
+            where: {
+                [Op.and]:
+                    [{id: userId}]
+            }
+        } );
+
+        const request = await RecoveryRequests.findOne( {
+            where: {
+                userId: userId
+            }
+        } ).catch(error => {
+            return error.toString();
+        } );
+
+        if (user === null || request === null) {
+            utils.setErrorResponse("Enlace inválido.",
+                412,
+                res);
+
+            return;
+        }
+
+        const nowLessOneDateTime = getDateTimeMinus(1);
+        const requestDateTime = getDateTimeFromDatabaseTimestamp(request.createdAt);
+        const timeDifference = parseInt(nowLessOneDateTime[1]) - parseInt(requestDateTime[1]);
+
+        if (nowLessOneDateTime[0] !== requestDateTime[0]
+            ||  timeDifference > 0 ) {
+            utils.setErrorResponse("Enlace expirado.",
+                412,
+                res);
+
+            return;
+        }
+
         if ( areAnyUndefined([password]) ) {
             utils.setErrorResponse("Por favor complete todos los campos.",
                 411,
@@ -101,23 +143,7 @@ class ForgotPassword {
             return;
         }
 
-        const user = await Users.findOne( {
-            where: {
-                [Op.and]:
-                    [{id: userId}]
-            }
-        } );
-
-        if (user === null) {
-            utils.setErrorResponse("Enlace inválido.",
-                412,
-                res);
-
-            return;
-        }
-
         const response = await auth.updateUser(user.id, {
-                                                email: user.email,
                                                 password: password
                                             })
                                                 .catch(function(error) {
@@ -134,15 +160,36 @@ class ForgotPassword {
             return;
         }
 
-        await Users.update( {
-                password: hashedPassword
+        const updateResponse = await Users.update( {
+                password: password
             }, {
                 where: {
                     id: userId
                 }
-             } );
+             } ).catch(error => {
+                 return error.toString();
+        } );
 
-        Logger.info("Contraseña cambiada.");
+        const destroyResponse = await RecoveryRequests.destroy( {
+            where: {
+                userId: user.id
+            }
+        } ).catch(error => {
+            return error.toString();
+        } );
+
+        if (updateResponse.length !== 1
+            || destroyResponse.length === 1) {
+            Logger.error("No se pudo quitar el link de recuperación.");
+
+            utils.setErrorResponse("No se pudo cambiar la contraseña.",
+                511,
+                res);
+
+            return;
+        }
+
+        Logger.info("Se actualizó la contraseña.");
 
         utils.setBodyResponse({
                 result: "Se actualizó la contraseña."},
@@ -189,6 +236,22 @@ class ForgotPassword {
            utils.setErrorResponse("Usuario no autorizado.",
                414,
                res);
+           return;
+       }
+
+       const response = await RecoveryRequests.create( {
+           userId: user.id
+       } ).catch(error => {
+           return error.toString();
+       } );
+
+       if (response.dataValues === undefined) {
+           Logger.error("Error al crear el link de recuperación.");
+
+           utils.setErrorResponse("Error al crear el link de recuperación.",
+               511,
+               res);
+
            return;
        }
 

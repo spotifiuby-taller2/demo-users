@@ -11,12 +11,14 @@ describe('SignUpService', function() {
       const createNonActivatedUserMock = sinon.fake.returns(Promise.resolve(null));
       const sendConfirmationEmailMock = sinon.fake.returns(Promise.resolve(null));
       const setBodyResponseMock = sinon.fake();
+
       const revertRewire = SignUpService.__set__({
         Users: {findOne: () => Promise.resolve(null)},
         NonActivatedUsers: {findOne: () => Promise.resolve(null), create: createNonActivatedUserMock},
         utils: {getId: () => 1, getBcryptOf: () => '', setBodyResponse: setBodyResponseMock},
         sendConfirmationEmail: sendConfirmationEmailMock,
       });
+
       const req = {
         body: {
           email: 'email@email.com',
@@ -25,6 +27,7 @@ describe('SignUpService', function() {
           isExternal: false,
         }
       };
+
       const res = {};
 
       await signUpService.handleSignUp(req, res);
