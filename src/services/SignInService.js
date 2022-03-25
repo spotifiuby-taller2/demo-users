@@ -1,6 +1,4 @@
 const {auth} = require("../services/FirebaseService");
-const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
-const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
@@ -8,81 +6,36 @@ const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
 async function signInWithBiometric(req, res){
-    const { email, password, link } = req.body;
+    const { email, password, idToken, link } = req.body;
 
-    const isAdmin = link === "web";
-
-    let accessToken = undefined;
-
-    const hashedPassword = utils.getBcryptOf(password);
+    const response = await auth.verifyIdToken(idToken);
 
     const user = await Users.findOne({
         where: {
             [Op.and]:
-                [{email: email},
-                 {password: hashedPassword}]
-        }
-    });
-
-    if (user === null) {
-
-        firebaseAuth.createUserWithEmailAndPassword(auth,
-            email,
-            hashedPassword)
-        .then((response) => {
-
-            accessToken = response.user.accessToken;
-
-            Users.create( {
-                id: response.user.uid,
-                email: email,
-                password: hashedPassword,
-                isAdmin: isAdmin,
-                isBlocked: false,
-                isExternal: true
-            } )
-            .catch(error => {
-
-                utils.setErrorResponse("Error al intentar crear la cuenta.",
-                    502,
-                    res);
-            });
-
-        })
-        .catch(error =>{
-            console.log(error);
-        });
-    }
-
-    else if (user.isAdmin && ! isAdmin) {
-        utils.setErrorResponse("Usuario no autorizado.",
-            403,
-            res);
-        return;
-    }
-
-    if (accessToken !== undefined)
-        utils.setBodyResponse({token: accessToken},
-            201,
-            res);
-        return;
-
-    const response = await firebaseAuth.signInWithEmailAndPassword(auth,
-        email,
-        hashedPassword)
-        .catch(error => {
-                utils.setErrorResponse("Error al intentar inicializar la cuenta.",
-                    502,
-                    res);
+                [{email: email}, 
+                {password: password},
+                {id: response.user_id}]
             }
-        );
+        });
 
-    if (res.statusCode >= 400) {
-        return;
+    if (user === undefined) {
+        await Users.create({
+            id: response.user_id,
+            email: email,
+            password: password,
+            isAdmin: false,
+            isBlocked: false,
+            isExternal: true
+        });
+    
     }
 
+    const responseBody = {
+        status: "ok"
+    }
 
-    utils.setBodyResponse({token: response.user.accessToken},
+    utils.setBodyResponse(responseBody,
             201,
             res);
 }
@@ -139,9 +92,9 @@ async function sigInWithOutGoogle(req, res) {
 }
 
 async function sigInWithGoogle(req, res) {
-    const { token } = req.body;
+    const { token, email} = req.body;
 
-    const response = await auth.verifyIdToken(token.idToken);
+    const response = await auth.verifyIdToken(token);
 
     if (response.user_id === undefined) {
         utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
@@ -153,17 +106,15 @@ async function sigInWithGoogle(req, res) {
 
     const user = await Users.findOne({
         where: {
-            email: token.user.email
+            email: email
         }
     });
 
     if (user === null) {
         await Users.create({
-            id: uid,
-            email: token.user
-                .email,
-            password: utils.getHashOf(token.user
-                .email),
+            id: response.user_id,
+            email: email,
+            password: utils.getHashOf( utils.getHashOf(email)),
             isAdmin: false,
             isBlocked: false,
             isExternal: true
