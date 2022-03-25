@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
-const Logger = require("./Logger");
 const { SENDGRID_API_KEY } = require("../others/constants");
 
 const config = {
@@ -19,7 +18,7 @@ async function sendEmail(email,
 
         to: email,
 
-        subject: subject,
+        subject,
 
         html: body,
 
@@ -59,7 +58,7 @@ async function sendPasswordRecoveryEmail(email,
         + `<a clicktracking=off href=${link}> este link </a>`;
 
     await sendEmail(email,
-            'Reestablecer contraseña',
+            'Restablecer contraseña',
             body);
 }
 

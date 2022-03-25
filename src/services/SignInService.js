@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
 async function signInWithBiometric(req, res){
-    const { email, password, link } = req.body;
+    const { email, password, idToken, link } = req.body;
 
     const isAdmin = link === "web";
 
@@ -53,11 +53,16 @@ async function signInWithBiometric(req, res){
        } )
     }
 
-    else if (user.isAdmin && ! isAdmin) {
-        utils.setErrorResponse("Usuario no autorizado.",
-            403,
-            res);
-        return;
+    if (user === undefined) {
+        await Users.create({
+            id: response.user_id,
+            email: email,
+            password: password,
+            isAdmin: false,
+            isBlocked: false,
+            isExternal: true
+        });
+    
     }
 
     if (accessToken !== undefined)
@@ -127,9 +132,9 @@ async function sigInWithOutGoogle(req, res) {
 }
 
 async function sigInWithGoogle(req, res) {
-    const { token } = req.body;
+    const { token, email} = req.body;
 
-    const response = await auth.verifyIdToken(token.idToken);
+    const response = await auth.verifyIdToken(token);
 
     if (response.user_id === undefined) {
         utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
@@ -141,17 +146,15 @@ async function sigInWithGoogle(req, res) {
 
     const user = await Users.findOne({
         where: {
-            email: token.user.email
+            email: email
         }
     });
 
     if (user === null) {
         await Users.create({
-            id: uid,
-            email: token.user
-                .email,
-            password: utils.getHashOf(token.user
-                .email),
+            id: response.user_id,
+            email: email,
+            password: utils.getHashOf( utils.getHashOf(email)),
             isAdmin: false,
             isBlocked: false,
             isExternal: true
