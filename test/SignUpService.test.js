@@ -15,7 +15,7 @@ describe('SignUpService', function() {
         Users: {findOne: () => Promise.resolve(null)},
         NonActivatedUsers: {findOne: () => Promise.resolve(null), create: createNonActivatedUserMock},
         utils: {getId: () => 1, getBcryptOf: () => '', setBodyResponse: setBodyResponseMock},
-        MailService: {sendConfirmationEmail: sendConfirmationEmailMock},
+        sendConfirmationEmail: sendConfirmationEmailMock,
       });
       const req = {
         body: {
@@ -44,13 +44,13 @@ describe('SignUpService', function() {
         };
         const findNonActivatedUserMock = sinon.fake.returns(Promise.resolve(user));
         const firebaseUser = {user: {accessToken: 'user token'}};
-        const createUserWithEmailAndPasswordMock = sinon.fake.returns(Promise.resolve(firebaseUser));
+        const createUserMock = sinon.fake.returns(Promise.resolve(firebaseUser));
         const createUserInDbMock = sinon.fake.returns(Promise.resolve());
         const setBodyResponseMock = sinon.fake();
         const destroyNonActivatedUserMock = sinon.fake.returns(Promise.resolve());
         const revertRewire = SignUpService.__set__({
           NonActivatedUsers: {findOne: findNonActivatedUserMock, destroy: destroyNonActivatedUserMock},
-          firebaseAuth: {createUserWithEmailAndPassword: createUserWithEmailAndPasswordMock},
+          auth: {createUser: createUserMock},
           Users: {create: createUserInDbMock},
           utils: {setBodyResponse: setBodyResponseMock},
         });
@@ -65,11 +65,14 @@ describe('SignUpService', function() {
         await signUpService.createVerifiedUser(req, res);
 
         assert(findNonActivatedUserMock.calledWith({where: {id: 1}}));
-        assert(createUserWithEmailAndPasswordMock.calledWith(sinon.match.any, user.email, user.password));
+        assert(createUserMock.calledWith(sinon.match.has('email', user.email)
+          .and(sinon.match.has('emailVerified', true))
+          .and(sinon.match.has('password', user.password))
+          .and(sinon.match.has('disabled', false))));
         assert(createUserInDbMock.calledOnce);
         assert(destroyNonActivatedUserMock.calledOnce);
         assert(res.status.calledWith(201))
-        assert(jsonMock.json.calledWith({token: 'user token'}))
+        assert(jsonMock.json.calledWith({status: 'ok'}))
         revertRewire();
       });
     });

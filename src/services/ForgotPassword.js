@@ -1,5 +1,4 @@
 const {auth} = require("../services/FirebaseService");
-const {getAuth,signInWithCredential, GoogleAuthProvider} = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
@@ -78,10 +77,10 @@ class ForgotPassword {
        *         "412":
        *           descritption: "Broken link."
        *
-       *         "413":
-       *           descritption: "Password too short."
+       *         "511":
+       *           descritption: "Could not update password."
        */
-     app.post( constants.FORGOT_PASSWORD_URL + ':/userId',
+     app.post( constants.FORGOT_PASSWORD_URL + '/:userId',
           this.handleRecoverPassword
               .bind(this) );
   }
@@ -102,15 +101,6 @@ class ForgotPassword {
             return;
         }
 
-        if (password.length < constants.MIN_PASS_LEN) {
-            utils.setErrorResponse("La contraseña debe tener al menos "
-                + constants.MIN_PASS_LEN + " caracteres.",
-                413,
-                res);
-
-            return;
-        }
-
         const user = await Users.findOne( {
             where: {
                 [Op.and]:
@@ -126,13 +116,31 @@ class ForgotPassword {
             return;
         }
 
+        const response = await auth.updateUser(user.id, {
+                                                email: user.email,
+                                                password: password
+                                            })
+                                                .catch(function(error) {
+                                                    return { error: error.toString() };
+                                                });
+
+        if (response.error !== undefined) {
+            Logger.error(response.error);
+
+            utils.setErrorResponse(error,
+                                    501,
+                                    res);
+
+            return;
+        }
+
         await Users.update( {
-            password: utils.getBcryptOf(password),
-            where: {
-                [Op.and]:
-                    [{id: User}]
-            }
-        } );
+                password: hashedPassword
+            }, {
+                where: {
+                    id: userId
+                }
+             } );
 
         Logger.info("Contraseña cambiada.");
 

@@ -61,7 +61,8 @@ if (process.env
 
 
 /* ====== Production vs Development config ====== */
-const isDevelopment = process.env.PRODUCTION === undefined;
+const isDevelopment = process.env
+                             .PRODUCTION === undefined;
 let databaseUrl;
 let firebaseConfig;
 
@@ -99,6 +100,9 @@ if (isDevelopment) {
     messagingSenderId: "296878360901",
     appId: "1:296878360901:web:7987ce42ec0a406b1f162c"
   };
+
+  firebaseJson = require("./firebase_develop.json");
+
 } else {
   // Heroku
   // DATABASE_URL=${DB}://${POSTGRES_USER}:${POSTGRES_PASSWORD}
@@ -133,6 +137,8 @@ if (isDevelopment) {
     messagingSenderId: "701624425016",
     appId: "1:701624425016:web:6cb2157c5a2c0a34e1a4cd"
   };
+
+  firebaseJson = require("./firebase_production.json");
 }
 
 const SENDGRID_API_KEY = "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";
@@ -172,5 +178,6 @@ module.exports = {
   LOG_LEVEL,
   BASE_SALT,
   AUTH_FRONT,
-  FORGOT_PASSWORD_URL
+  FORGOT_PASSWORD_URL,
+  firebaseJson
 }

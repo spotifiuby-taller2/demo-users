@@ -1,12 +1,11 @@
 const {auth} = require("../services/FirebaseService");
-const firebaseAuth = require("firebase/auth");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
-const MailService = require('../services/MailService');
+const { sendConfirmationEmail } = require('../services/MailService');
 
 class SignUpService {
   defineEvents(app) {
@@ -38,19 +37,16 @@ class SignUpService {
      *         "201":
      *           description: "Mail to verify email sent."
      *
-     *         "401":
+     *         "411":
      *           description: "Mail already registered."
      *
-     *         "402":
+     *         "412":
      *           description: "Empty required field."
-     *
-     *         "403":
-     *           description: "Password too short."
-     *
-     *         "404":
+
+     *         "414":
      *           description: "User already signed in as external."
      *
-     *         "405":
+     *         "415":
      *           description: "Mail already sent."
      *
      *         "501":
@@ -87,7 +83,7 @@ class SignUpService {
      *         "401":
      *           description: "Invalid confirmation link."
      *
-     *         "501":
+     *         "511":
      *           description: "Error creating user."
      */
     app.get( constants.SIGN_UP_END_URL + '/:userId',
@@ -95,7 +91,8 @@ class SignUpService {
         .bind(this) );
   }
 
-  async handleSignUp(req, res) {
+  async handleSignUp(req,
+                     res) {
     Logger.request(constants.SIGN_UP_URL);
 
     const { email,
@@ -105,18 +102,10 @@ class SignUpService {
 
     const isAdmin = link === "web";
 
-    if ( areAnyUndefined([email, password]) ) {
+    if ( areAnyUndefined([email,
+      password]) ) {
       utils.setErrorResponse("Por favor complete todos los campos.",
-        402,
-        res);
-
-      return;
-    }
-
-    if ( password.length < constants.MIN_PASS_LEN ) {
-      utils.setErrorResponse("La contraseña debe tener al menos "
-        + constants.MIN_PASS_LEN + " caracteres.",
-        403,
+        412,
         res);
 
       return;
@@ -129,13 +118,13 @@ class SignUpService {
     if (user !== null) {
       if (user.isExternal) {
         utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
-          404,
+          414,
           res);
       }
 
       else {
         utils.setErrorResponse("Ya hay un usuario con ese mail",
-          401,
+          411,
           res);
       }
       return;
@@ -145,25 +134,26 @@ class SignUpService {
 
     if (nonUser !== null) {
       utils.setErrorResponse("Ya hay un usuario con ese mail pendiente de confirmación",
-        405,
+        415,
         res);
 
       return;
     }
 
-    await NonActivatedUsers.create( {
+    await NonActivatedUsers.create({
       id,
       email,
-      password: utils.getBcryptOf(password),
+      password,
       isAdmin,
       isExternal
-    } ).catch(error => {
+
+    }).catch(error => {
       Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
       utils.setErrorResponse("Error al intentar crear la cuenta.",
         502,
         res);
-    } );
+    });
 
     if (res.statusCode >= 400) {
       return;
@@ -171,10 +161,10 @@ class SignUpService {
 
     try {
       if (isAdmin) {
-        await MailService.sendConfirmationEmail(email,
+        await sendConfirmationEmail(email,
           `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
       } else {
-        await MailService.sendConfirmationEmail(email,
+        await sendConfirmationEmail(email,
           `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
       }
 
@@ -190,8 +180,7 @@ class SignUpService {
     }
   }
 
-  async createVerifiedUser(req,
-                           res) {
+  async createVerifiedUser(req, res) {
     Logger.request(constants.SIGN_UP_END_URL + '/:userId');
 
     const userId = req.params
@@ -210,43 +199,47 @@ class SignUpService {
       return;
     }
 
-    firebaseAuth.createUserWithEmailAndPassword(auth,
-      tempUser.email,
-      tempUser.password)
-      .then((response) => {
-        const user = response.user;
+    const response = await auth.createUser( {
+      email: tempUser.email,
+      emailVerified: true,
+      password: tempUser.password,
+      disabled: false
+    } )
+      .catch(error => ({ error: error.toString() }) );
 
-        const responseBody = {
-          token: user.accessToken
-        }
+    if (response.error !== undefined) {
+      Logger.error(response.error.toString());
 
-        Users.create( {
-          id: user.uid,
-          email: tempUser.email,
-          password: tempUser.password,
-          isAdmin: tempUser.isAdmin,
-          isBlocked: false,
-          isExternal: tempUser.isExternal
-        } ).then();
+      utils.setErrorResponse(response.error,
+        511,
+        res);
 
-        NonActivatedUsers.destroy( {
-          where: {
-            id : userId
-          }
-        } ).then();
+      return;
+    }
 
-        Logger.info("Usuario creado");
+    const responseBody = {
+      status: "ok"
+    }
 
-        res.status(201)
-          .json(responseBody);
-      } )
-      .catch(error => {
-        Logger.error(error.toString());
+    await Users.create( {
+      id: response.uid,
+      email: tempUser.email,
+      password: tempUser.password,
+      isAdmin: tempUser.isAdmin,
+      isBlocked: false,
+      isExternal: tempUser.isExternal
+    } );
 
-        utils.setErrorResponse(error,
-          501,
-          res);
-      } );
+    await NonActivatedUsers.destroy( {
+      where: {
+        id : userId
+      }
+    } );
+
+    Logger.info("Usuario creado");
+
+    res.status(201)
+      .json(responseBody);
   }
 }
 
