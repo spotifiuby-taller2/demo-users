@@ -6,256 +6,247 @@ const NonActivatedUsers = require("../data/NonActivatedUsers");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
-const { sendConfirmationEmail } = require('../services/MailService');
+const MailService = require('../services/MailService');
 
 class SignUpService {
   defineEvents(app) {
     /**
-    * @swagger
-    * /signup:
-    *   post:
-    *    summary: Sign up
-    *
-    *    description: Allow sign up.
-    *
-    *    parameters:
-    *         - name: "email"
-    *           in: body
-    *           type: "string"
-    *           required: true
-    *
-    *         - name: "password"
-    *           in: body
-    *           type: "string"
-    *           required: true
-    *
-    *         - name: "link"
-    *           in: body
-    *           type: "string"
-    *           required: true
-    *
-    *    responses:
-    *         "201":
-    *           description: "Mail to verify email sent."
-    *
-    *         "401":
-    *           description: "Mail already registered."
-    *
-    *         "402":
-    *           description: "Empty required field."
-    *
-    *         "403":
-    *           description: "Password too short."
-    *
-    *         "404":
-    *           description: "User already signed in as external."
-    * 
-    *         "405":
-    *           description: "Mail already sent."
-    *
-    *         "501":
-    *           description: "Could not save user temporarily."
-    *
-    *         "502":
-    *           description: "Could not create account."
-    *
-    *         "503":
-    *           description: "Could not send email."
-    */
+     * @swagger
+     * /signup:
+     *   post:
+     *    summary: Sign up
+     *
+     *    description: Allow sign up.
+     *
+     *    parameters:
+     *         - name: "email"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *         - name: "password"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *         - name: "link"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *    responses:
+     *         "201":
+     *           description: "Mail to verify email sent."
+     *
+     *         "401":
+     *           description: "Mail already registered."
+     *
+     *         "402":
+     *           description: "Empty required field."
+     *
+     *         "403":
+     *           description: "Password too short."
+     *
+     *         "404":
+     *           description: "User already signed in as external."
+     *
+     *         "405":
+     *           description: "Mail already sent."
+     *
+     *         "501":
+     *           description: "Could not save user temporarily."
+     *
+     *         "502":
+     *           description: "Could not create account."
+     *
+     *         "503":
+     *           description: "Could not send email."
+     */
     app.post( constants.SIGN_UP_URL,
-              this.handleSignUp
-                  .bind(this) );
+      this.handleSignUp
+        .bind(this) );
 
     /**
-    * @swagger
-    * /signup/end/:userId:
-    *   get:
-    *    summary: Sign up end
-    *
-    *    description: Validate an email and create the user.
-    *
-    *    parameters:
-    *         - name: "userId"
-    *           in: path
-    *           type: "string"
-    *           required: true
-    *
-    *    responses:
-    *         "201":
-    *           description: "User created."
-    *
-    *         "401":
-    *           description: "Invalid confirmation link."
-    *
-    *         "501":
-    *           description: "Error creating user."
-    */
+     * @swagger
+     * /signup/end/:userId:
+     *   get:
+     *    summary: Sign up end
+     *
+     *    description: Validate an email and create the user.
+     *
+     *    parameters:
+     *         - name: "userId"
+     *           in: path
+     *           type: "string"
+     *           required: true
+     *
+     *    responses:
+     *         "201":
+     *           description: "User created."
+     *
+     *         "401":
+     *           description: "Invalid confirmation link."
+     *
+     *         "501":
+     *           description: "Error creating user."
+     */
     app.get( constants.SIGN_UP_END_URL + '/:userId',
-             this.createVerifiedUser
-                 .bind(this) );
+      this.createVerifiedUser
+        .bind(this) );
   }
 
-  async handleSignUp(req,
-                       res) {
-        Logger.request(constants.SIGN_UP_URL);
+  async handleSignUp(req, res) {
+    Logger.request(constants.SIGN_UP_URL);
 
-        const { email,
-                password,
-                link,
-                isExternal } = req.body;
+    const { email,
+      password,
+      link,
+      isExternal } = req.body;
 
-        const isAdmin = link === "web";
+    const isAdmin = link === "web";
 
-        if ( areAnyUndefined([email, password]) ) {
-            utils.setErrorResponse("Por favor complete todos los campos.",
-                                    402,
-                                    res);
+    if ( areAnyUndefined([email, password]) ) {
+      utils.setErrorResponse("Por favor complete todos los campos.",
+        402,
+        res);
 
-            return;
-        }
+      return;
+    }
 
-        if ( password.length < constants.MIN_PASS_LEN ) {
-              utils.setErrorResponse("La contraseña debe tener al menos "
-                                     + constants.MIN_PASS_LEN + " caracteres.",
-                  403,
-                  res);
+    if ( password.length < constants.MIN_PASS_LEN ) {
+      utils.setErrorResponse("La contraseña debe tener al menos "
+        + constants.MIN_PASS_LEN + " caracteres.",
+        403,
+        res);
 
-              return;
-         }
+      return;
+    }
 
-        const id = utils.getId();
+    const id = utils.getId();
 
-        const user = await Users.findOne({
-            where: {
-                email: email
-            }
-        } );
+    const user = await Users.findOne({where: {email}});
 
-        if (user !== null) {
-         if (user.isExternal) {
-             utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
-                 404,
-                 res);
-         }
-
-         else {
-             utils.setErrorResponse("Ya hay un usuario con ese mail",
-                 401,
-                 res);
-         }
-            return;
-        }
-
-      const nonUser = await NonActivatedUsers.findOne({
-          where: {
-              email: email
-          }
-      } );
-
-      if (nonUser !== null) {
-          utils.setErrorResponse("Ya hay un usuario con ese mail pendiente de confirmación",
-              405,
-              res);
-
-          return;
+    if (user !== null) {
+      if (user.isExternal) {
+        utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
+          404,
+          res);
       }
 
-        await NonActivatedUsers.create( {
-            id: id,
-            email: email,
-            password: utils.getBcryptOf(password),
-            isAdmin: isAdmin,
-            isExternal: isExternal
-        } ).catch(error => {
-            Logger.error("No se pudo crear el usuario temporal " +  error.toString());
-
-            utils.setErrorResponse("Error al intentar crear la cuenta.",
-                502,
-                res);
-        } );
-
-        if (res.statusCode >= 400) {
-            return;
-        }
-
-        try {
-            if (isAdmin) {
-                await sendConfirmationEmail(email,
-                    `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
-            } else {
-                await sendConfirmationEmail(email,
-                    `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
-            }
-
-            Logger.info("Correo enviado");
-
-            utils.setBodyResponse({result: "Correo enviado a tu cuenta."},
-                                    201,
-                                    res);
-        } catch(error) {
-            utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-                                    503,
-                                    res);
-        }
+      else {
+        utils.setErrorResponse("Ya hay un usuario con ese mail",
+          401,
+          res);
+      }
+      return;
     }
+
+    const nonUser = await NonActivatedUsers.findOne({where: {email}});
+
+    if (nonUser !== null) {
+      utils.setErrorResponse("Ya hay un usuario con ese mail pendiente de confirmación",
+        405,
+        res);
+
+      return;
+    }
+
+    await NonActivatedUsers.create( {
+      id,
+      email,
+      password: utils.getBcryptOf(password),
+      isAdmin,
+      isExternal
+    } ).catch(error => {
+      Logger.error("No se pudo crear el usuario temporal " +  error.toString());
+
+      utils.setErrorResponse("Error al intentar crear la cuenta.",
+        502,
+        res);
+    } );
+
+    if (res.statusCode >= 400) {
+      return;
+    }
+
+    try {
+      if (isAdmin) {
+        await MailService.sendConfirmationEmail(email,
+          `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
+      } else {
+        await MailService.sendConfirmationEmail(email,
+          `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
+      }
+
+      Logger.info("Correo enviado");
+
+      utils.setBodyResponse({result: "Correo enviado a tu cuenta."},
+        201,
+        res);
+    } catch(error) {
+      utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
+        503,
+        res);
+    }
+  }
 
   async createVerifiedUser(req,
                            res) {
-      Logger.request(constants.SIGN_UP_END_URL + '/:userId');
+    Logger.request(constants.SIGN_UP_END_URL + '/:userId');
 
-      const userId = req.params
-                        .userId;
+    const userId = req.params
+      .userId;
 
-      const tempUser = await NonActivatedUsers.findOne( {
-          where: {
-              id : userId
-          }
-      } );
-
-      if (tempUser === null) {
-          utils.setErrorResponse("Link de confirmación inválido",
-                                 401,
-                                 res);
-          return;
+    const tempUser = await NonActivatedUsers.findOne( {
+      where: {
+        id : userId
       }
+    } );
 
-      firebaseAuth.createUserWithEmailAndPassword(auth,
-                                                  tempUser.email,
-                                                  tempUser.password)
-          .then((response) => {
-                  const user = response.user;
+    if (tempUser === null) {
+      utils.setErrorResponse("Link de confirmación inválido",
+        401,
+        res);
+      return;
+    }
 
-                  const responseBody = {
-                      token: user.accessToken
-                  }
+    firebaseAuth.createUserWithEmailAndPassword(auth,
+      tempUser.email,
+      tempUser.password)
+      .then((response) => {
+        const user = response.user;
 
-                  Users.create( {
-                      id: user.uid,
-                      email: tempUser.email,
-                      password: tempUser.password,
-                      isAdmin: tempUser.isAdmin,
-                      isBlocked: false,
-                      isExternal: tempUser.isExternal
-                  } ).then();
+        const responseBody = {
+          token: user.accessToken
+        }
 
-                  NonActivatedUsers.destroy( {
-                      where: {
-                          id : userId
-                      }
-                  } ).then();
+        Users.create( {
+          id: user.uid,
+          email: tempUser.email,
+          password: tempUser.password,
+          isAdmin: tempUser.isAdmin,
+          isBlocked: false,
+          isExternal: tempUser.isExternal
+        } ).then();
 
-                  Logger.info("Usuario creado");
+        NonActivatedUsers.destroy( {
+          where: {
+            id : userId
+          }
+        } ).then();
 
-                  res.status(201)
-                     .json(responseBody);
-              } )
-          .catch(error => {
-              Logger.error(error.toString());
+        Logger.info("Usuario creado");
 
-              utils.setErrorResponse(error,
-                                     501,
-                                     res);
-          } );
+        res.status(201)
+          .json(responseBody);
+      } )
+      .catch(error => {
+        Logger.error(error.toString());
+
+        utils.setErrorResponse(error,
+          501,
+          res);
+      } );
   }
 }
 
