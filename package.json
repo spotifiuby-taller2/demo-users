@@ -38,7 +38,7 @@
     "sequelize": "6.6.5",
     "sequelize-mock": "0.10.2",
     "simple-node-logger": "21.8.12",
-    "sinon": "^13.0.1",
+    "sinon": "13.0.1",
     "sqlite3": "5.0.2",
     "swagger-jsdoc": "5.0.0",
     "swagger-ui-express": "4.3.0",
