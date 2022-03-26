@@ -106,7 +106,7 @@ describe('Utils tests : ', function() {
             'Date': DateMock
         });
 
-        const result = utilsFile.getDateTimeFromDatabaseTimestamp(0);
+        const result = utilsFile.getDateTimeFromDatabaseTimestamp(new DateMock());
 
         assert.strictEqual(result[0],
             '222');
