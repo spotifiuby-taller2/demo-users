@@ -93,6 +93,8 @@ class ForgotPassword {
 
     async handleRecoverPassword(req, res)
     {
+        Logger.info("Request a " + constants.FORGOT_PASSWORD_URL);
+
         const userId = req.params
                           .userId;
 
@@ -206,6 +208,8 @@ class ForgotPassword {
 
     async handleForgotPassword(req, res)
    {
+       Logger.info("Request a " + constants.FORGOT_PASSWORD_URL + '/:userId');
+
        const { email, link } = req.body;
 
        const isAdmin = link === "web";
