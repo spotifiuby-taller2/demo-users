@@ -122,12 +122,19 @@ class ForgotPassword {
             return;
         }
 
-        const nowLessOneDateTime = getDateTimeMinus(1);
-        const requestDateTime = getDateTimeFromDatabaseTimestamp(request.createdAt);
-        const timeDifference = parseInt(nowLessOneDateTime[1]) - parseInt(requestDateTime[1]);
 
-        if (nowLessOneDateTime[0] !== requestDateTime[0]
-            ||  timeDifference > 0 ) {
+        const now = new Date();
+
+        const differentDates = request.createdAt
+                                      .getDate() !== now.getDate();
+
+        const timeDifference = now.getTime() - request.createdAt
+                                                      .getTime();
+
+        const ONE_HOUR_DIFFERENCE = 3600000;
+
+        if (differentDates
+            || timeDifference > ONE_HOUR_DIFFERENCE) {
             utils.setErrorResponse("Enlace expirado.",
                 412,
                 res);
