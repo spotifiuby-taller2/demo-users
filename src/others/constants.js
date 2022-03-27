@@ -25,7 +25,6 @@ const LOG_LEVEL = process.env
 
 const RESET_DATABASE = false;
 
-
 /* Frontend hosts */
 const BACKOFFICE_HOST = process.env
                                .BACKOFFICE_HOST;
