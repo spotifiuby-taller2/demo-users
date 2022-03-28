@@ -188,7 +188,7 @@ class ForgotPassword {
         } );
 
         if (updateResponse.length !== 1
-            || destroyResponse.length === 1) {
+            || destroyResponse !== 1) {
             Logger.error("No se pudo quitar el link de recuperación.");
 
             utils.setErrorResponse("No se pudo cambiar la contraseña.",
