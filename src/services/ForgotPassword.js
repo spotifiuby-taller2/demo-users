@@ -91,8 +91,7 @@ class ForgotPassword {
               .bind(this) );
   }
 
-    async handleRecoverPassword(req, res)
-    {
+    async handleRecoverPassword(req, res) {
         Logger.info("Request a " + constants.FORGOT_PASSWORD_URL);
 
         const userId = req.params
@@ -206,8 +205,7 @@ class ForgotPassword {
                 res);
     }
 
-    async handleForgotPassword(req, res)
-   {
+    async handleForgotPassword(req, res) {
        Logger.info("Request a " + constants.FORGOT_PASSWORD_URL + '/:userId');
 
        const { email, link } = req.body;
@@ -277,9 +275,10 @@ class ForgotPassword {
        Logger.info("Correo enviado.");
 
        utils.setBodyResponse({
-               result: "Se envío un correo a la cuenta para reestablecer la contraseña."},
-               201,
-               res);
+               result: "Se envío un correo a la cuenta para reestablecer la contraseña."
+           },
+           201,
+           res);
    }
 }
 
