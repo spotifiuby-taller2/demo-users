@@ -16,14 +16,14 @@ const SYMBOL_MAX_LEN = 10;
 const TIMESTAMP_MAX_LEN = 30;
 
 const JSON_HEADER = {
-  'Content-Type': 'application/json'
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*'
 }
 
 const LOG_LEVEL = process.env
                          .LOG_LEVEL;
 
 const RESET_DATABASE = false;
-
 
 /* Frontend hosts */
 const BACKOFFICE_HOST = process.env

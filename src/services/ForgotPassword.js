@@ -91,8 +91,9 @@ class ForgotPassword {
               .bind(this) );
   }
 
-    async handleRecoverPassword(req, res)
-    {
+    async handleRecoverPassword(req, res) {
+        Logger.info("Request a " + constants.FORGOT_PASSWORD_URL);
+
         const userId = req.params
                           .userId;
 
@@ -122,12 +123,19 @@ class ForgotPassword {
             return;
         }
 
-        const nowLessOneDateTime = getDateTimeMinus(1);
-        const requestDateTime = getDateTimeFromDatabaseTimestamp(request.createdAt);
-        const timeDifference = parseInt(nowLessOneDateTime[1]) - parseInt(requestDateTime[1]);
 
-        if (nowLessOneDateTime[0] !== requestDateTime[0]
-            ||  timeDifference > 0 ) {
+        const now = new Date();
+
+        const differentDates = request.createdAt
+                                      .getDate() !== now.getDate();
+
+        const timeDifference = now.getTime() - request.createdAt
+                                                      .getTime();
+
+        const ONE_HOUR_DIFFERENCE = 3600000;
+
+        if (differentDates
+            || timeDifference > ONE_HOUR_DIFFERENCE) {
             utils.setErrorResponse("Enlace expirado.",
                 412,
                 res);
@@ -179,7 +187,7 @@ class ForgotPassword {
         } );
 
         if (updateResponse.length !== 1
-            || destroyResponse.length === 1) {
+            || destroyResponse !== 1) {
             Logger.error("No se pudo quitar el link de recuperación.");
 
             utils.setErrorResponse("No se pudo cambiar la contraseña.",
@@ -197,8 +205,9 @@ class ForgotPassword {
                 res);
     }
 
-    async handleForgotPassword(req, res)
-   {
+    async handleForgotPassword(req, res) {
+       Logger.info("Request a " + constants.FORGOT_PASSWORD_URL + '/:userId');
+
        const { email, link } = req.body;
 
        const isAdmin = link === "web";
@@ -266,9 +275,10 @@ class ForgotPassword {
        Logger.info("Correo enviado.");
 
        utils.setBodyResponse({
-               result: "Se envío un correo a la cuenta para reestablecer la contraseña."},
-               201,
-               res);
+               result: "Se envío un correo a la cuenta para reestablecer la contraseña."
+           },
+           201,
+           res);
    }
 }
 

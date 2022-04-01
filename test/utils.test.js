@@ -82,36 +82,4 @@ describe('Utils tests : ', function() {
         assert.strictEqual(areAnyUndefined(["", "a"]), true);
         assert.strictEqual(areAnyUndefined(["a", "b"]), false);
     });
-
-    it('getDateTimeMinus Ok', () => {
-        const utilsFile = rewire("../src/others/utils");
-
-        utilsFile.__set__({
-            'Date': DateMock
-        });
-
-        const result = utilsFile.getDateTimeMinus(0);
-
-        assert.strictEqual(result[0],
-            '222');
-
-        assert.strictEqual(result[1],
-                           '');
-    } );
-
-    it('getDateTimeFromDatabaseTimestamp Ok', () => {
-        const utilsFile = rewire("../src/others/utils");
-
-        utilsFile.__set__({
-            'Date': DateMock
-        });
-
-        const result = utilsFile.getDateTimeFromDatabaseTimestamp(0);
-
-        assert.strictEqual(result[0],
-            '222');
-
-        assert.strictEqual(result[1],
-            '');
-    } );
 } );

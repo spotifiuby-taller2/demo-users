@@ -43,7 +43,7 @@ async function sendEmail(email,
 async function sendConfirmationEmail(email,
                                      link) {
     const body = `
-    Para confirmar tu cuenta, por favor accedé a este link: `
+    Para confirmar tu cuenta, por favor accedé a: `
     + `<a clicktracking=off href=${link}> este link </a>`;
 
     await sendEmail(email,
@@ -54,7 +54,7 @@ async function sendConfirmationEmail(email,
 async function sendPasswordRecoveryEmail(email,
                                          link) {
     const body = `
-    Para recrear tu contraseña, por favor accedé a este link: `
+    Para recrear tu contraseña, por favor accedé a: `
         + `<a clicktracking=off href=${link}> este link </a>`;
 
     await sendEmail(email,

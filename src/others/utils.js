@@ -24,38 +24,6 @@ function getDate() {
                    .substr(0, 10);
 }
 
-function getDateTimeFromDatabaseTimestamp(timestamp) {
-  const data = timestamp.toISOString()
-                        .split("T");
-
-  const date = data[0];
-
-  const time = data[1].split(".")[0]
-                      .split(":")
-                      .join("");
-
-  return [date,
-          time];
-}
-
-function getDateTimeMinus(plusHours) {
-  const now = new Date();
-
-  now.setHours(now.getHours() - plusHours);
-
-  const dateInfo = now.toISOString()
-                      .split('T');
-
-  const dateNow = dateInfo[0];
-
-  const timeNow = dateInfo[1].substr(0, 8)
-                             .split(':')
-                             .join('');
-
-  return [dateNow,
-          timeNow];
-}
-
 function replaceAll(str,
                     toReplace,
                     newStr) {
@@ -116,7 +84,5 @@ module.exports = {
   replaceAll,
   getHashOf,
   getDate,
-  areAnyUndefined,
-  getDateTimeMinus,
-  getDateTimeFromDatabaseTimestamp
+  areAnyUndefined
 }
