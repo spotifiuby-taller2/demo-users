@@ -37,6 +37,10 @@ const Users = database.define('users', {
     isExternal: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
+    },
+    phoneNumber:{
+        type: Sequelize.STRING(constants.PHONE_NUMBER_LEN),
+        allowNull: false,
     }
 } );
 
