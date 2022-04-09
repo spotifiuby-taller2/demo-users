@@ -9,4 +9,4 @@ RUN npm ci
 RUN mkdir logs
 COPY src/ ./src
 COPY .env* ./
-CMD npm run startdocker
+CMD npm run start
