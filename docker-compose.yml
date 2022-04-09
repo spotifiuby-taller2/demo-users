@@ -23,8 +23,9 @@ services:
       - "5432:5432"
 
   ws_node:
-    build: .
-    command: npm run startdocker
+    build:
+      context: .
+      dockerfile: Dockerfile.local
     container_name: ${NODE_CONTAINER_NAME}
     ports:
       - ${NODE_LOCAL_PORT}:${NODE_DOCKER_PORT}
