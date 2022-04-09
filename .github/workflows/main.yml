@@ -46,4 +46,3 @@ jobs:
           HD_DD_AGENT_MAJOR_VERSION: 7
           HD_DD_API_KEY: ${{secrets.DD_API_KEY}}
           HD_DD_DYNO_HOST: true
-          HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
