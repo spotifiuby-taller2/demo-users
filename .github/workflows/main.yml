@@ -1,4 +1,4 @@
-name: ci
+name: main
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
           usedocker: true
           buildpack: "https://github.com/DataDog/heroku-buildpack-datadog.git"
         env:
-          DD_AGENT_MAJOR_VERSION: 7
-          DD_API_KEY: ${{secrets.DD_API_KEY}}
-          DD_DYNO_HOST: true
-          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
+          HD_DD_AGENT_MAJOR_VERSION: 7
+          HD_DD_API_KEY: ${{secrets.DD_API_KEY}}
+          HD_DD_DYNO_HOST: true
+          HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
