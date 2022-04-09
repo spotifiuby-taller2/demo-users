@@ -42,7 +42,6 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
-          buildpack: "https://github.com/DataDog/heroku-buildpack-datadog.git"
         env:
           HD_DD_AGENT_MAJOR_VERSION: 7
           HD_DD_API_KEY: ${{secrets.DD_API_KEY}}
