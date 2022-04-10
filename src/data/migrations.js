@@ -409,6 +409,17 @@ async function runMigrations() {
         .catch(error => {
             console.log( error.toString() );
         } );
+
+    await queryInterface.addColumn('users',
+        'walletId', {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            validate: { notEmpty: true },
+            unique: true
+        } )
+        .catch(error => {
+            console.log( error.toString() );
+        } );
 }
 
 module.exports = {
