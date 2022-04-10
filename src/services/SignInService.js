@@ -5,82 +5,46 @@ const Logger = require("./Logger");
 const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
-async function signInWithBiometric(req, res){
-    const { email, password, idToken, link } = req.body;
-
-    const isAdmin = link === "web";
-
-    let accessToken = undefined;
-
-    const user = await Users.findOne({
-        where: {
-            [Op.and]:
-                [{email: email},
-                 {password: password}]
-        }
-    });
-
-    if (user === null) {
-        const response = await auth.createUser( {
-            email: email,
-            emailVerified: true,
-            password: password,
-            disabled: false
-        } )
-            .catch(error => {
-                return { error: error.toString() }
-            } );
-
-        if (response.error !== undefined) {
-            Logger.error(error.toString());
-
-            utils.setErrorResponse(error,
-                561,
-                res);
-
-            return;
-        }
-
-       accessToken = response.user.accessToken;
-
-       await Users.create( {
-           id: response.user.uid,
-           email: email,
-           password: hashedPassword,
-           isAdmin: isAdmin,
-           isBlocked: false,
-           isExternal: true
-       } )
+async function signInWithBiometric(req, res) {
+    if (idToken === undefined){
+        createBiometricSignInUser(email, password, res);
+        return;
     }
 
-    if (user === undefined) {
-        await Users.create({
-            id: response.user_id,
+    signInWithOutGoogle(req, res);
+}
+
+async function createBiometricSignInUser(email, password, res){
+        Users.create( {
+            id: res.uid,
             email: email,
             password: password,
             isAdmin: false,
             isBlocked: false,
             isExternal: true
-        });
-    
-    }
+        } )
+    .catch(error => {
+        return { error: error.toString() }
+    } );
 
-    if (accessToken !== undefined)
-        utils.setBodyResponse({token: accessToken},
-            200,
+    if (response !== undefined && response.error !== undefined) {
+        Logger.error(response.error.toString());
+
+        return utils.setErrorResponse(response.error,
+            511,
             res);
-        return;
+    }
 
     const responseBody = {
         status: "ok"
     }
 
     utils.setBodyResponse(responseBody,
-            200,
-            res);
+        201,
+        res);
 }
 
-async function sigInWithOutGoogle(req, res) {
+async function signInWithOutGoogle(req, res) {
     const { email,
             password,
             idToken,
@@ -96,7 +60,7 @@ async function sigInWithOutGoogle(req, res) {
             res);
 
         return;
-    }
+    };
 
     const user = await Users.findOne({
         where: {
@@ -114,8 +78,7 @@ async function sigInWithOutGoogle(req, res) {
 
         return;
     }
-
-    if (user.isAdmin && ! isAdmin) {
+    else if (user.isAdmin && ! isAdmin) {
         utils.setErrorResponse("Usuario no autorizado.",
             463,
             res);
@@ -131,7 +94,7 @@ async function sigInWithOutGoogle(req, res) {
             res);
 }
 
-async function sigInWithGoogle(req, res) {
+async function signInWithGoogle(req, res) {
     const { token, email} = req.body;
 
     const response = await auth.verifyIdToken(token);
@@ -213,16 +176,15 @@ class SignInService {
    {
         Logger.request(constants.SIGN_IN_URL);
 
-        if ( req.body
-                .signin === 'google' ){
-            await sigInWithGoogle(req, res);
+        if ( req.body.signin === 'google' ){
+            await signInWithGoogle(req, res);
         }
         else if ( req.body
                      .signin === 'biometric' ){
             await signInWithBiometric(req, res);
         }
         else{
-            await sigInWithOutGoogle(req, res);
+            await signInWithOutGoogle(req, res);
         }
    }        
 
