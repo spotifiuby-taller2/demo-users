@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
-const { BASE_SALT } = require("../others/constants");
+const { BASE_SALT, MIN_PASS_LEN } = require("../others/constants");
 
 function setBodyResponse(responseBody,
                          status,
@@ -76,6 +76,36 @@ function areAnyUndefined(list) {
   } ).length > 0;
 }
 
+function invalidFieldFormat(body, isAdmin){
+  const { email,
+    password,
+    repeatPassword,
+    isArtist,
+    isListener} = body;
+
+    if (password.length < MIN_PASS_LEN ) {
+      return true;
+    }
+    /*
+    else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password)){
+      return true;
+    }*/
+    
+    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)){
+      return true;
+    }
+
+    if (password !== repeatPassword){
+      return true;
+    }
+
+    if ( ! isArtist && ! isListener && ! isAdmin ){
+      return true
+  }
+
+    return false;
+}
+
 module.exports = {
   getId,
   getBcryptOf,
@@ -84,5 +114,6 @@ module.exports = {
   replaceAll,
   getHashOf,
   getDate,
-  areAnyUndefined
+  areAnyUndefined,
+  invalidFieldFormat
 }
