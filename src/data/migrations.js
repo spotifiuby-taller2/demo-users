@@ -10,9 +10,13 @@ async function runMigrations() {
                        .catch(e => {
                         console.log(e);
                        } );*/
-
-    /* await queryInterface.addColumn('users',
-                                  'isAdmin');
+    /*
+    await queryInterface.addColumn('users',
+                                  'isAdmin',{
+                                      type: Sequelize.BOOLEAN,
+                                      allowNull: false,
+                                      defaultValue: false
+                                  })
                        .catch(e => {
                         console.log(e);
                        } );*/
@@ -41,12 +45,135 @@ async function runMigrations() {
     await queryInterface.addColumn('users',
                                   'phoneNumber', {
                                     type: Sequelize.STRING(constants.PHONE_NUMBER_LEN),
-                                    allowNull: false,
-                                    defaultValue: ''
+                                    defaultValue: null
                                   } )
                       .catch(error => {
                         console.log( error.toString() );
                       } );
+
+    await queryInterface.addColumn('users',
+                                  'name', {
+                                    type: Sequelize.STRING(constants.NAME_MAX_LEN),
+                                    allowNull: false,
+                                    defaultValue: 'Anonimo'
+                                  } )
+                      .catch(error => {
+                        console.log( error.toString() );
+                      } );
+
+    await queryInterface.addColumn('users',
+                                'surname', {
+                                  type: Sequelize.STRING(constants.NAME_MAX_LEN),
+                                  allowNull: false,
+                                  defaultValue: 'Anonimo'
+                                } )
+                    .catch(error => {
+                      console.log( error.toString() );
+                    } );
+    
+    await queryInterface.addColumn('users',
+                                    'isArtist',
+                                    {
+                                      type: Sequelize.BOOLEAN,
+                                      allowNull: false,
+                                      defaultValue: false
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('users',
+                                    'isListener',
+                                    {
+                                      type: Sequelize.BOOLEAN,
+                                      allowNull: false,
+                                      defaultValue: false
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('users',
+                                    'latitude',
+                                    {
+                                      type: Sequelize.DECIMAL(8, 6),
+                                      defaultValue: null
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('users',
+                                  'longitude',
+                                  {
+                                    type: Sequelize.DECIMAL(9, 6),
+                                    defaultValue: null
+                                  })
+                    .catch(e => {
+                      console.log(e);
+                    } );
+
+    await queryInterface.addColumn('non_activated_users',
+                                  'name', {
+                                    type: Sequelize.STRING(constants.NAME_MAX_LEN),
+                                    allowNull: false,
+                                    defaultValue: 'Anonimo'
+                                  } )
+                      .catch(error => {
+                        console.log( error.toString() );
+                      } );
+
+    await queryInterface.addColumn('non_activated_users',
+                                'surname', {
+                                  type: Sequelize.STRING(constants.NAME_MAX_LEN),
+                                  allowNull: false,
+                                  defaultValue: 'Anonimo'
+                                } )
+                    .catch(error => {
+                      console.log( error.toString() );
+                    } );
+    
+    await queryInterface.addColumn('non_activated_users',
+                                    'isArtist',
+                                    {
+                                      type: Sequelize.BOOLEAN,
+                                      allowNull: false,
+                                      defaultValue: false
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('non_activated_users',
+                                    'isListener',
+                                    {
+                                      type: Sequelize.BOOLEAN,
+                                      allowNull: false,
+                                      defaultValue: false
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('non_activated_users',
+                                    'latitude',
+                                    {
+                                      type: Sequelize.DECIMAL(8, 6),
+                                      defaultValue: null
+                                    })
+                      .catch(e => {
+                        console.log(e);
+                      } );
+
+    await queryInterface.addColumn('non_activated_users',
+                                  'longitude',
+                                  {
+                                    type: Sequelize.DECIMAL(9, 6),
+                                    defaultValue: null
+                                  })
+                    .catch(e => {
+                      console.log(e);
+                    } );
 }
 
 module.exports = {

@@ -41,6 +41,33 @@ const Users = database.define('users', {
     phoneNumber:{
         type: Sequelize.STRING(constants.PHONE_NUMBER_LEN),
         allowNull: false,
+        defaultValue: ''
+    },
+    name:{
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+    },
+    surname:{
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+    },
+    isArtist:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    },
+    isListener:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    },
+    latitude:{
+        type: Sequelize.DECIMAL(8, 6),
+        defaultValue: null
+    },
+    longitude:{
+        type: Sequelize.DECIMAL(9, 6),
+        defaultValue: null
     }
 } );
 

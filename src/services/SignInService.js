@@ -6,32 +6,38 @@ const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
 async function signInWithBiometric(req, res) {
-    const { email, password, idToken } = req.body;
+    const {  idToken } = req.body;
 
-    if (idToken === undefined){
-        await createBiometricSignInUser(email, password, res);
+    if (idToken === undefined) {
+        await createBiometricSignInUser(req.body, res);
         return;
     }
 
     await signInWithOutGoogle(req, res);
 }
 
-async function createBiometricSignInUser(email, password, res){
+async function createBiometricSignInUser(body, res){
     const response = await auth.createUser( {
-        email: email,
+        email: body.email,
         emailVerified: true,
-        password: password,
+        password: body.password,
         disabled: false
     } ) .then(res => {
 
-        Users.create( {
+       // Solves promises
+        Users.create({
             id: res.uid,
-            email: email,
-            password: password,
+            email: body.email,
+            password: body.password,
             isAdmin: false,
             isBlocked: false,
-            isExternal: true
-        } )
+            isExternal: true,
+            isListener: body.isListener,
+            isArtist: body.isArtist,
+            latitude: body.latitude,
+            longitude: body.longitude
+        })
+    } )
     .catch(error => {
         return { error: error.toString() }
     } );
@@ -104,7 +110,7 @@ async function signInWithOutGoogle(req, res) {
 }
 
 async function signInWithGoogle(req, res) {
-    const { token, email} = req.body;
+    const { token, email, name, surname, phoneNumber, isArtist, isListener, latitude, longitude} = req.body;
 
     const response = await auth.verifyIdToken(token);
 
@@ -129,7 +135,13 @@ async function signInWithGoogle(req, res) {
             password: utils.getHashOf( utils.getHashOf(email)),
             isAdmin: false,
             isBlocked: false,
-            isExternal: true
+            isExternal: true,
+            name: name,
+            surname: surname,
+            isArtist: isArtist,
+            isListener: isListener,
+            latitude: latitude,
+            longitude: longitude
         });
     }
 

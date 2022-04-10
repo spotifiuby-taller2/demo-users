@@ -4,7 +4,7 @@ const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
-const { areAnyUndefined } = require("../others/utils");
+const { areAnyUndefined, invalidFieldFormat } = require("../others/utils");
 const { sendConfirmationEmail } = require('../services/MailService');
 const { Op } = require("sequelize");
 
@@ -50,6 +50,9 @@ class SignUpService {
      *
      *         "465":
      *           description: "Mail already sent."
+     * 
+     *         "416":
+     *           description: "Invalid field format"
      *
      *         "561":
      *           description: "Could not save user temporarily."
@@ -91,6 +94,7 @@ class SignUpService {
     app.get( constants.SIGN_UP_END_URL + '/:userId/:pin',
       this.createVerifiedUser
         .bind(this) );
+
   }
 
   async handleSignUp(req,
@@ -100,14 +104,28 @@ class SignUpService {
     const { email,
       password,
       phoneNumber,
+      name,
+      isArtist,
+      isListener,
+      surname,
       link,
-      isExternal } = req.body;
+      isExternal,
+      latitude,
+      longitude } = req.body;
 
     const isAdmin = link === "web";
 
-    if ( areAnyUndefined([email,phoneNumber, password]) ) {
+    if ( areAnyUndefined([name, surname, email,phoneNumber, password]) ) {
       utils.setErrorResponse("Por favor complete todos los campos.",
         462,
+        res);
+
+      return;
+    }
+
+    if ( invalidFieldFormat(req.body, isAdmin) ){
+      utils.setErrorResponse('Hay campos con un formato incorrecto.',
+        416,
         res);
 
       return;
@@ -153,6 +171,12 @@ class SignUpService {
       isExternal,
       pin,
       phoneNumber,
+      name,
+      surname,
+      isArtist,
+      isListener,
+      latitude,
+      longitude
     }).catch(error => {
       Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
@@ -237,7 +261,13 @@ class SignUpService {
       isAdmin: tempUser.isAdmin,
       isBlocked: false,
       isExternal: tempUser.isExternal,
-      phoneNumber: tempUser.phoneNumber
+      phoneNumber: tempUser.phoneNumber,
+      name: tempUser.name,
+      surname: tempUser.surname,
+      isArtist: tempUser.isArtist,
+      isListener: tempUser.isListener,
+      latitude: tempUser.latitude,
+      longitude: tempUser.longitude
     } );
 
     await NonActivatedUsers.destroy( {
@@ -251,6 +281,9 @@ class SignUpService {
     res.status(200)
       .json(responseBody);
   }
+
 }
+
+
 
 module.exports = SignUpService;

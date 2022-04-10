@@ -16,6 +16,7 @@ const DATE_FORMAT = "YYYY-M-D H:mm:ss.SS";
 const TIMEZONE = "America/Buenos_Aires";
 const SYMBOL_MAX_LEN = 10;
 const TIMESTAMP_MAX_LEN = 30;
+const NAME_MAX_LEN = 30;
 
 const JSON_HEADER = {
   'Content-Type': 'application/json',
@@ -50,6 +51,8 @@ const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
 const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
 const FORGOT_PASSWORD_URL = "/forgotpassword";
+const LISTENER_LOC_URL="/listener/location";
+
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -193,5 +196,7 @@ module.exports = {
   ONE_HOUR_DIFFERENCE,
   USERS_LIST_URL,
   USERS_BLOCK_URL,
-  USERS_UNLOCK_URL
+  USERS_UNLOCK_URL,
+  NAME_MAX_LEN,
+  LISTENER_LOC_URL
 }
