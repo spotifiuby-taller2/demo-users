@@ -1,6 +1,7 @@
 const database = require('../data/database');
 const SignUpService = require('../services/SignUpService');
 const SignInService = require('../services/SignInService');
+const { ProfileService } = require('../services/ProfileService');
 const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
@@ -33,10 +34,11 @@ class App {
     this.signInService = new SignInService();
     this.forgotPassword = new ForgotPassword();
     this.infoService = new InfoService();
+    this.profileService = new ProfileService();
   }
 
   async syncDB() {
-    if (! constants.isDevelopment ) {
+    if (! constants.isDevelopment) {
         await runMigrations();
     }
 
@@ -68,6 +70,9 @@ class App {
         .defineEvents(this.app);
 
     this.infoService
+        .defineEvents(this.app);
+
+    this.profileService
         .defineEvents(this.app);
   }
 }

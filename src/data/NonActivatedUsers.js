@@ -67,7 +67,59 @@ const NonActivatedUsers = database.define('non_activated_users', {
     longitude:{
         type: Sequelize.DECIMAL(9, 6),
         defaultValue: null
-    }
+    },
+
+    metal: {
+        type: Sequelize.BOOLEAN
+    },
+
+    rap: {
+        type: Sequelize.BOOLEAN
+    },
+
+    pop: {
+        type: Sequelize.BOOLEAN
+    },
+
+    classic: {
+        type: Sequelize.BOOLEAN
+    },
+
+    electronic: {
+        type: Sequelize.BOOLEAN
+    },
+
+    jazz: {
+        type: Sequelize.BOOLEAN
+    },
+
+    reggeaton: {
+        type: Sequelize.BOOLEAN
+    },
+
+    indie: {
+        type: Sequelize.BOOLEAN
+    },
+
+    punk: {
+        type: Sequelize.BOOLEAN
+    },
+
+    salsa: {
+        type: Sequelize.BOOLEAN
+    },
+
+    blues: {
+        type: Sequelize.BOOLEAN
+    },
+
+    rock: {
+        type: Sequelize.BOOLEAN
+    },
+
+    other: {
+        type: Sequelize.BOOLEAN
+    },
 });
 
 module.exports = NonActivatedUsers;
