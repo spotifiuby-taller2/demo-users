@@ -7,6 +7,8 @@ const MAX_STR_LEN = 254;
 const FIREBASE_MAX_LEN = 36;
 const BCRYPT_LEN = 60;
 const SHA_LEN = 64;
+const PIN_LEN = 8;
+const PHONE_NUMBER_LEN = 15;
 
 const MIN_STR_LEN = 2;
 const MIN_PASS_LEN = 10;
@@ -172,6 +174,8 @@ module.exports = {
   MAX_STR_LEN,
   FIREBASE_MAX_LEN,
   BCRYPT_LEN,
+  PIN_LEN,
+  PHONE_NUMBER_LEN,
   MIN_STR_LEN,
   MIN_PASS_LEN,
   DATE_FORMAT,

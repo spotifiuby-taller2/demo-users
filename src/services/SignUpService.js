@@ -6,6 +6,8 @@ const Users = require("../data/Users");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { sendConfirmationEmail } = require('../services/MailService');
+const { Op } = require("sequelize");
+
 
 class SignUpService {
   defineEvents(app) {
@@ -86,7 +88,7 @@ class SignUpService {
      *         "561":
      *           description: "Error creating user."
      */
-    app.get( constants.SIGN_UP_END_URL + '/:userId',
+    app.get( constants.SIGN_UP_END_URL + '/:userId/:pin',
       this.createVerifiedUser
         .bind(this) );
   }
@@ -97,13 +99,13 @@ class SignUpService {
 
     const { email,
       password,
+      phoneNumber,
       link,
       isExternal } = req.body;
 
     const isAdmin = link === "web";
 
-    if ( areAnyUndefined([email,
-      password]) ) {
+    if ( areAnyUndefined([email,phoneNumber, password]) ) {
       utils.setErrorResponse("Por favor complete todos los campos.",
         462,
         res);
@@ -140,13 +142,17 @@ class SignUpService {
       return;
     }
 
+    const pin = Math.random().toString().slice(2, 9);
+
+
     await NonActivatedUsers.create({
       id,
       email,
       password,
       isAdmin,
-      isExternal
-
+      isExternal,
+      pin,
+      phoneNumber,
     }).catch(error => {
       Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
@@ -161,16 +167,16 @@ class SignUpService {
 
     try {
       if (isAdmin) {
-        await sendConfirmationEmail(email,
-          `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}`);
+        await sendConfirmationEmail(email,pin,
+          `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}/${pin}`);
       } else {
-        await sendConfirmationEmail(email,
-          `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}`);
+        await sendConfirmationEmail(email,pin,
+          `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}/${pin}`);
       }
 
       Logger.info("Correo enviado");
 
-      utils.setBodyResponse({result: "Correo enviado a tu cuenta."},
+      utils.setBodyResponse({result: "Correo enviado a tu cuenta.", id: id},
         200,
         res);
     } catch(error) {
@@ -181,19 +187,22 @@ class SignUpService {
   }
 
   async createVerifiedUser(req, res) {
-    Logger.request(constants.SIGN_UP_END_URL + '/:userId');
+    Logger.request(constants.SIGN_UP_END_URL + '/:userId/:pin');
 
-    const userId = req.params
-      .userId;
+    const userId = req.params.userId;
+    
+    const pin = req.params.pin;  
 
     const tempUser = await NonActivatedUsers.findOne( {
       where: {
-        id : userId
+          [Op.and]:
+              [{id: userId},
+               {pin: pin}]
       }
-    } );
+      });
 
     if (tempUser === null) {
-      utils.setErrorResponse("Link de confirmación inválido",
+      utils.setErrorResponse("PIN de confirmación inválido",
         461,
         res);
       return;
@@ -227,7 +236,8 @@ class SignUpService {
       password: tempUser.password,
       isAdmin: tempUser.isAdmin,
       isBlocked: false,
-      isExternal: tempUser.isExternal
+      isExternal: tempUser.isExternal,
+      phoneNumber: tempUser.phoneNumber
     } );
 
     await NonActivatedUsers.destroy( {

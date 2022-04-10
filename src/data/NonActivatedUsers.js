@@ -32,7 +32,16 @@ const NonActivatedUsers = database.define('non_activated_users', {
     isExternal: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
+    },
+    pin:{
+        type: Sequelize.STRING(constants.PIN_LEN),
+        allowNull: false,
+    },
+    phoneNumber:{
+        type: Sequelize.STRING(constants.PHONE_NUMBER_LEN),
+        allowNull: false,
     }
+
 } );
 
 module.exports = NonActivatedUsers;
