@@ -35,7 +35,7 @@ async function signInWithBiometric(req, res){
             Logger.error(error.toString());
 
             utils.setErrorResponse(error,
-                511,
+                561,
                 res);
 
             return;
@@ -67,7 +67,7 @@ async function signInWithBiometric(req, res){
 
     if (accessToken !== undefined)
         utils.setBodyResponse({token: accessToken},
-            201,
+            200,
             res);
         return;
 
@@ -76,7 +76,7 @@ async function signInWithBiometric(req, res){
     }
 
     utils.setBodyResponse(responseBody,
-            201,
+            200,
             res);
 }
 
@@ -88,11 +88,11 @@ async function sigInWithOutGoogle(req, res) {
 
     const isAdmin = link === "web";
 
-        const response = await auth.verifyIdToken(idToken);
+    const response = await auth.verifyIdToken(idToken);
 
     if (response.user_id === undefined) {
         utils.setErrorResponse("No se pudo encontrar ningun usuario con ese mail y/ o contraseña",
-            412,
+            462,
             res);
 
         return;
@@ -107,9 +107,9 @@ async function sigInWithOutGoogle(req, res) {
         }
     });
 
-    if (user === undefined) {
+    if (user === undefined || user === null) {
         utils.setErrorResponse("No se encontró ningun usuario con ese mail y/ o contraseña",
-            412,
+            462,
             res);
 
         return;
@@ -117,7 +117,7 @@ async function sigInWithOutGoogle(req, res) {
 
     if (user.isAdmin && ! isAdmin) {
         utils.setErrorResponse("Usuario no autorizado.",
-            413,
+            463,
             res);
         return;
     }
@@ -127,7 +127,7 @@ async function sigInWithOutGoogle(req, res) {
     }
 
     utils.setBodyResponse(responseBody,
-            201,
+            200,
             res);
 }
 
@@ -138,7 +138,7 @@ async function sigInWithGoogle(req, res) {
 
     if (response.user_id === undefined) {
         utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
-            412,
+            462,
             res);
 
         return;
@@ -163,7 +163,7 @@ async function sigInWithGoogle(req, res) {
 
     utils.setBodyResponse(
         {status: "ok"},
-        201, 
+        200,
         res);
 }
 
@@ -194,13 +194,13 @@ class SignInService {
     *           required: true
     *
     *    responses:
-    *         "201":
+    *         "200":
     *           description: "User exists."
-
-    *         "412":
+    *
+    *         "462":
     *           descritption: "User not exists."
     *
-    *         "413":
+    *         "463":
     *           description: "Not admin."
     */
     app.post( constants.SIGN_IN_URL,
@@ -213,10 +213,12 @@ class SignInService {
    {
         Logger.request(constants.SIGN_IN_URL);
 
-        if ( req.body.signin === 'google' ){
+        if ( req.body
+                .signin === 'google' ){
             await sigInWithGoogle(req, res);
         }
-        else if ( req.body.signin === 'biometric' ){
+        else if ( req.body
+                     .signin === 'biometric' ){
             await signInWithBiometric(req, res);
         }
         else{

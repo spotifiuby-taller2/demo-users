@@ -34,28 +34,28 @@ class SignUpService {
      *           required: true
      *
      *    responses:
-     *         "201":
+     *         "200":
      *           description: "Mail to verify email sent."
      *
-     *         "411":
+     *         "461":
      *           description: "Mail already registered."
      *
-     *         "412":
+     *         "462":
      *           description: "Empty required field."
-
-     *         "414":
+     *
+     *         "464":
      *           description: "User already signed in as external."
      *
-     *         "415":
+     *         "465":
      *           description: "Mail already sent."
      *
-     *         "501":
+     *         "561":
      *           description: "Could not save user temporarily."
      *
-     *         "502":
+     *         "562":
      *           description: "Could not create account."
      *
-     *         "503":
+     *         "563":
      *           description: "Could not send email."
      */
     app.post( constants.SIGN_UP_URL,
@@ -77,13 +77,13 @@ class SignUpService {
      *           required: true
      *
      *    responses:
-     *         "201":
+     *         "200":
      *           description: "User created."
      *
-     *         "401":
+     *         "461":
      *           description: "Invalid confirmation link."
      *
-     *         "511":
+     *         "561":
      *           description: "Error creating user."
      */
     app.get( constants.SIGN_UP_END_URL + '/:userId',
@@ -105,7 +105,7 @@ class SignUpService {
     if ( areAnyUndefined([email,
       password]) ) {
       utils.setErrorResponse("Por favor complete todos los campos.",
-        412,
+        462,
         res);
 
       return;
@@ -118,13 +118,13 @@ class SignUpService {
     if (user !== null) {
       if (user.isExternal) {
         utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
-          414,
+          464,
           res);
       }
 
       else {
         utils.setErrorResponse("Ya hay un usuario con ese mail",
-          411,
+          461,
           res);
       }
       return;
@@ -134,7 +134,7 @@ class SignUpService {
 
     if (nonUser !== null) {
       utils.setErrorResponse("Ya hay un usuario con ese mail pendiente de confirmación",
-        415,
+        465,
         res);
 
       return;
@@ -151,7 +151,7 @@ class SignUpService {
       Logger.error("No se pudo crear el usuario temporal " +  error.toString());
 
       utils.setErrorResponse("Error al intentar crear la cuenta.",
-        502,
+        562,
         res);
     });
 
@@ -171,11 +171,11 @@ class SignUpService {
       Logger.info("Correo enviado");
 
       utils.setBodyResponse({result: "Correo enviado a tu cuenta."},
-        201,
+        200,
         res);
     } catch(error) {
       utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-        503,
+        563,
         res);
     }
   }
@@ -194,7 +194,7 @@ class SignUpService {
 
     if (tempUser === null) {
       utils.setErrorResponse("Link de confirmación inválido",
-        401,
+        461,
         res);
       return;
     }
@@ -211,7 +211,7 @@ class SignUpService {
       Logger.error(response.error.toString());
 
       utils.setErrorResponse(response.error,
-        511,
+        561,
         res);
 
       return;
@@ -238,7 +238,7 @@ class SignUpService {
 
     Logger.info("Usuario creado");
 
-    res.status(201)
+    res.status(200)
       .json(responseBody);
   }
 }
