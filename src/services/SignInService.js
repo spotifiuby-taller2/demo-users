@@ -6,15 +6,24 @@ const { Op } = require("sequelize");
 const Users = require("../data/Users");
 
 async function signInWithBiometric(req, res) {
+    const { email, password, idToken } = req.body;
+
     if (idToken === undefined){
-        createBiometricSignInUser(email, password, res);
+        await createBiometricSignInUser(email, password, res);
         return;
     }
 
-    signInWithOutGoogle(req, res);
+    await signInWithOutGoogle(req, res);
 }
 
 async function createBiometricSignInUser(email, password, res){
+    const response = await auth.createUser( {
+        email: email,
+        emailVerified: true,
+        password: password,
+        disabled: false
+    } ) .then(res => {
+
         Users.create( {
             id: res.uid,
             email: email,
