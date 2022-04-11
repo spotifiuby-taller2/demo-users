@@ -72,6 +72,7 @@ let DB_PASSWORD;
 let DB_HOST;
 let DB_PORT;
 let POSTGRES_DB;
+let firebaseJson;
 
 if (isDevelopment) {
 
@@ -145,6 +146,9 @@ const SENDGRID_API_KEY = "SG.kEUTJxSZR-qXa6r-7PssIA.aj0U9dawThnV8thwn5NMP1ePW2YW
 
 const BASE_SALT = '$2b$10$sfW8rHWvJcda/4cMOq.p5.';
 
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+
 module.exports = {
   DB_USER,
   DB_PASSWORD,
@@ -179,5 +183,7 @@ module.exports = {
   BASE_SALT,
   AUTH_FRONT,
   FORGOT_PASSWORD_URL,
-  firebaseJson
+  firebaseJson,
+  TWILIO_ACCOUNT_SID,
+  TWILIO_AUTH_TOKEN,
 }
