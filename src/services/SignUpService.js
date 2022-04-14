@@ -118,19 +118,13 @@ class SignUpService {
 
         const isAdmin = link === "web";
 
-        if (areAnyUndefined([name, surname, email, phoneNumber, password])) {
-            utils.setErrorResponse("Por favor complete todos los campos.",
-                462,
-                res);
-
+        if (areAnyUndefined([email, password])) {
+            utils.setErrorResponse("Email y contraseña son requeridos", 400, res);
             return;
         }
 
-        if (invalidFieldFormat(req.body, isAdmin)) {
-            utils.setErrorResponse('Hay campos con un formato incorrecto.',
-                416,
-                res);
-
+        if (invalidFieldFormat(email, password)) {
+            utils.setErrorResponse('Hay campos con un formato incorrecto.', 400, res);
             return;
         }
 

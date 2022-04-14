@@ -55,10 +55,12 @@ const NonActivatedUsers = database.define('non_activated_users', {
     isArtist:{
         type: Sequelize.BOOLEAN,
         allowNull: false,
-    },   
+        defaultValue: false,
+    },
     isListener:{
         type: Sequelize.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
     },
     latitude:{
         type: Sequelize.DECIMAL(8, 6),
