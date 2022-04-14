@@ -1,6 +1,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const rewire = require("rewire");
+const {postToGateway} = require("../src/others/utils");
 const SignUpService = rewire("../src/services/SignUpService");
 
 const signUpService = new SignUpService();
@@ -11,11 +12,12 @@ describe('SignUpService', function() {
       const createNonActivatedUserMock = sinon.fake.returns(Promise.resolve(null));
       const sendConfirmationEmailMock = sinon.fake.returns(Promise.resolve(null));
       const setBodyResponseMock = sinon.fake();
+      const setErrorResponseMock = sinon.fake();
 
       const revertRewire = SignUpService.__set__({
         Users: {findOne: () => Promise.resolve(null)},
         NonActivatedUsers: {findOne: () => Promise.resolve(null), create: createNonActivatedUserMock},
-        utils: {getId: () => 1, getBcryptOf: () => '', setBodyResponse: setBodyResponseMock},
+        utils: {getId: () => 1, getBcryptOf: () => '', setBodyResponse: setBodyResponseMock, setErrorResponse: setErrorResponseMock },
         sendConfirmationEmail: sendConfirmationEmailMock,
       });
 
@@ -23,8 +25,13 @@ describe('SignUpService', function() {
         body: {
           email: 'email@email.com',
           password: 'long password',
-          link: 'web',
+          repeatPassword: 'long password',
           isExternal: false,
+          phoneNumber: '1234',
+          name: 'name',
+          isArtist: true,
+          isListener: true,
+          surname: 'surname',
         }
       };
 
@@ -34,7 +41,7 @@ describe('SignUpService', function() {
 
       assert(createNonActivatedUserMock.calledOnce);
       assert(sendConfirmationEmailMock.calledOnce);
-      assert(setBodyResponseMock.calledWith({result: "Correo enviado a tu cuenta."}, 201, res));
+      assert(setBodyResponseMock.calledWith({result: "Correo enviado a tu cuenta.", id: 1}, 200, res));
       revertRewire();
     });
 
@@ -50,12 +57,13 @@ describe('SignUpService', function() {
         const createUserMock = sinon.fake.returns(Promise.resolve(firebaseUser));
         const createUserInDbMock = sinon.fake.returns(Promise.resolve());
         const setBodyResponseMock = sinon.fake();
+        const postToGatewayMock = sinon.fake.returns(Promise.resolve({id: 1}));
         const destroyNonActivatedUserMock = sinon.fake.returns(Promise.resolve());
         const revertRewire = SignUpService.__set__({
           NonActivatedUsers: {findOne: findNonActivatedUserMock, destroy: destroyNonActivatedUserMock},
           auth: {createUser: createUserMock},
           Users: {create: createUserInDbMock},
-          utils: {setBodyResponse: setBodyResponseMock},
+          utils: {setBodyResponse: setBodyResponseMock, postToGateway: postToGatewayMock},
         });
         const req = {
           params: {
@@ -67,15 +75,16 @@ describe('SignUpService', function() {
 
         await signUpService.createVerifiedUser(req, res);
 
-        assert(findNonActivatedUserMock.calledWith({where: {id: 1}}));
+        assert(findNonActivatedUserMock.calledOnce);
         assert(createUserMock.calledWith(sinon.match.has('email', user.email)
           .and(sinon.match.has('emailVerified', true))
           .and(sinon.match.has('password', user.password))
           .and(sinon.match.has('disabled', false))));
         assert(createUserInDbMock.calledOnce);
         assert(destroyNonActivatedUserMock.calledOnce);
-        assert(res.status.calledWith(201))
-        assert(jsonMock.json.calledWith({status: 'ok'}))
+        assert(postToGatewayMock.calledOnce);
+        assert(res.status.calledWith(200));
+        assert(jsonMock.json.calledWith({status: 'ok'}));
         revertRewire();
       });
     });

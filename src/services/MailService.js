@@ -40,11 +40,12 @@ async function sendEmail(email,
     }
 }
 
-async function sendConfirmationEmail(email,
+async function sendConfirmationEmail(email,pin,
                                      link) {
     const body = `
     Para confirmar tu cuenta, por favor accedé a: `
-    + `<a clicktracking=off href=${link}> este link </a>`;
+    + `<a clicktracking=off href=${link}> este link </a>
+    Su pin de validación es: ${pin}`;
 
     await sendEmail(email,
               'Confirmación de cuenta',

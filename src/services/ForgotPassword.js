@@ -32,22 +32,22 @@ class ForgotPassword {
     *           required: true
     *
     *    responses:
-    *         "201":
+    *         "200":
     *           description: "Mail sent to recover password."
     * 
-    *         "411":
+    *         "461":
     *           descritption: "Empty fields."
     * 
-    *         "412":
+    *         "462":
     *           descritption: "User does not exists."
     *
-    *         "413":
+    *         "463":
     *           description: "External user"
     *
-    *         "414":
+    *         "464":
     *           description: "Unauthorized"
     *
-    *         "511":
+    *         "561":
     *           description: "Database error."
     */
     app.post( constants.FORGOT_PASSWORD_URL,
@@ -74,16 +74,16 @@ class ForgotPassword {
        *           required: true
        *
        *    responses:
-       *         "201":
+       *         "200":
        *           description: "Password changed."
        *
-       *         "411":
+       *         "461":
        *           descritption: "Empty fields."
        *
-       *         "412":
+       *         "462":
        *           descritption: "Broken link."
        *
-       *         "511":
+       *         "561":
        *           descritption: "Could not update password."
        */
      app.post( constants.FORGOT_PASSWORD_URL + '/:userId',
@@ -117,12 +117,11 @@ class ForgotPassword {
 
         if (user === null || request === null) {
             utils.setErrorResponse("Enlace inválido.",
-                412,
+                462,
                 res);
 
             return;
         }
-
 
         const now = new Date();
 
@@ -132,12 +131,10 @@ class ForgotPassword {
         const timeDifference = now.getTime() - request.createdAt
                                                       .getTime();
 
-        const ONE_HOUR_DIFFERENCE = 3600000;
-
         if (differentDates
-            || timeDifference > ONE_HOUR_DIFFERENCE) {
+            || timeDifference > constants.ONE_HOUR_DIFFERENCE) {
             utils.setErrorResponse("Enlace expirado.",
-                412,
+                462,
                 res);
 
             return;
@@ -145,7 +142,7 @@ class ForgotPassword {
 
         if ( areAnyUndefined([password]) ) {
             utils.setErrorResponse("Por favor complete todos los campos.",
-                411,
+                461,
                 res);
 
             return;
@@ -162,7 +159,7 @@ class ForgotPassword {
             Logger.error(response.error);
 
             utils.setErrorResponse(error,
-                                    501,
+                                    561,
                                     res);
 
             return;
@@ -191,7 +188,7 @@ class ForgotPassword {
             Logger.error("No se pudo quitar el link de recuperación.");
 
             utils.setErrorResponse("No se pudo cambiar la contraseña.",
-                511,
+                561,
                 res);
 
             return;
@@ -201,7 +198,7 @@ class ForgotPassword {
 
         utils.setBodyResponse({
                 result: "Se actualizó la contraseña."},
-                201,
+                200,
                 res);
     }
 
@@ -214,7 +211,7 @@ class ForgotPassword {
 
        if ( areAnyUndefined([email]) ) {
            utils.setErrorResponse("Por favor complete todos los campos.",
-                                  411,
+                                  461,
                                   res);
            return;
        }
@@ -228,7 +225,7 @@ class ForgotPassword {
 
        if (user === null) {
            utils.setErrorResponse("No se encontró ningún usuario con ese mail.",
-                                   412,
+                                   462,
                                    res);
            return;
        }
@@ -236,14 +233,14 @@ class ForgotPassword {
        if (user.isExternal) {
            utils.setErrorResponse("Usuario con identidad federada: " +
                "por favor utilizar el servicio externo correspondiente para recuperar la contraseña.",
-               413,
+               463,
                res);
            return;
        }
 
        if (user.isAdmin && ! isAdmin) {
            utils.setErrorResponse("Usuario no autorizado.",
-               414,
+               464,
                res);
            return;
        }
@@ -258,7 +255,7 @@ class ForgotPassword {
            Logger.error("Error al crear el link de recuperación.");
 
            utils.setErrorResponse("Error al crear el link de recuperación.",
-               511,
+               561,
                res);
 
            return;
