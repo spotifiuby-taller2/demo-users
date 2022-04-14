@@ -7,6 +7,7 @@ const Logger = require("./Logger");
 const {areAnyUndefined, invalidFieldFormat} = require("../others/utils");
 const {sendConfirmationEmail} = require('../services/MailService');
 const {Op} = require("sequelize");
+const WhatsAppService = require("../services/WhatsAppService");
 
 
 class SignUpService {
@@ -190,19 +191,17 @@ class SignUpService {
         }
 
         try {
+            let message;
             if (isAdmin) {
                 await sendConfirmationEmail(email, pin,
                     `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}/${pin}`);
+                message = "Correo enviado";
             } else {
-                await sendConfirmationEmail(email, pin,
-                    `${constants.AUTH_FRONT}${constants.SIGN_UP_END_URL}/${id}/${pin}`);
+                await WhatsAppService.sendVerificationCode(phoneNumber, pin);
+                message = "Pin enviado";
             }
-
-            Logger.info("Correo enviado");
-
-            utils.setBodyResponse({result: "Correo enviado a tu cuenta.", id},
-                200,
-                res);
+            Logger.info(message);
+            utils.setBodyResponse({result: message, id}, 200, res);
         } catch (error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
                 563,
@@ -218,11 +217,7 @@ class SignUpService {
         const pin = req.params.pin;
 
         const tempUser = await NonActivatedUsers.findOne({
-            where: {
-                [Op.and]:
-                    [{id: userId},
-                        {pin: pin}]
-            }
+            where: {[Op.and]: [{id: userId}, {pin}]}
         });
 
         if (tempUser === null) {

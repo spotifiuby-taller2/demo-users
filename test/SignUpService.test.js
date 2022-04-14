@@ -1,14 +1,13 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const rewire = require("rewire");
-const {postToGateway} = require("../src/others/utils");
 const SignUpService = rewire("../src/services/SignUpService");
 
 const signUpService = new SignUpService();
 
 describe('SignUpService', function() {
   describe('handleSignUp', function () {
-    it("creates a non activated user and sends confirmation email", async function() {
+    it("creates a non activated admin and sends confirmation email", async function() {
       const createNonActivatedUserMock = sinon.fake.returns(Promise.resolve(null));
       const sendConfirmationEmailMock = sinon.fake.returns(Promise.resolve(null));
       const setBodyResponseMock = sinon.fake();
@@ -32,6 +31,7 @@ describe('SignUpService', function() {
           isArtist: true,
           isListener: true,
           surname: 'surname',
+          link: 'web',
         }
       };
 
@@ -41,7 +41,44 @@ describe('SignUpService', function() {
 
       assert(createNonActivatedUserMock.calledOnce);
       assert(sendConfirmationEmailMock.calledOnce);
-      assert(setBodyResponseMock.calledWith({result: "Correo enviado a tu cuenta.", id: 1}, 200, res));
+      assert(setBodyResponseMock.calledWith({result: "Correo enviado", id: 1}, 200, res));
+      revertRewire();
+    });
+
+    it("creates a non activated user and sends pin using whatsApp", async function() {
+      const createNonActivatedUserMock = sinon.fake.returns(Promise.resolve(null));
+      const sendWhatsAppVerificationCodeMock = sinon.fake.returns(Promise.resolve());
+      const setBodyResponseMock = sinon.fake();
+      const setErrorResponseMock = sinon.fake();
+
+      const revertRewire = SignUpService.__set__({
+        Users: {findOne: () => Promise.resolve(null)},
+        NonActivatedUsers: {findOne: () => Promise.resolve(null), create: createNonActivatedUserMock},
+        utils: {getId: () => 1, getBcryptOf: () => '', setBodyResponse: setBodyResponseMock, setErrorResponse: setErrorResponseMock },
+        WhatsAppService: { sendVerificationCode: sendWhatsAppVerificationCodeMock},
+      });
+
+      const req = {
+        body: {
+          email: 'email@email.com',
+          password: 'long password',
+          repeatPassword: 'long password',
+          isExternal: false,
+          phoneNumber: '1234',
+          name: 'name',
+          isArtist: true,
+          isListener: true,
+          surname: 'surname',
+        }
+      };
+
+      const res = {};
+
+      await signUpService.handleSignUp(req, res);
+
+      assert(createNonActivatedUserMock.calledOnce);
+      assert(sendWhatsAppVerificationCodeMock.calledOnce);
+      assert(setBodyResponseMock.calledWith({result: "Pin enviado", id: 1}, 200, res));
       revertRewire();
     });
 
