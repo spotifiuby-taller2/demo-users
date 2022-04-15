@@ -45,6 +45,7 @@ const HOME_URL = "/home";
 /* Backends paths */
 const USERS_URL = "/users";
 const USERS_LIST_URL = USERS_URL + "/list";
+const APP_USERS_LIST_URL = USERS_URL + "/applist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
@@ -202,5 +203,6 @@ module.exports = {
   NAME_MAX_LEN,
   LISTENER_LOC_URL,
   PROFILE_URL,
-  MUSICAL_PREF_URL
+  MUSICAL_PREF_URL,
+  APP_USERS_LIST_URL
 }
