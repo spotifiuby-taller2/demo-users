@@ -48,6 +48,7 @@ const USERS_LIST_URL = USERS_URL + "/list";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
+const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
 const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
@@ -200,5 +201,6 @@ module.exports = {
   USERS_UNLOCK_URL,
   NAME_MAX_LEN,
   LISTENER_LOC_URL,
-  PROFILE_URL
+  PROFILE_URL,
+  MUSICAL_PREF_URL
 }

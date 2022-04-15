@@ -98,6 +98,12 @@ class InfoService {
 
                 email: user.dataValues
                            .email,
+                
+                name: user.dataValues
+                        .name,
+                
+                surname: user.dataValues
+                        .surname,
 
                 isBlocked: user.dataValues
                                .isBlocked,

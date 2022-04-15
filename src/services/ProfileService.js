@@ -4,12 +4,38 @@ const Users = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
+const bodyParser = require("body-parser");
 
 class ProfileService {
     defineEvents(app) {
         /**
          * @swagger
          * /users/profile:
+         *   get:
+         *    summary: User profile.
+         *
+         *    description: Return user profile.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "Return profile."
+         *
+         *         "461":
+         *           description: "User does not exist."
+         */
+        app.get( constants.PROFILE_URL,
+            this.getProfile
+                .bind(this) );
+
+        /**
+         * @swagger
+         * /users/profile/musicalpref:
          *   get:
          *    summary: Users list.
          *
@@ -23,13 +49,13 @@ class ProfileService {
          *
          *    responses:
          *         "200":
-         *           description: "Returning profile."
+         *           description: "Musical preferences updated."
          *
          *         "461":
          *           description: "User does not exist."
          */
-        app.get( constants.PROFILE_URL,
-            this.getProfile
+         app.patch( constants.MUSICAL_PREF_URL,
+            this.updateMusicalPreferences
                 .bind(this) );
     }
 
@@ -51,7 +77,7 @@ class ProfileService {
             }
         } );
 
-        if (user.error) {
+        if (user === null) {
             return setErrorResponse("El usuario no existe.",
                                     461,
                                     res);
@@ -84,6 +110,68 @@ class ProfileService {
                200,
                res);
     }
+
+    async updateMusicalPreferences(req, res) {
+
+        Logger.info("Request a /users/profile/musicalpref");
+
+        const userId = req.query.userId;
+
+        const {musicalPref} = req.body;
+
+        const user = await Users.findOne({
+            where: {
+                [Op.and]: [{id: userId},
+                            {isBlocked: false}]
+            }
+        }).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if (user.error) {
+            return setErrorResponse("El usuario no existe.",
+                                461,
+                                res);
+        }
+
+        const response = await Users.update(
+            {
+                metal: musicalPref.metal,
+                rock: musicalPref.rock,
+                jazz: musicalPref.jazz,
+                pop: musicalPref.pop,
+                punk: musicalPref.punk,
+                reggeaton: musicalPref.reggeaton,
+                salsa: musicalPref.salsa,
+                indie: musicalPref.indie,
+                rap: musicalPref.rap,
+                classic: musicalPref.classic,
+                blues: musicalPref.blues,
+                others: musicalPref.others,
+            },
+                {
+                    where: 
+                        {id: userId}
+                }
+            ).catch(error => ({ error: error.toString() }) );
+        
+        if (response.error !== undefined) {
+            Logger.error(response.error.toString());
+          
+            utils.setErrorResponse(response.error,
+                561,
+                res);
+          
+            return;
+            }
+        
+
+        return setBodyResponse({status: 'Intereses musicales actualizados'},
+                200,
+                res);
+                }
 }
 
 module.exports = {

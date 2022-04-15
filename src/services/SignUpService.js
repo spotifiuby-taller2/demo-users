@@ -115,7 +115,7 @@ class SignUpService {
 
     const isAdmin = link === "web";
 
-    if ( areAnyUndefined([name, surname, email,phoneNumber, password]) ) {
+    if ( areAnyUndefined([name, surname, email, phoneNumber, password]) ) {
       utils.setErrorResponse("Por favor complete todos los campos.",
         462,
         res);
@@ -251,8 +251,9 @@ class SignUpService {
     }
 
     const responseBody = {
-      status: "ok"
-    }
+      status: "ok",
+      id: response.uid
+    };
 
     await Users.create( {
       id: response.uid,
