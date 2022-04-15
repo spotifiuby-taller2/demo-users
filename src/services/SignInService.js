@@ -93,7 +93,7 @@ async function signInWithOutGoogle(req, res) {
 
         return;
     }
-    else if (user.isAdmin && ! isAdmin) {
+    else if (isAdmin && ! user.isAdmin) {
         utils.setErrorResponse("Usuario no autorizado.",
             463,
             res);
@@ -182,7 +182,7 @@ class SignInService {
     *           description: "User exists."
     *
     *         "462":
-    *           descritption: "User not exists."
+    *           descritption: "User does not exist."
     *
     *         "463":
     *           description: "Not admin."
@@ -190,7 +190,6 @@ class SignInService {
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
                   .bind(this) );
-
   }
 
   async handleSignIn(req, res)
