@@ -152,8 +152,8 @@ class InfoService {
 
         const users = await Users.findAll({
             where: {
-            [Op.And]: [{isAdmin: false},
-                       {isBlocked: false}]
+                isAdmin: false,
+                isBlocked: false
             }
         } );
 
