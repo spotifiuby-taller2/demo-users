@@ -11,93 +11,125 @@ const WhatsAppService = require("../services/WhatsAppService");
 
 
 class SignUpService {
-    defineEvents(app) {
-        /**
-         * @swagger
-         * /signup:
-         *   post:
-         *    summary: Sign up
-         *
-         *    description: Allow sign up.
-         *
-         *    parameters:
-         *         - name: "email"
-         *           in: body
-         *           type: "string"
-         *           required: true
-         *
-         *         - name: "password"
-         *           in: body
-         *           type: "string"
-         *           required: true
-         *
-         *         - name: "link"
-         *           in: body
-         *           type: "string"
-         *           required: true
-         *
-         *    responses:
-         *         "200":
-         *           description: "Mail to verify email sent."
-         *
-         *         "461":
-         *           description: "Mail already registered."
-         *
-         *         "462":
-         *           description: "Empty required field."
-         *
-         *         "464":
-         *           description: "User already signed in as external."
-         *
-         *         "465":
-         *           description: "Mail already sent."
-         *
-         *         "416":
-         *           description: "Invalid field format"
-         *
-         *         "561":
-         *           description: "Could not save user temporarily."
-         *
-         *         "562":
-         *           description: "Could not create account."
-         *
-         *         "563":
-         *           description: "Could not send email."
-         */
-        app.post(constants.SIGN_UP_URL,
-            this.handleSignUp
-                .bind(this));
+  defineEvents(app) {
+    /**
+     * @swagger
+     * /signup:
+     *   post:
+     *    summary: Sign up
+     *
+     *    description: Allow sign up.
+     *
+     *    parameters:
+     *         - name: "email"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *         - name: "password"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *         - name: "link"
+     *           in: body
+     *           type: "string"
+     *           required: true
+     *
+     *    responses:
+     *         "200":
+     *           description: "Mail to verify email sent."
+     *
+     *         "461":
+     *           description: "Mail already registered."
+     *
+     *         "462":
+     *           description: "Empty required field."
+     *
+     *         "464":
+     *           description: "User already signed in as external."
+     *
+     *         "465":
+     *           description: "Mail already sent."
+     * 
+     *         "416":
+     *           description: "Invalid field format"
+     *
+     *         "561":
+     *           description: "Could not save user temporarily."
+     *
+     *         "562":
+     *           description: "Could not create account."
+     *
+     *         "563":
+     *           description: "Could not send email."
+     */
+    app.post( constants.SIGN_UP_URL,
+      this.handleSignUp
+        .bind(this) );
 
-        /**
-         * @swagger
-         * /signup/end/:userId:
-         *   get:
-         *    summary: Sign up end
-         *
-         *    description: Validate an email and create the user.
-         *
-         *    parameters:
-         *         - name: "userId"
-         *           in: path
-         *           type: "string"
-         *           required: true
-         *
-         *    responses:
-         *         "200":
-         *           description: "User created."
-         *
-         *         "461":
-         *           description: "Invalid confirmation link."
-         *
-         *         "561":
-         *           description: "Error creating user."
-         */
-        app.get(constants.SIGN_UP_END_URL + '/:userId/:pin',
-            this.createVerifiedUser
-                .bind(this));
+    /**
+     * @swagger
+     * /signup/end/:userId:
+     *   get:
+     *    summary: Sign up end
+     *
+     *    description: Validate an email and create the user.
+     *
+     *    parameters:
+     *         - name: "userId"
+     *           in: path
+     *           type: "string"
+     *           required: true
+     *
+     *    responses:
+     *         "200":
+     *           description: "User created."
+     *
+     *         "461":
+     *           description: "Invalid confirmation link."
+     *
+     *         "561":
+     *           description: "Error creating user."
+     */
+    app.get( constants.SIGN_UP_END_URL + '/:userId/:pin',
+      this.createVerifiedUser
+        .bind(this) );
 
+  }
+
+  async handleSignUp(req,
+                     res) {
+    Logger.request(constants.SIGN_UP_URL);
+
+    const { email,
+      password,
+      phoneNumber,
+      name,
+      isArtist,
+      isListener,
+      surname,
+      link,
+      isExternal,
+      latitude,
+      longitude } = req.body;
+
+    const isAdmin = link === "web";
+
+    if ( areAnyUndefined([name, surname, email, phoneNumber, password]) ) {
+      utils.setErrorResponse("Por favor complete todos los campos.",
+        462,
+        res);
+
+      return;
     }
 
+    if ( invalidFieldFormat(req.body, isAdmin) ){
+      utils.setErrorResponse('Hay campos con un formato incorrecto.',
+        416,
+        res);
+    }
+  }
     async handleSignUp(req,
                        res) {
         Logger.request(constants.SIGN_UP_URL);
@@ -195,11 +227,18 @@ class SignUpService {
                 message = "Pin enviado";
             }
             Logger.info(message);
-            utils.setBodyResponse({result: message, id}, 200, res);
+            let response = {result: message, id:  id};
+            utils.setBodyResponse(response, 200, res);
         } catch (error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
                 563,
                 res);
+            
+            await NonActivatedUsers.destroy({
+                where: {
+                    id: id
+                }
+            });
         }
     }
 
@@ -251,7 +290,8 @@ class SignUpService {
             return;
         }
         const responseBody = {
-            status: "ok"
+            status: "ok",
+            id: response.uid
         }
 
         await Users.create({
@@ -282,7 +322,6 @@ class SignUpService {
         res.status(200)
             .json(responseBody);
     }
-
 }
 
 

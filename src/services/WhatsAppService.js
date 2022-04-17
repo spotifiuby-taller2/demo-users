@@ -7,7 +7,8 @@ const sendVerificationCode = async (number, verificationCode) => {
     body: `Your Spotifiuby verification code is ${verificationCode}`,
     to: `whatsapp:${number}`
   })
-    .then(response => Logger.info(`Verification code sent to twilio for ${response.to}`));
+    .then(response => Logger.info(`Verification code sent to twilio for ${response.to}`))
+    .catch(err => console.log(err));
 };
 
 module.exports = {sendVerificationCode};

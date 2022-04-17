@@ -22,7 +22,19 @@ async function createBiometricSignInUser(body, res){
         emailVerified: true,
         password: body.password,
         disabled: false
-    } ) .then(res => {
+    } ) .then(async(res) => {
+
+        const requestBody = {
+            redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
+        }
+        const gatewayResponse = await utils.postToGateway(requestBody);
+        if (gatewayResponse.error !== undefined) {
+            Logger.error(gatewayResponse.error.toString());
+            utils.setErrorResponse(gatewayResponse.error,
+                500,
+                res);
+            return;
+        }
 
        // Solves promises
         Users.create({
@@ -35,7 +47,8 @@ async function createBiometricSignInUser(body, res){
             isListener: body.isListener,
             isArtist: body.isArtist,
             latitude: body.latitude,
-            longitude: body.longitude
+            longitude: body.longitude,
+            walletId: gatewayResponse.id
         })
     } )
     .catch(error => {
@@ -93,7 +106,7 @@ async function signInWithOutGoogle(req, res) {
 
         return;
     }
-    else if (user.isAdmin && ! isAdmin) {
+    else if (isAdmin && ! user.isAdmin) {
         utils.setErrorResponse("Usuario no autorizado.",
             463,
             res);
@@ -129,6 +142,19 @@ async function signInWithGoogle(req, res) {
     });
 
     if (user === null) {
+
+        const requestBody = {
+            redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
+        }
+        const gatewayResponse = await utils.postToGateway(requestBody);
+        if (gatewayResponse.error !== undefined) {
+            Logger.error(gatewayResponse.error.toString());
+            utils.setErrorResponse(gatewayResponse.error,
+                500,
+                res);
+            return;
+        }
+
         await Users.create({
             id: response.user_id,
             email: email,
@@ -141,7 +167,8 @@ async function signInWithGoogle(req, res) {
             isArtist: isArtist,
             isListener: isListener,
             latitude: latitude,
-            longitude: longitude
+            longitude: longitude,
+            walletId: gatewayResponse.id
         });
     }
 
@@ -182,7 +209,7 @@ class SignInService {
     *           description: "User exists."
     *
     *         "462":
-    *           descritption: "User not exists."
+    *           descritption: "User does not exist."
     *
     *         "463":
     *           description: "Not admin."
@@ -190,7 +217,6 @@ class SignInService {
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
                   .bind(this) );
-
   }
 
   async handleSignIn(req, res)

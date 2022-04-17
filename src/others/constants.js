@@ -51,9 +51,11 @@ const HOME_URL = "/home";
 /* Backends paths */
 const USERS_URL = "/users";
 const USERS_LIST_URL = USERS_URL + "/list";
+const APP_USERS_LIST_URL = USERS_URL + "/applist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
+const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
 const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
@@ -220,4 +222,6 @@ module.exports = {
     MY_API_KEY,
     TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN,
+    APP_USERS_LIST_URL,
+    MUSICAL_PREF_URL
 }

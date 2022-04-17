@@ -3,6 +3,7 @@ const constants = require("../others/constants");
 const Users = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
+const {Op} = require("sequelize");
 const {auth} = require("../services/FirebaseService");
 
 class InfoService {
@@ -21,6 +22,22 @@ class InfoService {
          */
         app.get( constants.USERS_LIST_URL,
             this.listUsers
+                .bind(this) );
+
+        /**
+         * @swagger
+         * /users/applist:
+         *   post:
+         *    summary: List app users.
+         *
+         *    description: Return list of app users.
+         *
+         *    responses:
+         *         "200":
+         *           description: "Returning list."
+         */
+        app.get( constants.APP_USERS_LIST_URL,
+            this.listAppUsers
                 .bind(this) );
 
         /**
@@ -83,27 +100,30 @@ class InfoService {
                 .bind(this) );
     }
 
-    async listUsers(req,
-                    res) {
-        Logger.info("Request a /users/list");
 
-        const users = await Users.findAll();
-
+    getFormattedUsers(users,
+                      res) {
         const formattedUsers = [];
 
         users.forEach(user => {
             formattedUsers.push( {
                 id: user.dataValues
-                        .id,
+                    .id,
 
                 email: user.dataValues
-                           .email,
+                    .email,
+
+                name: user.dataValues
+                    .name,
+
+                surname: user.dataValues
+                    .surname,
 
                 isBlocked: user.dataValues
-                               .isBlocked,
+                    .isBlocked,
 
                 isAdmin: user.dataValues
-                              .isAdmin,
+                    .isAdmin,
             } );
         } );
 
@@ -112,8 +132,33 @@ class InfoService {
         }
 
         return setBodyResponse(response,
-                               200,
-                               res);
+            200,
+            res);
+    }
+
+    async listUsers(req,
+                    res) {
+        Logger.info("Request a /users/list");
+
+        const users = await Users.findAll();
+
+        return this.getFormattedUsers(users,
+                                      res);
+    }
+
+    async listAppUsers(req,
+                       res) {
+        Logger.info("Request a /users/applist");
+
+        const users = await Users.findAll({
+            where: {
+                isAdmin: false,
+                isBlocked: false
+            }
+        } );
+
+        return this.getFormattedUsers(users,
+                                      res);
     }
 
     async blockUser(req,
