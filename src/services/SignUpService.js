@@ -285,11 +285,9 @@ class SignUpService {
         if (response.error !== undefined) {
             Logger.error(response.error.toString());
 
-            utils.setErrorResponse(response.error,
-                561,
-                res);
-
-            return;
+            return utils.setErrorResponse(response.error,
+                                        561,
+                                        res);
         }
 
         const requestBody = {
@@ -298,10 +296,9 @@ class SignUpService {
         const gatewayResponse = await utils.postToGateway(requestBody);
         if (gatewayResponse.error !== undefined) {
             Logger.error(gatewayResponse.error.toString());
-            utils.setErrorResponse(gatewayResponse.error,
+            return utils.setErrorResponse(gatewayResponse.error,
                 500,
                 res);
-            return;
         }
         const responseBody = {
             status: "ok",
