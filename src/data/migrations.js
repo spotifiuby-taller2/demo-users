@@ -414,6 +414,7 @@ async function runMigrations() {
         'walletId', {
             type: Sequelize.INTEGER,
             allowNull: false,
+            defaultValue: 0,
             validate: { notEmpty: true },
             unique: true
         } )

@@ -162,19 +162,30 @@ class SignUpService {
 
         const id = utils.getId();
 
-        const user = await Users.findOne({where: {email}});
+        const user = await Users.findOne({
+                where: {email}
+            })
+            .catch(error => {
+                return {
+                    error: error.toString()
+                };
+            });
 
         if (user !== null) {
-            if (user.isExternal) {
-                utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y ya no puede registrarse en esta aplicación",
-                    464,
-                    res);
+            if (user.error !== undefined) {
+                return utils.setErrorResponse("Error al crear al usuario.",
+                                                562,
+                                                res);
+            } else if (user.isExternal) {
+                return utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y " +
+                                                "ya no puede registrarse en esta aplicación",
+                                                464,
+                                                res);
             } else {
-                utils.setErrorResponse("Ya hay un usuario con ese mail",
-                    461,
-                    res);
+                return utils.setErrorResponse("Ya hay un usuario con ese mail",
+                                                461,
+                                                res);
             }
-            return;
         }
 
         const nonUser = await NonActivatedUsers.findOne({where: {email}});
@@ -226,8 +237,11 @@ class SignUpService {
                 await WhatsAppService.sendVerificationCode(phoneNumber, pin);
                 message = "Pin enviado";
             }
+
             Logger.info(message);
+
             let response = {result: message, id:  id};
+
             utils.setBodyResponse(response, 200, res);
         } catch (error) {
             utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
