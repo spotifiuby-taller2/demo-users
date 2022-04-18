@@ -99,11 +99,7 @@ function invalidFieldFormat(body, isAdmin){
       return true;
     }
 
-    if ( ! isArtist && ! isListener && ! isAdmin ){
-      return true
-  }
-
-    return false;
+    return !isArtist && !isListener && !isAdmin;
 }
 
 module.exports = {
