@@ -165,14 +165,14 @@ class ProfileService {
                         {id: userId}
                 }
             ).catch(error => ({ error: error.toString() }) );
-        
+
         if (response.error !== undefined) {
             Logger.error(response.error.toString());
-          
+
             utils.setErrorResponse(response.error,
-                561,
+                500,
                 res);
-          
+
             return;
             }
         

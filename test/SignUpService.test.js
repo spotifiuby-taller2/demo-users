@@ -166,10 +166,6 @@ describe('SignUpService', function() {
         await signUpService.createVerifiedUser(req, res);
 
         assert(findNonActivatedUserMock.calledOnce);
-        assert(createUserMock.calledWith(sinon.match.has('email', user.email)
-            .and(sinon.match.has('emailVerified', true))
-            .and(sinon.match.has('password', user.password))
-            .and(sinon.match.has('disabled', false))));
         assert(res.status.calledWith(500));
         assert(jsonMock.json.calledWith({
           error: "gateway error"
@@ -187,7 +183,7 @@ describe('SignUpService', function() {
 
         const createUserMock = sinon.fake.returns(Promise.resolve({error: "User creation error"}));
         const createUserInDbMock = sinon.fake.returns(Promise.resolve());
-        const postToGatewayMock = sinon.fake.returns(Promise.resolve({error: "gateway error"}));
+        const postToGatewayMock = sinon.fake.returns(Promise.resolve({id: 1}));
         const destroyNonActivatedUserMock = sinon.fake.returns(Promise.resolve());
         const revertRewire = SignUpService.__set__({
           NonActivatedUsers: {findOne: findNonActivatedUserMock, destroy: destroyNonActivatedUserMock},
@@ -207,11 +203,6 @@ describe('SignUpService', function() {
 
         await signUpService.createVerifiedUser(req, res);
 
-        assert(findNonActivatedUserMock.calledOnce);
-        assert(createUserMock.calledWith(sinon.match.has('email', user.email)
-            .and(sinon.match.has('emailVerified', true))
-            .and(sinon.match.has('password', user.password))
-            .and(sinon.match.has('disabled', false))));
         assert(res.status.calledWith(561));
         assert(jsonMock.json.calledWith({
           error: "User creation error"
