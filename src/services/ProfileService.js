@@ -53,6 +53,9 @@ class ProfileService {
          *
          *         "461":
          *           description: "User does not exist."
+         *
+         *         "500":
+         *           description: "Database error."
          */
          app.patch( constants.MUSICAL_PREF_URL,
             this.updateMusicalPreferences
@@ -130,10 +133,16 @@ class ProfileService {
             }
         });
 
-        if (user === null || user.error === undefined) {
+        if (user === null) {
             return setErrorResponse("El usuario no existe.",
                                 461,
                                 res);
+        }
+
+        if (user.error !== undefined) {
+            return setErrorResponse("Error al consultar la base de datos.",
+                500,
+                res);
         }
 
         const response = await Users.update(

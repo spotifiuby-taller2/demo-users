@@ -173,6 +173,8 @@ class SignUpService {
 
         if (user !== null) {
             if (user.error !== undefined) {
+                Logger.error(user.error);
+
                 return utils.setErrorResponse("Error al crear al usuario.",
                                                 562,
                                                 res);
@@ -244,15 +246,17 @@ class SignUpService {
 
             utils.setBodyResponse(response, 200, res);
         } catch (error) {
-            utils.setErrorResponse("No se pudo enviar el correo a la cuenta indicada.",
-                563,
-                res);
-            
+            Logger.error(error.toString());
+
             await NonActivatedUsers.destroy({
                 where: {
                     id: id
                 }
             });
+
+            return utils.setErrorResponse("No se pudo enviar el mensaje.",
+                                            563,
+                                            res);
         }
     }
 
@@ -268,10 +272,23 @@ class SignUpService {
         });
 
         if (tempUser === null) {
-            utils.setErrorResponse("PIN de confirmación inválido",
+            Logger.error("461: PIN de confirmación inválido");
+
+            return utils.setErrorResponse("PIN de confirmación inválido",
                 461,
                 res);
-            return;
+        }
+
+        const requestBody = {
+            redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
+        }
+        const gatewayResponse = await utils.postToGateway(requestBody);
+        if (gatewayResponse.error !== undefined) {
+            Logger.error("500: " + gatewayResponse.error.toString());
+
+            return utils.setErrorResponse(gatewayResponse.error,
+                500,
+                res);
         }
 
         const response = await auth.createUser({
@@ -283,23 +300,13 @@ class SignUpService {
             .catch(error => ({error: error.toString()}));
 
         if (response.error !== undefined) {
-            Logger.error(response.error.toString());
+            Logger.error("561: " + response.error.toString());
 
             return utils.setErrorResponse(response.error,
-                                        561,
-                                        res);
-        }
-
-        const requestBody = {
-            redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
-        }
-        const gatewayResponse = await utils.postToGateway(requestBody);
-        if (gatewayResponse.error !== undefined) {
-            Logger.error(gatewayResponse.error.toString());
-            return utils.setErrorResponse(gatewayResponse.error,
-                500,
+                561,
                 res);
         }
+
         const responseBody = {
             status: "ok",
             id: response.uid

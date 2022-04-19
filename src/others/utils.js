@@ -13,6 +13,7 @@ function setBodyResponse(responseBody,
 function setErrorResponse(error,
                           status,
                           res) {
+
     const responseBody = {
         error: error.toString()
     }
