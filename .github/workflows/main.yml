@@ -41,7 +41,12 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
+          docker_build_args: |
+            TWILIO_AUTH_TOKEN_ARG
+            TWILIO_ACCOUNT_SID_ARG
         env:
           HD_DD_AGENT_MAJOR_VERSION: 7
           HD_DD_API_KEY: ${{secrets.DD_API_KEY}}
           HD_DD_DYNO_HOST: true
+          TWILIO_AUTH_TOKEN_ARG: ${{secrets.TWILIO_AUTH_TOKEN}}
+          TWILIO_ACCOUNT_SID_ARG: ${{secrets.TWILIO_ACCOUNT_SID}}
