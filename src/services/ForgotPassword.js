@@ -246,20 +246,11 @@ class ForgotPassword {
        }
 
         const response = await RecoveryRequests.destroy( {
-            userId: user.id
-        } ).catch(error => {
+            where: {
+                userId: user.id
+            } } ).catch(error => {
             return error.toString();
         } );
-
-        if (response.dataValues === undefined) {
-            Logger.error("Error al crear el link de recuperación.");
-
-            utils.setErrorResponse("Error al crear el link de recuperación.",
-                561,
-                res);
-
-            return;
-        }
 
        const response2 = await RecoveryRequests.create( {
            userId: user.id
