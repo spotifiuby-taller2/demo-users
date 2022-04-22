@@ -98,38 +98,6 @@ class SignUpService {
 
   }
 
-  async handleSignUp(req,
-                     res) {
-    Logger.request(constants.SIGN_UP_URL);
-
-    const { email,
-      password,
-      phoneNumber,
-      name,
-      isArtist,
-      isListener,
-      surname,
-      link,
-      isExternal,
-      latitude,
-      longitude } = req.body;
-
-    const isAdmin = link === "web";
-
-    if ( areAnyUndefined([name, surname, email, phoneNumber, password]) ) {
-      utils.setErrorResponse("Por favor complete todos los campos.",
-        462,
-        res);
-
-      return;
-    }
-
-    if ( invalidFieldFormat(req.body, isAdmin) ){
-      utils.setErrorResponse('Hay campos con un formato incorrecto.',
-        416,
-        res);
-    }
-  }
     async handleSignUp(req,
                        res) {
         Logger.request(constants.SIGN_UP_URL);
@@ -149,9 +117,17 @@ class SignUpService {
         } = req.body;
 
         const isAdmin = link === "web";
+        let fields;
 
-        if (areAnyUndefined([email, password])) {
-            utils.setErrorResponse("Email y contraseña son requeridos", 400, res);
+        if ( isAdmin ){
+            fields=[email, password];
+        }
+        else{
+            fields = [name, surname, email, phoneNumber, password];
+        }
+
+        if (areAnyUndefined(fields)) {
+            utils.setErrorResponse("Faltan completar campos requeridos", 400, res);
             return;
         }
 
