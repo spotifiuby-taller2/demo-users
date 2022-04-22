@@ -26,6 +26,22 @@ class InfoService {
 
         /**
          * @swagger
+         * /users/list:
+         *   post:
+         *    summary: Artist list.
+         *
+         *    description: Return list of artists.
+         *
+         *    responses:
+         *         "200":
+         *           description: "Returning list."
+         */
+         app.get( constants.APP_ARTIST_LIST_URL,
+            this.listArtists
+                .bind(this) );
+
+        /**
+         * @swagger
          * /users/applist:
          *   post:
          *    summary: List app users.
@@ -145,6 +161,22 @@ class InfoService {
         return this.getFormattedUsers(users,
                                       res);
     }
+
+    async listArtists(req, res) {
+        Logger.info("Request a /users/artistlist");
+
+        const users = await Users.findAll(
+            {
+                where: {
+                    isArtist: true,
+                    isBlocked: false
+                }
+            } 
+        );
+
+        return this.getFormattedUsers(users,
+                                res);
+        }
 
     async listAppUsers(req,
                        res) {

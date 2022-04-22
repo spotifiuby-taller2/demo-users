@@ -129,6 +129,9 @@ const Users = database.define('users', {
     other: {
         type: Sequelize.BOOLEAN
     },
+    photoUrl: {
+        type: Sequelize.STRING(constants.MAX_STR_LEN),
+    }
 } );
 
 module.exports = Users;

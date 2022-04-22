@@ -52,9 +52,11 @@ const HOME_URL = "/home";
 const USERS_URL = "/users";
 const USERS_LIST_URL = USERS_URL + "/list";
 const APP_USERS_LIST_URL = USERS_URL + "/applist";
+const APP_ARTIST_LIST_URL = USERS_URL + "/artistlist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
+const PROFILE_PHOTO_URL = PROFILE_URL + "/photo";
 const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
@@ -223,5 +225,7 @@ module.exports = {
     TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN,
     APP_USERS_LIST_URL,
-    MUSICAL_PREF_URL
+    MUSICAL_PREF_URL,
+    APP_ARTIST_LIST_URL,
+    PROFILE_PHOTO_URL
 }
