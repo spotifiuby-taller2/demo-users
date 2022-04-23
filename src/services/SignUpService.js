@@ -150,14 +150,18 @@ class SignUpService {
 
         const isAdmin = link === "web";
 
-        if (areAnyUndefined([email, password])) {
-            utils.setErrorResponse("Email y contraseña son requeridos", 400, res);
-            return;
+        if (areAnyUndefined([email,
+                            password,
+                            phoneNumber,
+                            name,
+                            surname]) || (! isArtist && ! isListener )) {
+            return utils.setErrorResponse("Faltan especificar campos",
+                                          400,
+                                          res);
         }
 
         if (invalidFieldFormat(email, password)) {
-            utils.setErrorResponse('Hay campos con un formato incorrecto.', 400, res);
-            return;
+            return utils.setErrorResponse('Hay campos con un formato incorrecto.', 400, res);
         }
 
         const id = utils.getId();
