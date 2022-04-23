@@ -71,10 +71,9 @@ const Users = database.define('users', {
         type: Sequelize.DECIMAL(9, 6),
         defaultValue: null
     },
+
     walletId:{
         type: Sequelize.INTEGER,
-        allowNull: false,
-        validate: { notEmpty: true },
         unique: true
     },
 

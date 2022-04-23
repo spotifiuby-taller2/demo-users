@@ -21,12 +21,11 @@ async function runMigrations() {
                         console.log(e);
                        } );*/
 
-    await queryInterface.addColumn('users',
+    await queryInterface.changeColumn('users ',
         'walletId', {
             type: Sequelize.INTEGER,
-            validate: { notEmpty: true },
             unique: true
-        } )
+        }, )
         .catch(error => {
             console.log( error.toString() );
         } );
