@@ -30,13 +30,12 @@ async function createBiometricSignInUser(body, res){
         const gatewayResponse = await utils.postToGateway(requestBody);
         if (gatewayResponse.error !== undefined) {
             Logger.error(gatewayResponse.error.toString());
-            utils.setErrorResponse(gatewayResponse.error,
+
+            return utils.setErrorResponse(gatewayResponse.error,
                 500,
                 res);
-            return;
         }
 
-       // Solves promises
         Users.create({
             id: res.uid,
             email: body.email,
@@ -83,34 +82,32 @@ async function signInWithOutGoogle(req, res) {
     const response = await auth.verifyIdToken(idToken);
 
     if (response.user_id === undefined) {
-        utils.setErrorResponse("No se pudo encontrar ningun usuario con ese mail y/ o contraseña",
+        return utils.setErrorResponse("No se pudo encontrar ningun usuario con ese mail y/ o contraseña",
             462,
             res);
-
-        return;
-    };
+    }
 
     const user = await Users.findOne({
         where: {
             [Op.and]:
                 [{email: email},
-                 {password: password},
-                 {id: response.user_id}]
+                 {password: password}]
         }
     });
 
     if (user === undefined || user === null) {
-        utils.setErrorResponse("No se encontró ningun usuario con ese mail y/ o contraseña",
+        return utils.setErrorResponse("No se encontró ningun usuario con ese mail y/ o contraseña",
             462,
             res);
-
-        return;
     }
     else if (isAdmin && ! user.isAdmin) {
-        utils.setErrorResponse("Usuario no autorizado.",
+        return utils.setErrorResponse("Usuario no autorizado.",
             463,
             res);
-        return;
+    } else if (user.isBlocked) {
+        return utils.setErrorResponse("Usuario bloqueado.",
+            464,
+            res);
     }
 
     const responseBody = {
@@ -128,11 +125,9 @@ async function signInWithGoogle(req, res) {
     const response = await auth.verifyIdToken(token);
 
     if (response.user_id === undefined) {
-        utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
+        return utils.setErrorResponse("No se encontro ningun usuario con esa cuenta",
             462,
             res);
-
-        return;
     }
 
     const user = await Users.findOne({
@@ -142,7 +137,6 @@ async function signInWithGoogle(req, res) {
     });
 
     if (user === null) {
-
         const requestBody = {
             redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
         }
@@ -168,8 +162,15 @@ async function signInWithGoogle(req, res) {
             isListener: isListener,
             latitude: latitude,
             longitude: longitude,
-            walletId: gatewayResponse.id
+            walletId: gatewayResponse.id,
+            phoneNumber: phoneNumber
         });
+    }
+
+    else if (user.isBlocked) {
+        return utils.setErrorResponse("Usuario bloqueado.",
+            464,
+            res);
     }
 
     utils.setBodyResponse(
@@ -213,6 +214,9 @@ class SignInService {
     *
     *         "463":
     *           description: "Not admin."
+    *
+    *         "464":
+    *           description: "User blocked."
     */
     app.post( constants.SIGN_IN_URL,
               this.handleSignIn
