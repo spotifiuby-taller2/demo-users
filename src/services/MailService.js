@@ -40,7 +40,8 @@ async function sendEmail(email,
     }
 }
 
-async function sendConfirmationEmail(email,pin,
+async function sendConfirmationEmail(email,
+                                     pin,
                                      link) {
     const body = `
     Para confirmar tu cuenta, por favor accedé a: `

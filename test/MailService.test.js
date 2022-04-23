@@ -20,7 +20,7 @@ describe('MailService', function () {
 
   describe('sendConfirmationEmail', function () {
     it('sends confirmation to provided email with subject and link', async function () {
-      await MailService.sendConfirmationEmail(email, link);
+      await MailService.sendConfirmationEmail(email, "", link);
 
       assert(fakeSendMail.calledWith(sinon.match.has('to', email)
         .and(sinon.match.has('subject', 'Confirmación de cuenta'))
