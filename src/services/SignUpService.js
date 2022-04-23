@@ -151,10 +151,7 @@ class SignUpService {
         const isAdmin = link === "web";
 
         if (areAnyUndefined([email,
-                            password,
-                            phoneNumber,
-                            name,
-                            surname]) || (! isArtist && ! isListener )) {
+                            password]) || (! isArtist && ! isListener )) {
             return utils.setErrorResponse("Faltan especificar campos",
                                           400,
                                           res);
