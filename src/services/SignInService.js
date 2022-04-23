@@ -95,7 +95,8 @@ async function signInWithOutGoogle(req, res) {
         }
     });
 
-    if (user === undefined || user === null) {
+    if (user === undefined || user === null
+        || (! isAdmin && user.isAdmin)) {
         return utils.setErrorResponse("No se encontró ningun usuario con ese mail y/ o contraseña",
             462,
             res);
