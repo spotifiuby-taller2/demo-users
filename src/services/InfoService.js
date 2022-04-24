@@ -203,42 +203,15 @@ class InfoService {
         
         const listenerId = req.query.userId;
 
-        /*
         const artists = await Users.findAll(
             {
                 include: [{
-                    model: ArtistFav,
-                    as: "favs",
-                    where: {
-                        idListener: listenerId
+                    model: Users,
+                    as: "idArtist",
+                    where:{
+                        id: listenerId
                     }
-                }
-
-                ]
-            } 
-        )
-        .catch(error => ({error: error.toString()}));
-
-        if (artists.error !== undefined) {
-            Logger.error(artists.error.toString());
-
-            return utils.setErrorResponse(artists.error,
-                571,
-                res);
-
-        }
-        */
-        const artists = await Users.findOne(
-            {
-                include: [{
-                    model: ArtistFav,
-                    as: "favs",
-                    required: false
                 }],
-                where:{
-                    id: listenerId,
-                }
-
             } 
         )
         .catch(error => ({error: error.toString()}));

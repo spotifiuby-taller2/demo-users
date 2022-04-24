@@ -156,10 +156,8 @@ const ArtistFav = database.define('artistfavs', {
         }
     }});
 
+    Users.belongsToMany(Users, { through: ArtistFav, as: "idArtist", foreignKey: 'idArtist'});
+    Users.belongsToMany(Users, { through: ArtistFav, as: "idListener", foreignKey: 'idListener'});
 
-Users.associate = function (models) {
-    Users.belongsToMany(models.users, { through: ArtistFav, as: "idArtist", foreignKey: 'id'});
-    Users.belongsToMany(models.users, { through: ArtistFav, as: "idListener", foreignKey: 'id'});
-  }
 
 module.exports = {Users,ArtistFav};
