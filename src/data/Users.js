@@ -134,4 +134,32 @@ const Users = database.define('users', {
     }
 } );
 
-module.exports = Users;
+const ArtistFav = database.define('artistfavs', {
+    idArtist: {
+        type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+        allowNull: false,
+        validate: { notEmpty: true },
+        primaryKey: true,
+        references: {
+            model: Users, // <----- name of the table
+            key: 'id'
+        }
+    },
+    idListener: {
+        type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+        allowNull: false,
+        validate: { notEmpty: true },
+        primaryKey: true,
+        references: {
+            model: Users, // <----- name of the table
+            key: 'id'
+        }
+    }});
+
+
+Users.associate = function (models) {
+    Users.belongsToMany(models.users, { through: ArtistFav, as: "idArtist", foreignKey: 'id'});
+    Users.belongsToMany(models.users, { through: ArtistFav, as: "idListener", foreignKey: 'id'});
+  }
+
+module.exports = {Users,ArtistFav};

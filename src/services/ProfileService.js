@@ -1,6 +1,6 @@
 const {setBodyResponse, setErrorResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const Users = require("../data/Users");
+const {Users} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
@@ -156,7 +156,7 @@ class ProfileService {
             }
         });
 
-        if (user === null || user.error === undefined) {
+        if (user === null || user.error !== undefined) {
             return setErrorResponse("El usuario no existe.",
                                 461,
                                 res);

@@ -1,12 +1,10 @@
 const {setBodyResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const Users = require("../data/Users");
+const {Users, ArtistFav} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
 const {auth} = require("../services/FirebaseService");
-const ArtistFav = require("../data/ArtistFav");
-
 
 class InfoService {
     defineEvents(app) {
@@ -230,19 +228,22 @@ class InfoService {
 
         }
         */
-        const artists = await ArtistFav.findAll(
+        const artists = await Users.findOne(
             {
                 include: [{
-                    model: Users,
+                    model: ArtistFav,
                     as: "favs",
+                    required: false
                 }],
-                where: {
-                    idListener: listenerId
+                where:{
+                    id: listenerId,
                 }
 
             } 
         )
         .catch(error => ({error: error.toString()}));
+
+        console.log(artists);
 
         if (artists.error !== undefined) {
             Logger.error(artists.error.toString());
@@ -252,7 +253,7 @@ class InfoService {
                 res);
 
         }
-        console.log(artists);
+        
 
         return this.getFormattedUsers(artists,
                                 res);
