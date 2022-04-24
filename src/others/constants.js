@@ -53,6 +53,7 @@ const USERS_URL = "/users";
 const USERS_LIST_URL = USERS_URL + "/list";
 const APP_USERS_LIST_URL = USERS_URL + "/applist";
 const APP_ARTIST_LIST_URL = USERS_URL + "/artistlist";
+const APP_FAV_ARTIST_LIST_URL = USERS_URL + "/favartistlist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
@@ -227,5 +228,6 @@ module.exports = {
     APP_USERS_LIST_URL,
     MUSICAL_PREF_URL,
     APP_ARTIST_LIST_URL,
-    PROFILE_PHOTO_URL
+    PROFILE_PHOTO_URL,
+    APP_FAV_ARTIST_LIST_URL
 }

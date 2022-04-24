@@ -5,6 +5,8 @@ const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
 const {auth} = require("../services/FirebaseService");
+const ArtistFav = require("../data/ArtistFav");
+
 
 class InfoService {
     defineEvents(app) {
@@ -35,9 +37,29 @@ class InfoService {
          *    responses:
          *         "200":
          *           description: "Returning list."
+         * 
          */
          app.get( constants.APP_ARTIST_LIST_URL,
             this.listArtists
+                .bind(this) );
+
+        /**
+         * @swagger
+         * /users/list:
+         *   post:
+         *    summary: Fav Artist list.
+         *
+         *    description: Return list of favourite artists.
+         *
+         *    responses:
+         *         "200":
+         *           description: "Returning list."
+         * 
+         *         "571":
+         *           description: "Error fetching listener"
+         */
+         app.get( constants.APP_FAV_ARTIST_LIST_URL,
+            this.listFavArtists
                 .bind(this) );
 
         /**
@@ -176,7 +198,65 @@ class InfoService {
 
         return this.getFormattedUsers(users,
                                 res);
+    }
+
+    async listFavArtists(req, res) {
+        Logger.info("Request a /users/favartistlist");
+        
+        const listenerId = req.query.userId;
+
+        /*
+        const artists = await Users.findAll(
+            {
+                include: [{
+                    model: ArtistFav,
+                    as: "favs",
+                    where: {
+                        idListener: listenerId
+                    }
+                }
+
+                ]
+            } 
+        )
+        .catch(error => ({error: error.toString()}));
+
+        if (artists.error !== undefined) {
+            Logger.error(artists.error.toString());
+
+            return utils.setErrorResponse(artists.error,
+                571,
+                res);
+
         }
+        */
+        const artists = await ArtistFav.findAll(
+            {
+                include: [{
+                    model: Users,
+                    as: "favs",
+                }],
+                where: {
+                    idListener: listenerId
+                }
+
+            } 
+        )
+        .catch(error => ({error: error.toString()}));
+
+        if (artists.error !== undefined) {
+            Logger.error(artists.error.toString());
+
+            return utils.setErrorResponse(artists.error,
+                571,
+                res);
+
+        }
+        console.log(artists);
+
+        return this.getFormattedUsers(artists,
+                                res);
+    }
 
     async listAppUsers(req,
                        res) {
