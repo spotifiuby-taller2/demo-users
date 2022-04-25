@@ -64,7 +64,7 @@ async function createBiometricSignInUser(body, res){
     }
 
     const responseBody = {
-        status: "ok"
+        status: "ok",
     }
 
     utils.setBodyResponse(responseBody,

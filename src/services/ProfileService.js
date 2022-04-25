@@ -61,7 +61,7 @@ class ProfileService {
         /**
          * @swagger
          * /users/profile/photo:
-         *   get:
+         *   patch:
          *    summary: set profile photo url.
          *
          *    description: update profile photo url.
@@ -81,6 +81,33 @@ class ProfileService {
          */
         app.patch( constants.PROFILE_PHOTO_URL,
             this.updatePhotoUrl
+                .bind(this) );
+
+        
+        /**
+         * @swagger
+         * /users/profile/type:
+         *   get:
+         *    summary: get user type.
+         *
+         *    description: get user type.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "return user type."
+         *
+         *         "461":
+         *           description: "User does not exist."
+         */
+
+         app.get( constants.PROFILE_USER_TYPE_URL,
+            this.getUserType
                 .bind(this) );
             }
 
@@ -109,6 +136,7 @@ class ProfileService {
         }
 
         const profileResponse = {
+                'id': user.id,
                 'email': user.email,
                 'phoneNumber': user.phoneNumber,
                 'name':  user.name,
@@ -249,6 +277,40 @@ class ProfileService {
         return setBodyResponse({status: 'Foto de perfil actualizada'},
                 200,
                 res);
+    }
+
+
+    async getUserType(req, res){
+        
+        Logger.info("Request a /users/profile/type");
+
+        const userId = req.query.userId;
+
+        const user = await Users.findOne({
+            where: {
+                [Op.and]: [{id: userId},
+                            {isBlocked: false}]
+            }
+        }).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if ( user === null ){
+            Logger.error(`No existe el usuario`);
+        
+            return utils.setErrorResponse(`No existe el usuario`,
+                461,
+                res);
+        }
+
+        Logger.info(`Usuario encontrado.`);
+
+        utils.setBodyResponse({status: user.isListener? constants.LISTENER: constants.ARTIST},
+            201,
+            res);
+
     }
 }
 
