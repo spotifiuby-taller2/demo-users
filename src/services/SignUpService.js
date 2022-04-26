@@ -97,39 +97,6 @@ class SignUpService {
         .bind(this) );
 
   }
-
-  async handleSignUp(req,
-                     res) {
-    Logger.request(constants.SIGN_UP_URL);
-
-    const { email,
-      password,
-      phoneNumber,
-      name,
-      isArtist,
-      isListener,
-      surname,
-      link,
-      isExternal,
-      latitude,
-      longitude } = req.body;
-
-    const isAdmin = link === "web";
-
-    if ( areAnyUndefined([name, surname, email, phoneNumber, password]) ) {
-      utils.setErrorResponse("Por favor complete todos los campos.",
-        462,
-        res);
-
-      return;
-    }
-
-    if ( invalidFieldFormat(req.body, isAdmin) ){
-      utils.setErrorResponse('Hay campos con un formato incorrecto.',
-        416,
-        res);
-    }
-  }
     async handleSignUp(req,
                        res) {
         Logger.request(constants.SIGN_UP_URL);
@@ -336,7 +303,7 @@ class SignUpService {
             }
         });
 
-        Logger.info("Usuario creado");
+        Logger.info("Usuario creado con email y contraseña: " + response.uid);
 
         res.status(200)
             .json(responseBody);

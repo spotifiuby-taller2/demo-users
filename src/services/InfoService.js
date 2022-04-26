@@ -197,6 +197,8 @@ class InfoService {
                                     res);
         }
 
+        Logger.info("Usuario bloqueado: " + idToBlock);
+
         const response = {
             ok: "ok"
         }

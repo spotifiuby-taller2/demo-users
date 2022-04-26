@@ -115,6 +115,8 @@ async function signInWithOutGoogle(req, res) {
         status: "ok"
     }
 
+    Logger.info("Ingreso con email y contraseña: " + response.user_id);
+
     utils.setBodyResponse(responseBody,
             200,
             res);
@@ -166,6 +168,8 @@ async function signInWithGoogle(req, res) {
             walletId: gatewayResponse.id,
             phoneNumber: phoneNumber
         });
+
+        Logger.info("Nuevo usuario con cuenta de Google: " + response.user_id);
     }
 
     else if (user.isBlocked) {
@@ -173,6 +177,8 @@ async function signInWithGoogle(req, res) {
             464,
             res);
     }
+
+    Logger.info("Ingreso con cuenta de Google: " + response.user_id);
 
     utils.setBodyResponse(
         {status: "ok"},
