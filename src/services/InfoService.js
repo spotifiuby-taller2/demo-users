@@ -258,6 +258,8 @@ class InfoService {
                     res);
             }
 
+            Logger.info("Usuario creado con email y contraseña: " + response.uid);
+
             return utils.setBodyResponse(response,
                 200,
                 res);
