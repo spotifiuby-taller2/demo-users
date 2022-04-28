@@ -260,6 +260,12 @@ class InfoService {
 
                 isAdmin: user.dataValues
                     .isAdmin,
+
+                isArtist: user.dataValues
+                    .isArtist,
+
+                isListener: user.dataValues
+                    .isListener,
             } );
         } );
 
