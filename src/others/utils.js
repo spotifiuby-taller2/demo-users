@@ -89,6 +89,7 @@ function invalidFieldFormat(email, password) {
     }
 
     return false;
+
 }
 
 
