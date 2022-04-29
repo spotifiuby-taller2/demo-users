@@ -1,6 +1,6 @@
 const {setBodyResponse, setErrorResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const Users = require("../data/Users");
+const {Users} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
@@ -60,7 +60,59 @@ class ProfileService {
          app.patch( constants.MUSICAL_PREF_URL,
             this.updateMusicalPreferences
                 .bind(this) );
-    }
+
+        /**
+         * @swagger
+         * /users/profile/photo:
+         *   patch:
+         *    summary: set profile photo url.
+         *
+         *    description: update profile photo url.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "Musical preferences updated."
+         *
+         *         "461":
+         *           description: "User does not exist."
+         */
+        app.patch( constants.PROFILE_PHOTO_URL,
+            this.updatePhotoUrl
+                .bind(this) );
+
+        
+        /**
+         * @swagger
+         * /users/profile/type:
+         *   get:
+         *    summary: get user type.
+         *
+         *    description: get user type.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "return user type."
+         *
+         *         "461":
+         *           description: "User does not exist."
+         */
+
+         app.get( constants.PROFILE_USER_TYPE_URL,
+            this.getUserType
+                .bind(this) );
+            }
 
     async getProfile(req,
                      res) {
@@ -87,6 +139,7 @@ class ProfileService {
         }
 
         const profileResponse = {
+                'id': user.id,
                 'email': user.email,
                 'phoneNumber': user.phoneNumber,
                 'name':  user.name,
@@ -106,7 +159,8 @@ class ProfileService {
                 'salsa':  user.salsa,
                 'blues':  user.blues,
                 'rock':  user.rock,
-                'other':  user.other
+                'other':  user.other,
+                'photoUrl': user.photoUrl
         };
 
         return setBodyResponse(profileResponse,
@@ -134,7 +188,7 @@ class ProfileService {
         });
 
         if (user === null) {
-            return setErrorResponse("El usuario no existe.",
+          return setErrorResponse("El usuario no existe.",
                                 461,
                                 res);
         }
@@ -180,7 +234,93 @@ class ProfileService {
         return setBodyResponse({status: 'Intereses musicales actualizados'},
                 200,
                 res);
+    }
+
+
+    async updatePhotoUrl(req, res) {
+
+        Logger.info("Request a /users/profile/photo");
+
+        const userId = req.query.userId;
+        const photoUrl = req.query.photoUrl;
+
+
+        const user = await Users.findOne({
+            where: {
+                [Op.and]: [{id: userId},
+                            {isBlocked: false}]
+            }
+        }).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if (user === null || user.error !== undefined) {
+            return setErrorResponse("El usuario no existe.",
+                                461,
+                                res);
+        }
+
+        const response = await Users.update(
+            {
+                photoUrl: photoUrl
+            },
+                {
+                    where: 
+                        {id: userId}
                 }
+            ).catch(error => ({ error: error.toString() }) );
+        
+        if (response.error !== undefined) {
+            Logger.error(response.error.toString());
+          
+            utils.setErrorResponse(response.error,
+                561,
+                res);
+          
+            return;
+            }
+        
+
+        return setBodyResponse({status: 'Foto de perfil actualizada'},
+                200,
+                res);
+    }
+
+
+    async getUserType(req, res){
+        
+        Logger.info("Request a /users/profile/type");
+
+        const userId = req.query.userId;
+
+        const user = await Users.findOne({
+            where: {
+                [Op.and]: [{id: userId},
+                            {isBlocked: false}]
+            }
+        }).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if ( user === null ){
+            Logger.error(`No existe el usuario`);
+        
+            return utils.setErrorResponse(`No existe el usuario`,
+                461,
+                res);
+        }
+
+        Logger.info(`Usuario encontrado.`);
+
+        utils.setBodyResponse({status: user.isListener? constants.LISTENER: constants.ARTIST},
+            201,
+            res);
+
+    }
 }
 
 module.exports = {

@@ -3,7 +3,7 @@ const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
 const { Op } = require("sequelize");
-const Users = require("../data/Users");
+const {Users} = require("../data/Users");
 
 async function signInWithBiometric(req, res) {
     const {  idToken } = req.body;
@@ -63,7 +63,7 @@ async function createBiometricSignInUser(body, res){
     }
 
     const responseBody = {
-        status: "ok"
+        status: "ok",
     }
 
     utils.setBodyResponse(responseBody,

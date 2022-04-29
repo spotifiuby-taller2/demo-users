@@ -128,6 +128,35 @@ const Users = database.define('users', {
     other: {
         type: Sequelize.BOOLEAN
     },
+    photoUrl: {
+        type: Sequelize.STRING(constants.MAX_STR_LEN),
+    }
 } );
 
-module.exports = Users;
+const ArtistFav = database.define('artistfavs', {
+    idArtist: {
+        type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+        allowNull: false,
+        validate: { notEmpty: true },
+        primaryKey: true,
+        references: {
+            model: Users, // <----- name of the table
+            key: 'id'
+        }
+    },
+    idListener: {
+        type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+        allowNull: false,
+        validate: { notEmpty: true },
+        primaryKey: true,
+        references: {
+            model: Users, // <----- name of the table
+            key: 'id'
+        }
+    }});
+
+    Users.belongsToMany(Users, { through: ArtistFav, as: "idArtist", foreignKey: 'idArtist'});
+    Users.belongsToMany(Users, { through: ArtistFav, as: "idListener", foreignKey: 'idListener'});
+
+
+module.exports = {Users,ArtistFav};

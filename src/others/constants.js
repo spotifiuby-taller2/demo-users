@@ -17,6 +17,8 @@ const TIMEZONE = "America/Buenos_Aires";
 const SYMBOL_MAX_LEN = 10;
 const TIMESTAMP_MAX_LEN = 30;
 const NAME_MAX_LEN = 30;
+const LISTENER='listener';
+const ARTIST='artist';
 
 const JSON_HEADER = {
     'Content-Type': 'application/json',
@@ -52,9 +54,13 @@ const HOME_URL = "/home";
 const USERS_URL = "/users";
 const USERS_LIST_URL = USERS_URL + "/list";
 const APP_USERS_LIST_URL = USERS_URL + "/applist";
+const APP_ARTIST_LIST_URL = USERS_URL + "/artistlist";
+const APP_FAV_ARTIST_LIST_URL = USERS_URL + "/favartistlist";
+const APP_FAV_ARTIST_URL = USERS_URL + "/favartist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
+const PROFILE_PHOTO_URL = PROFILE_URL + "/photo";
 const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
@@ -63,6 +69,7 @@ const FORGOT_PASSWORD_URL = "/forgotpassword";
 const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 const REDIRECT_URL = "/redirect";
+const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
 
 
 /* ====== Docker vs Development config ====== */
@@ -223,5 +230,12 @@ module.exports = {
     TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN,
     APP_USERS_LIST_URL,
-    MUSICAL_PREF_URL
+    MUSICAL_PREF_URL,
+    APP_ARTIST_LIST_URL,
+    PROFILE_PHOTO_URL,
+    APP_FAV_ARTIST_LIST_URL,
+    APP_FAV_ARTIST_URL,
+    LISTENER,
+    ARTIST,
+    PROFILE_USER_TYPE_URL
 }

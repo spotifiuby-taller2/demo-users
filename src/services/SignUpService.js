@@ -2,7 +2,7 @@ const {auth} = require("../services/FirebaseService");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const NonActivatedUsers = require("../data/NonActivatedUsers");
-const Users = require("../data/Users");
+const {Users} = require("../data/Users");
 const Logger = require("./Logger");
 const {areAnyUndefined, invalidFieldFormat} = require("../others/utils");
 const {sendConfirmationEmail} = require('../services/MailService');
@@ -116,12 +116,18 @@ class SignUpService {
         } = req.body;
 
         const isAdmin = link === "web";
+        let fields;
 
-        if ( areAnyUndefined([email,
-                            password]) ) {
-            return utils.setErrorResponse("Faltan especificar campos",
-                                          400,
-                                          res);
+        if ( isAdmin ){
+            fields=[email, password];
+        }
+        else{
+            fields = [name, surname, email, phoneNumber, password];
+        }
+
+        if (areAnyUndefined(fields)) {
+            utils.setErrorResponse("Faltan completar campos requeridos", 400, res);
+            return;
         }
 
         if (invalidFieldFormat(email, password)) {
