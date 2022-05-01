@@ -70,6 +70,7 @@ const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 const REDIRECT_URL = "/redirect";
 const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
+const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
 
 
 /* ====== Docker vs Development config ====== */
@@ -237,5 +238,6 @@ module.exports = {
     APP_FAV_ARTIST_URL,
     LISTENER,
     ARTIST,
-    PROFILE_USER_TYPE_URL
+    PROFILE_USER_TYPE_URL,
+    EDIT_PROFILE_URL
 }

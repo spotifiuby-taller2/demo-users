@@ -276,6 +276,10 @@ class SignUpService {
         if (response.error !== undefined) {
             Logger.error("561: " + response.error.toString());
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> feature/edit-profile
             return utils.setErrorResponse(response.error,
                 561,
                 res);
