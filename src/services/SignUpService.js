@@ -261,11 +261,10 @@ class SignUpService {
         if (response.error !== undefined) {
             Logger.error(response.error.toString());
 
-            utils.setErrorResponse(response.error,
+        
+            return utils.setErrorResponse(response.error,
                 561,
                 res);
-
-            return;
         }
 
         const requestBody = {

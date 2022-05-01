@@ -4,7 +4,7 @@ const {Users} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
-const bodyParser = require("body-parser");
+const {auth} = require("../services/FirebaseService");
 
 class ProfileService {
     defineEvents(app) {
@@ -108,6 +108,116 @@ class ProfileService {
 
          app.get( constants.PROFILE_USER_TYPE_URL,
             this.getUserType
+                .bind(this) );
+
+
+        /**
+         * @swagger
+         * /users/editprofile:
+         *   patch:
+         *    summary: edit profile.
+         *
+         *    description: edit user profile and return message if everthing is ok.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         * 
+         *         - name: "name"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "surname"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "phoneNumber"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "metal"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "pop"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "punk"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "rap"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "reggeaton"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         *          
+         *         - name: "classic"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "electronic"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "blues"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "salsa"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "rock"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "indie"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "jazz"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *         - name: "others"
+         *           in: body
+         *           type: "string"
+         *           required: false
+         * 
+         *    responses:
+         *         "200":
+         *           description: "return message profile edit was successful"
+         *
+         *         "561":
+         *           description: "Error editing profile"
+         * 
+         *         "562":
+         *           description: "Error editing user email"
+         */
+
+         app.patch( constants.EDIT_PROFILE_URL,
+            this.editProfile
                 .bind(this) );
             }
 
@@ -308,6 +418,40 @@ class ProfileService {
         Logger.info(`Usuario encontrado.`);
 
         utils.setBodyResponse({status: user.isListener? constants.LISTENER: constants.ARTIST},
+            201,
+            res);
+
+    }
+
+    async editProfile(req, res){
+
+        Logger.info("Request a /users/editprofile");
+
+        const userId = req.query.userId;
+        const body = req.body;
+
+        delete body['apiKey'];
+        delete body['verbRedirect'];
+        delete body['redirectTo'];
+
+
+        const response = await Users.update(
+            body,
+            {
+                where: {
+                    id: userId,
+                    isBlocked: false
+                }
+        }
+        )
+        .catch(error => ({error: error.toString()}));;
+
+        if ( response.error  !== undefined ){
+            Logger.error("No se pudo editar el perfil del usuario");
+            return utils.setErrorResponse("No se pudo editar el perfil del usuario", 461, res);
+        }
+
+        utils.setBodyResponse({status: 'Perfil del usuario actualizado'},
             201,
             res);
 
