@@ -1,7 +1,6 @@
 const database = require('../data/database');
 const SignUpService = require('../services/SignUpService');
 const SignInService = require('../services/SignInService');
-const { ProfileService } = require('../services/ProfileService');
 const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
@@ -11,8 +10,8 @@ const { runMigrations } = require("../data/migrations");
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const ForgotPassword = require("../services/ForgotPassword");
+const {RestaurantService} = require("../services/RestaurantService");
 const { swaggerConfig } = require('./swaggerConfig');
-const { InfoService } = require("../services/InfoService");
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
@@ -31,23 +30,30 @@ class App {
                   swaggerUi.setup(swaggerDoc) );
 
     this.signUpService = new SignUpService();
+
     this.signInService = new SignInService();
+
     this.forgotPassword = new ForgotPassword();
-    this.infoService = new InfoService();
-    this.profileService = new ProfileService();
+
+    this.restaurantsService = new RestaurantService();
   }
 
   async syncDB() {
-    if (! constants.isDevelopment) {
-        await runMigrations();
-    }
+    // Delete this constant after first run
+    // const firstTimeToRun = true;
 
     // "sync()" creates the database table for our model(s),
     // if we make .sync({force: true}),
-    // the db is dropped first if it is already existed
+    // the db is dropped first if it is already existed.
     await database.sync( {
+        // force: constants.RESET_DATABASE || firstTimeToRun
         force: constants.RESET_DATABASE
     } );
+
+      // if (! constants.isDevelopment || firstTimeToRun) {
+      if (! constants.isDevelopment) {
+          await runMigrations();
+      }
 
     this.app
         .listen(constants.nodePort, () => {
@@ -69,10 +75,7 @@ class App {
     this.forgotPassword
         .defineEvents(this.app);
 
-    this.infoService
-        .defineEvents(this.app);
-
-    this.profileService
+    this.restaurantsService
         .defineEvents(this.app);
   }
 }
@@ -86,4 +89,4 @@ main.syncDB()
       } )
     .catch( (error) => {
       console.log(error);
-    }) ;
+    } ) ;

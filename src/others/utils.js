@@ -13,7 +13,6 @@ function setBodyResponse(responseBody,
 function setErrorResponse(error,
                           status,
                           res) {
-
     const responseBody = {
         error: error.toString()
     }
@@ -92,13 +91,10 @@ function invalidFieldFormat(email, password) {
 
 }
 
-
 // response.json() is a promise
-const postToGateway = (body) => {
-    body.verbRedirect = "POST";
-    body.apiKey = constants.MY_API_KEY;
-
-    return fetch(constants.SERVICES_HOST + constants.REDIRECT_URL, {
+const postTo = (body,
+                url) => {
+    return fetch(url, {
             method: "POST",
             headers: constants.JSON_HEADER,
             body: JSON.stringify(body)
@@ -120,5 +116,5 @@ module.exports = {
     getDate,
     areAnyUndefined,
     invalidFieldFormat,
-    postToGateway
+    postTo
 }

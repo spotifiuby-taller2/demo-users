@@ -1,14 +1,11 @@
-const {auth} = require("../services/FirebaseService");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
-const NonActivatedUsers = require("../data/NonActivatedUsers");
 const {Users} = require("../data/Users");
+const {NonActivatedUsers} = require("../data/NonActivatedUsers");
 const Logger = require("./Logger");
 const {areAnyUndefined, invalidFieldFormat} = require("../others/utils");
 const {sendConfirmationEmail} = require('../services/MailService');
 const {Op} = require("sequelize");
-const WhatsAppService = require("../services/WhatsAppService");
-
 
 class SignUpService {
   defineEvents(app) {
@@ -152,11 +149,6 @@ class SignUpService {
                 return utils.setErrorResponse("Error al crear al usuario.",
                                                 562,
                                                 res);
-            } else if (user.isExternal) {
-                return utils.setErrorResponse("El usuario ya se ha loguedo de manera externa y " +
-                                                "ya no puede registrarse en esta aplicación",
-                                                464,
-                                                res);
             } else {
                 return utils.setErrorResponse("Ya hay un usuario con ese mail",
                                                 461,
@@ -174,11 +166,9 @@ class SignUpService {
             return;
         }
 
-        const pin = Math.random().toString().slice(2, 9);
+        const pin = utils.getId();
 
-
-        await NonActivatedUsers.create({
-            id,
+        await NonActivatedUsers.create( {
             email,
             password,
             isAdmin,
@@ -186,11 +176,7 @@ class SignUpService {
             pin,
             phoneNumber,
             name,
-            surname,
-            isArtist,
-            isListener,
-            latitude,
-            longitude
+            surname
         }).catch(error => {
             Logger.error("No se pudo crear el usuario temporal " + error.toString());
 
@@ -205,18 +191,14 @@ class SignUpService {
 
         try {
             let message;
-            if (isAdmin) {
+
                 await sendConfirmationEmail(email, pin,
-                    `${constants.BACKOFFICE_HOST}${constants.SIGN_UP_END_URL}/${id}/${pin}`);
+                    `${constants.FRONT_HOST}${constants.SIGN_UP_END_URL}/${pin}/${pin}`);
                 message = "Correo enviado";
-            } else {
-                await WhatsAppService.sendVerificationCode(phoneNumber, pin);
-                message = "Pin enviado";
-            }
 
             Logger.info(message);
 
-            let response = {result: message, id:  id};
+            let response = {result: message, pin:  pin};
 
             utils.setBodyResponse(response, 200, res);
         } catch (error) {
@@ -224,7 +206,7 @@ class SignUpService {
 
             await NonActivatedUsers.destroy({
                 where: {
-                    id: id
+                    pin: pin
                 }
             });
 
@@ -237,79 +219,45 @@ class SignUpService {
     async createVerifiedUser(req, res) {
         Logger.request(constants.SIGN_UP_END_URL + '/:userId/:pin');
 
-        const userId = req.params.userId;
-
-        const pin = req.params.pin;
+        const pin = req.params
+                       .pin;
 
         const tempUser = await NonActivatedUsers.findOne({
-            where: {[Op.and]: [{id: userId}, {pin}]}
-        });
+            where: { [Op.and]: [
+                {pin: pin}
+            ] }
+        } ).catch(error => {
+                return {
+                    error: error.toString()
+                };
+            });
 
-        if (tempUser === null) {
-            Logger.error("461: PIN de confirmación inválido");
-
-            return utils.setErrorResponse("PIN de confirmación inválido",
-                461,
-                res);
-        }
-
-        const requestBody = {
-            redirectTo: constants.PAYMENT_HOST + constants.WALLET_URL,
-        }
-        const gatewayResponse = await utils.postToGateway(requestBody);
-        if (gatewayResponse.error !== undefined) {
-            Logger.error("500: " + gatewayResponse.error.toString());
-
-            return utils.setErrorResponse(gatewayResponse.error,
-                500,
-                res);
-        }
-
-        const response = await auth.createUser({
-            email: tempUser.email,
-            emailVerified: true,
-            password: tempUser.password,
-            disabled: false
-        })
-            .catch(error => ({error: error.toString()}));
-
-        if (response.error !== undefined) {
-            Logger.error("561: " + response.error.toString());
-
-            return utils.setErrorResponse(response.error,
-                561,
+        if (tempUser === null || tempUser.error !== undefined) {
+            return utils.setErrorResponse("No se pudo consultar la base de datos.",
+                563,
                 res);
         }
 
         const responseBody = {
             status: "ok",
-            id: response.uid
         }
 
         await Users.create({
-            id: response.uid,
             email: tempUser.email,
             password: tempUser.password,
             isAdmin: tempUser.isAdmin,
-            isBlocked: false,
-            isExternal: tempUser.isExternal,
             phoneNumber: tempUser.phoneNumber,
             name: tempUser.name,
             surname: tempUser.surname,
-            isArtist: tempUser.isArtist,
-            isListener: tempUser.isListener,
-            latitude: tempUser.latitude,
-            longitude: tempUser.longitude,
-            walletId: gatewayResponse.id
         });
 
         await NonActivatedUsers.destroy({
             where: {
-                id: userId
+                pin: pin
             }
         });
 
-        Logger.info("Usuario creado con email y contraseña: " + response.uid);
+        Logger.info("Usuario creado con email y contraseña");
 
         res.status(200)
             .json(responseBody);
