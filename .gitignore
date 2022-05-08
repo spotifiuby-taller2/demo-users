@@ -4,7 +4,6 @@ node_modules
 build
 coverage
 logs/*
-package-lock.json
 
 .idea
 .nyc_output

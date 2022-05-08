@@ -1,9 +1,13 @@
+const {auth} = require("../services/FirebaseService");
 const constants = require('../others/constants');
 const utils = require("../others/utils");
 const Logger = require("./Logger");
 const { areAnyUndefined } = require("../others/utils");
 const { Op } = require("sequelize");
 const {Users} = require("../data/Users");
+const RecoveryRequests = require("../data/RecoveryRequest");
+const {getDateTimeFromDatabaseTimestamp} = require("../others/utils");
+const {getDateTimeMinus} = require("../others/utils");
 const {sendPasswordRecoveryEmail} = require("./MailService");
 
 class ForgotPassword {
@@ -99,9 +103,7 @@ class ForgotPassword {
         const user = await Users.findOne( {
             where: {
                 [Op.and]:
-                    [ {
-                    id: userId
-                } ]
+                    [{id: userId}]
             }
         } );
 
