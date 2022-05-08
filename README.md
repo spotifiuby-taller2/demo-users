@@ -10,6 +10,7 @@
     * `npm run startdev`
 
 - #### Local con Docker Compose
+
 ```
 docker-compose up --build
 ```
