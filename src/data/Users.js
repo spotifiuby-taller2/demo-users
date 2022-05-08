@@ -130,6 +130,9 @@ const Users = database.define('users', {
     },
     photoUrl: {
         type: Sequelize.STRING(constants.MAX_STR_LEN),
+    },
+    pushNotificationToken: {
+        type: Sequelize.STRING(constants.MAX_STR_LEN),
     }
 } );
 

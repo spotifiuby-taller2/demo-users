@@ -36,7 +36,7 @@ class ProfileService {
         /**
          * @swagger
          * /users/profile/musicalpref:
-         *   get:
+         *   patch:
          *    summary: Users list.
          *
          *    description: Return list of users.
@@ -89,11 +89,11 @@ class ProfileService {
         
         /**
          * @swagger
-         * /users/profile/type:
+         * /users/profile/basicinfo:
          *   get:
-         *    summary: get user type.
+         *    summary: get user name, surname and type.
          *
-         *    description: get user type.
+         *    description: get user name, surname and type.
          *
          *    parameters:
          *         - name: "id"
@@ -103,14 +103,14 @@ class ProfileService {
          *
          *    responses:
          *         "200":
-         *           description: "return user type."
+         *           description: "return user name, surname and type."
          *
          *         "461":
          *           description: "User does not exist."
          */
 
-         app.get( constants.PROFILE_USER_TYPE_URL,
-            this.getUserType
+         app.get( constants.PROFILE_USER_BASIC_INFO_URL,
+            this.getUserBasicInfo
                 .bind(this) );
 
 
@@ -222,7 +222,40 @@ class ProfileService {
          app.patch( constants.EDIT_PROFILE_URL,
             this.editProfile
                 .bind(this) );
-            }
+
+        /**
+         * @swagger
+         * /users/profile/pushNotificationToken:
+         *   patch:
+         *    summary: set push notification token.
+         *
+         *    description: Return list of users.
+         *
+         *    parameters:
+         *         - name: "id"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         * 
+         *         - name: "token"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "201":
+         *           description: "Push notification token updated."
+         *
+         *         "461":
+         *           description: "User does not exist."
+         *
+         *         "462":
+         *           description: "Update push notification token failed"
+         */
+         app.patch( constants.PUSH_NOTIFICATION_TOKEN_URL,
+            this.setPushNotificationToken
+                .bind(this) );
+    }
 
     async getProfile(req,
                      res) {
@@ -270,7 +303,8 @@ class ProfileService {
                 'blues':  user.blues,
                 'rock':  user.rock,
                 'other':  user.other,
-                'photoUrl': user.photoUrl
+                'photoUrl': user.photoUrl,
+                'pushNotificationToken': user.pushNotificationToken,
         };
 
         return setBodyResponse(profileResponse,
@@ -399,9 +433,9 @@ class ProfileService {
     }
 
 
-    async getUserType(req, res){
+    async getUserBasicInfo(req, res){
         
-        Logger.info("Request a /users/profile/type");
+        Logger.info("Request a /users/profile/basicinfo");
 
         const userId = req.query.userId;
 
@@ -426,7 +460,7 @@ class ProfileService {
 
         Logger.info(`Usuario encontrado.`);
 
-        utils.setBodyResponse({status: user.isListener? constants.LISTENER: constants.ARTIST},
+        utils.setBodyResponse({type: user.isListener? constants.LISTENER: constants.ARTIST, name: user.name, surname: user.surname},
             201,
             res);
 
@@ -461,6 +495,59 @@ class ProfileService {
         }
 
         utils.setBodyResponse({status: 'Perfil del usuario actualizado'},
+            201,
+            res);
+
+    }
+
+    async setPushNotificationToken(req, res){
+
+        Logger.info("Request a /users/profile/pushnotificationtoken");
+
+        const userId = req.query.userId;
+        const {token} = req.body;
+
+        const user = await Users.findOne({
+            where: {
+                [Op.and]: [{id: userId},
+                            {isBlocked: false}]
+            }
+        }).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if (user === null || user.error !== undefined) {
+            return setErrorResponse("El usuario no existe.",
+                                461,
+                                res);
+        }
+
+        const updatedUser = await Users.update(
+            {
+                pushNotificationToken: token
+            },
+            {
+                where: {
+                    [Op.and]: [{id: userId},
+                                {isBlocked: false}]
+                }
+            }
+        ).catch(error => {
+            return {
+                error: error.toString()
+            }
+        });
+
+        if (updatedUser === null || updatedUser.error !== undefined) {
+            return setErrorResponse(`No se pudo actualizar el push notification token del usuario ${userId}`,
+                                462,
+                                res);
+        }
+
+
+        utils.setBodyResponse({status: 'Push notification token actualizado'},
             201,
             res);
 

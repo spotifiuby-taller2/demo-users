@@ -69,8 +69,9 @@ const FORGOT_PASSWORD_URL = "/forgotpassword";
 const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 const REDIRECT_URL = "/redirect";
-const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
+const PROFILE_USER_BASIC_INFO_URL= PROFILE_URL + "/basicinfo";
 const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
+const PUSH_NOTIFICATION_TOKEN_URL = PROFILE_URL + "/pushnotificationtoken";
 
 
 /* ====== Docker vs Development config ====== */
@@ -238,6 +239,7 @@ module.exports = {
     APP_FAV_ARTIST_URL,
     LISTENER,
     ARTIST,
-    PROFILE_USER_TYPE_URL,
-    EDIT_PROFILE_URL
+    PROFILE_USER_BASIC_INFO_URL,
+    EDIT_PROFILE_URL,
+    PUSH_NOTIFICATION_TOKEN_URL
 }
