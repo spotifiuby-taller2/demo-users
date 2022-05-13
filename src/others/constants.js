@@ -70,7 +70,7 @@ const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 const REDIRECT_URL = "/redirect";
 const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
-
+const PARSE_USERS_URL= "/parse";
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -237,5 +237,6 @@ module.exports = {
     APP_FAV_ARTIST_URL,
     LISTENER,
     ARTIST,
-    PROFILE_USER_TYPE_URL
+    PROFILE_USER_TYPE_URL,
+    PARSE_USERS_URL
 }
