@@ -305,6 +305,7 @@ class ProfileService {
                 'other':  user.other,
                 'photoUrl': user.photoUrl,
                 'pushNotificationToken': user.pushNotificationToken,
+                'isVerified': user.isVerified,
         };
 
         return setBodyResponse(profileResponse,

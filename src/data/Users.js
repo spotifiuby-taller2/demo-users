@@ -133,6 +133,11 @@ const Users = database.define('users', {
     },
     pushNotificationToken: {
         type: Sequelize.STRING(constants.MAX_STR_LEN),
+    },
+    isVerified:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
     }
 } );
 

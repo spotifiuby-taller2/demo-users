@@ -368,6 +368,9 @@ class InfoService {
 
                 isListener: user.dataValues
                     .isListener,
+
+                isVerified: user.dataValues
+                    .isVerified,
             } );
         } );
 
