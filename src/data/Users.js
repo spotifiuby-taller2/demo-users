@@ -158,8 +158,33 @@ const ArtistFav = database.define('artistfavs', {
         }
     }});
 
+    const Notifications = database.define('notifications', {
+        idEmissor: {
+            type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+            allowNull: false,
+            validate: { notEmpty: true },
+            primaryKey: true,
+            references: {
+                model: Users, // <----- name of the table
+                key: 'id'
+            }
+        },
+        idReceptor: {
+            type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
+            allowNull: false,
+            validate: { notEmpty: true },
+            primaryKey: true,
+            references: {
+                model: Users, // <----- name of the table
+                key: 'id'
+            }
+        }});
+
+
     Users.belongsToMany(Users, { through: ArtistFav, as: "idArtist", foreignKey: 'idArtist'});
     Users.belongsToMany(Users, { through: ArtistFav, as: "idListener", foreignKey: 'idListener'});
+    Users.belongsToMany(Users, { through: Notifications, as: "idEmissor", foreignKey: 'idReceptor'});
+    Users.belongsToMany(Users, { through: Notifications, as: "idReceptor", foreignKey: 'idEmissor'});
 
 
-module.exports = {Users,ArtistFav};
+module.exports = {Users,ArtistFav,Notifications};
