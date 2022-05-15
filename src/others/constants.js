@@ -61,6 +61,7 @@ const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
 const PROFILE_PHOTO_URL = PROFILE_URL + "/photo";
+const PROFILE_VERIFICATION_VIDEO_URL = PROFILE_URL + "/verification/video";
 const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
@@ -220,5 +221,6 @@ module.exports = {
     PROFILE_USER_BASIC_INFO_URL,
     EDIT_PROFILE_URL,
     PUSH_NOTIFICATION_TOKEN_URL,
-    NOTIFICATION_LIST_URL
+    NOTIFICATION_LIST_URL,
+    PROFILE_VERIFICATION_VIDEO_URL
 }

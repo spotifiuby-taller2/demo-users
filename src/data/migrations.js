@@ -54,6 +54,14 @@ async function runMigrations() {
     .catch(error => {
       console.log(error.toString());
     });
+
+  await queryInterface.addColumn('users',
+    'verificationVideoUrl', {
+      type: Sequelize.STRING(constants.MAX_STR_LEN)
+    })
+    .catch(error => {
+      console.log(error.toString());
+    });
 }
 
 module.exports = {
