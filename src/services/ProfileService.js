@@ -1,6 +1,6 @@
 const {setBodyResponse, setErrorResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const {Users} = require("../data/Users");
+const {Users, ArtistFav} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
@@ -307,6 +307,25 @@ class ProfileService {
       'isVerified': user.isVerified,
       'verificationVideoUrl': user.verificationVideoUrl
     };
+
+
+    if ( user.isArtist ){
+      
+      const followers = await ArtistFav.findAll(
+        {
+          where: {
+            idArtist: user.id,
+          }
+        }
+      ).catch(err => {return { error: err.toString() }})
+      
+      if ( followers.error !== undefined ){
+        return utils.setErrorResponse(followers.error, 481, res);
+      }
+
+      profileResponse['nFollowers'] = followers.length;
+
+    }
 
     return setBodyResponse(profileResponse, 200, res);
   }
