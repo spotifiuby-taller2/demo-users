@@ -70,11 +70,13 @@ const FORGOT_PASSWORD_URL = "/forgotpassword";
 const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 const REDIRECT_URL = "/redirect";
+
 const PROFILE_USER_BASIC_INFO_URL= PROFILE_URL + "/basicinfo";
 const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
 const PUSH_NOTIFICATION_TOKEN_URL = PROFILE_URL + "/pushnotificationtoken";
 const NOTIFICATION_LIST_URL = USERS_URL + "/notificationlist"
-
+const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
+const PARSE_USERS_URL= "/parse";
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -222,5 +224,7 @@ module.exports = {
     EDIT_PROFILE_URL,
     PUSH_NOTIFICATION_TOKEN_URL,
     NOTIFICATION_LIST_URL,
-    PROFILE_VERIFICATION_VIDEO_URL
+    PROFILE_VERIFICATION_VIDEO_URL,
+    PROFILE_USER_TYPE_URL,
+    PARSE_USERS_URL
 }
