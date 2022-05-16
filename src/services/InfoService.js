@@ -1,6 +1,6 @@
 const {setBodyResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const {Users, ArtistFav} = require("../data/Users");
+const {Users, ArtistFav, Notifications} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
@@ -63,7 +63,7 @@ class InfoService {
         /**
          * @swagger
          * /users/applist:
-         *   post:
+         *   get:
          *    summary: List app users.
          *
          *    description: Return list of app users.
@@ -174,7 +174,7 @@ class InfoService {
                 .bind(this) );
 
 
-                /**
+        /**
          * @swagger
          * /users/favartist:
          *   delete:
@@ -207,7 +207,7 @@ class InfoService {
                 .bind(this) );
 
 
-               /**
+        /**
          * @swagger
          * /users/favartist:
          *   get:
@@ -234,6 +234,108 @@ class InfoService {
                 app.get( constants.APP_FAV_ARTIST_URL,
                     this.getFavArtist
                         .bind(this) );
+
+        /**
+         * @swagger
+         * /users/notificationlist:
+         *   get:
+         *    summary: get user notification list.
+         *
+         *    description: get user notification list.
+         *
+         *    parameters:
+         *         - name: "idEmissor"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "return notification list."
+         *
+         *         "471":
+         *           description: "Emissor does not exists."
+         *
+         *         "571":
+         *           description: "Error returning notification list."
+         */
+               app.get( constants.NOTIFICATION_LIST_URL,
+                    this.getNotificationList
+                        .bind(this) );
+
+                
+        
+
+        /**
+         * @swagger
+         * /users/notificationlist:
+         *   post:
+         *    summary: add a notification.
+         *
+         *    description: add a notification.
+         *
+         *    parameters:
+         *         - name: "idEmissor"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         * 
+         *         - name: "idReceptor"
+         *           in: query
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "notification added."
+         *
+         *         "471":
+         *           description: "emissor or receptor doesn't exist"
+         *
+         *     
+         */
+                app.delete( constants.NOTIFICATION_LIST_URL,
+                    this.deleteNotification
+                        .bind(this) );
+
+        /**
+         * @swagger
+         * /users/notificationlist:
+         *   post:
+         *    summary: add a new notification.
+         *
+         *    description: add a new notification.
+         *
+         *    parameters:
+         *         - name: "idEmissor"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         * 
+         *         - name: "idReceptor"
+         *           in: body
+         *           type: "string"
+         *           required: true
+         *
+         *    responses:
+         *         "200":
+         *           description: "notification added."
+         *
+         *         "471":
+         *           description: "Emissor doesn't exist"
+         *
+         *         "472":
+         *           description: "Receptor doesn't exist"
+         * 
+         *         "571":
+         *           description: "Error creating notification."
+         */
+        
+                app.post( constants.NOTIFICATION_LIST_URL,
+                    this.addNotification
+                        .bind(this) );
+
+
     }
 
 
@@ -266,6 +368,9 @@ class InfoService {
 
                 isListener: user.dataValues
                     .isListener,
+
+                isVerified: user.dataValues
+                    .isVerified,
             } );
         } );
 
@@ -498,6 +603,8 @@ class InfoService {
 
     async addFavArtist(req, res){
 
+        Logger.info("Request a /users/favartist");
+
         const {idArtist, idListener} = req.body;
 
         let response = await  Users.findOne(
@@ -554,16 +661,15 @@ class InfoService {
 
     async deleteFavArtist(req, res){
 
+        Logger.info("Request a /users/favartist");
+
         const idListener = req.query.idListener;
         const idArtist = req.query.idArtist;
 
 
         const response = await ArtistFav.destroy(
             {
-                where:{
-                    idListener: idListener,
-                    idArtist: idArtist
-                }
+                where: {[Op.and]: [{idListener: idListener}, {idArtist: idArtist}]}
             }
         )
 
@@ -583,6 +689,8 @@ class InfoService {
     }
 
     async getFavArtist(req, res){
+
+        Logger.info("Request a /users/favartist");
 
         const idListener = req.query.idListener;
         const idArtist = req.query.idArtist;
@@ -619,6 +727,125 @@ class InfoService {
                 571,
                 res)
         });
+
+    }
+
+
+    async deleteNotification(req, res){
+
+        Logger.info("Request a /users/notificationlist");
+
+        const idEmissor = req.query.idEmissor;
+        const idReceptor = req.query.idReceptor;
+
+        const response = await Notifications
+            .destroy({
+                where: {[Op.and]: [{idEmissor: idEmissor}, {idReceptor: idReceptor}]}
+            })
+            .catch(err => {
+                return {error: err.toString()}
+            });
+
+        if ( response.error !== undefined ){
+            return utils.setErrorResponse('Error al destruir la notificación',571,res);
+        }
+        else if ( response === 0 ){
+            return utils.setErrorResponse('La notificación no existe',471,res);
+        }
+
+        Logger.info(`La notificación ha sido borrada con exito.`);
+
+        utils.setBodyResponse({status: 'Notificación eliminada.'},
+            201,
+            res);
+    }
+
+    async addNotification(req, res){
+        Logger.info("Request a /users/notificationlist");
+
+        const idEmissor = req.body.idEmissor;
+        const idReceptor = req.body.idReceptor;
+
+        const response = await Notifications
+            .create({
+                idEmissor: idEmissor,
+                idReceptor: idReceptor
+            })
+            .catch(err => {
+                return {error: err.toString()}
+            });
+        
+
+        if ( response.error !== undefined ){
+            return utils.setErrorResponse(response.error,471,res);
+        }
+
+        Logger.info(`La notificación ha sido creada con exito.`);
+
+        utils.setBodyResponse({status: 'Notificación eliminada.'},
+            201,
+            res);
+    }
+
+
+    async getNotificationList(req, res){
+        Logger.info("Request a /users/notificationlist");
+
+        const idEmissor = req.query.idEmissor;
+
+        let emissor = await Users.findOne(
+            {
+                where: {[Op.and]: [{id: idEmissor},{isBlocked: false}]}
+            }
+        ).catch(err => {return {error: err.toString()}});
+
+        if (  emissor === null ){
+            
+            return utils.setErrorResponse('No existe el emisor',471,res);
+        }
+
+        const receivers = await Users.findAll(
+            {
+                include: [{
+                    model: Users,
+                    as: "idEmissor",
+                    where:{
+                        id: idEmissor
+                    }
+                }],
+            } 
+        )
+        .catch(error => ({error: error.toString()}));
+
+        if ( receivers === null ){
+            
+            return utils.setErrorResponse('No se encontraron totificaciones',472,res);
+        }
+
+        const notifications = []
+
+        receivers.forEach( receiver =>{
+
+            const notification = {
+                idEmissor: idEmissor,
+                idReceptor: receiver.id,
+                nameEmissor: emissor.name,
+                surnameEmissor: emissor.surname,
+                nameReceptor: receiver.name,
+                surnameReceptor: receiver.surname,
+                pushNotificationToken: receiver.pushNotificationToken
+            }
+
+            notifications.push(notification);
+
+        } )
+
+
+        const response = {
+            notifications: notifications
+        }
+
+        utils.setBodyResponse(response,200, res);
 
     }
 }

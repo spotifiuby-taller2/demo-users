@@ -61,6 +61,7 @@ const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
 const PROFILE_URL = USERS_URL + "/profile";
 const PROFILE_PHOTO_URL = PROFILE_URL + "/photo";
+const PROFILE_VERIFICATION_VIDEO_URL = PROFILE_URL + "/verification/video";
 const MUSICAL_PREF_URL = PROFILE_URL + "/musicalpref";
 const SIGN_UP_URL = "/signup";
 const SIGN_IN_URL = "/signin";
@@ -72,6 +73,7 @@ const REDIRECT_URL = "/redirect";
 const PROFILE_USER_BASIC_INFO_URL= PROFILE_URL + "/basicinfo";
 const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
 const PUSH_NOTIFICATION_TOKEN_URL = PROFILE_URL + "/pushnotificationtoken";
+const NOTIFICATION_LIST_URL = USERS_URL + "/notificationlist"
 
 
 /* ====== Docker vs Development config ====== */
@@ -92,7 +94,6 @@ if (process.env
 const isDevelopment = process.env
     .PRODUCTION === undefined;
 let databaseUrl;
-let firebaseConfig;
 
 const DB_DIALECT = "postgres";
 let DB_USER;
@@ -100,7 +101,6 @@ let DB_PASSWORD;
 let DB_HOST;
 let DB_PORT;
 let POSTGRES_DB;
-let firebaseJson;
 
 if (isDevelopment) {
 
@@ -120,18 +120,6 @@ if (isDevelopment) {
     } else {
         databaseUrl = process.env.DATABASE_URL;
     }
-
-    firebaseConfig = {
-        apiKey: "AIzaSyDlFbw1n3eqg7ogdwGuiTetV6isK4Uhqno",
-        authDomain: "fir-firebase-acc6b.firebaseapp.com",
-        projectId: "fir-firebase-acc6b",
-        storageBucket: "fir-firebase-acc6b.appspot.com",
-        messagingSenderId: "296878360901",
-        appId: "1:296878360901:web:7987ce42ec0a406b1f162c"
-    };
-
-    firebaseJson = require("./firebase_develop.json");
-
 } else {
     // Heroku
     // DATABASE_URL=${DB}://${POSTGRES_USER}:${POSTGRES_PASSWORD}
@@ -158,17 +146,9 @@ if (isDevelopment) {
         .split(":")[1]
         .split("/")[1];
 
-    firebaseConfig = {
-        apiKey: "AIzaSyCnDa9J7DKKtNv5crxZ4NrRGcW5c7nZTAg",
-        authDomain: "fir-firebase-2-9eb22.firebaseapp.com",
-        projectId: "fir-firebase-2-9eb22",
-        storageBucket: "fir-firebase-2-9eb22.appspot.com",
-        messagingSenderId: "701624425016",
-        appId: "1:701624425016:web:6cb2157c5a2c0a34e1a4cd"
-    };
-
-    firebaseJson = require("./firebase_production.json");
 }
+
+const firebaseJson = require("./firebase_production.json");
 
 const SENDGRID_API_KEY = "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";
 const MY_API_KEY = "72b60f6945b9beccf2a92c7da5f5c1963f4ec68240a1814b4ec5273cac5e7a44";
@@ -195,7 +175,6 @@ module.exports = {
     SIGN_UP_END_URL,
     JSON_HEADER,
     nodePort,
-    firebaseConfig,
     databaseUrl,
     BACKOFFICE_HOST,
     MAX_STR_LEN,
@@ -241,5 +220,7 @@ module.exports = {
     ARTIST,
     PROFILE_USER_BASIC_INFO_URL,
     EDIT_PROFILE_URL,
-    PUSH_NOTIFICATION_TOKEN_URL
+    PUSH_NOTIFICATION_TOKEN_URL,
+    NOTIFICATION_LIST_URL,
+    PROFILE_VERIFICATION_VIDEO_URL
 }
