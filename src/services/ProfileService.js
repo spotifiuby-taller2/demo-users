@@ -75,7 +75,7 @@ class ProfileService {
      *
      *    responses:
      *         "200":
-     *           description: "Musical preferences updated."
+     *           description: "profile photo updated."
      *
      *         "461":
      *           description: "User does not exist."
@@ -399,7 +399,7 @@ class ProfileService {
     Logger.info("Request a /users/profile/photo");
 
     const userId = req.query.userId;
-    const photoUrl = req.query.photoUrl;
+    const photoUrl = req.body.photoURL;
 
 
     const user = await Users.findOne({
