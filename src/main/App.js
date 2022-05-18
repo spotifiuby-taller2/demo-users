@@ -13,6 +13,7 @@ const swaggerUi = require('swagger-ui-express');
 const ForgotPassword = require("../services/ForgotPassword");
 const { swaggerConfig } = require('./swaggerConfig');
 const { InfoService } = require("../services/InfoService");
+const { ParseService } = require("../services/ParseService");
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
@@ -35,6 +36,7 @@ class App {
     this.forgotPassword = new ForgotPassword();
     this.infoService = new InfoService();
     this.profileService = new ProfileService();
+    this.parseService = new ParseService();
   }
 
   async syncDB() {
@@ -73,6 +75,9 @@ class App {
         .defineEvents(this.app);
 
     this.profileService
+        .defineEvents(this.app);
+
+    this.parseService
         .defineEvents(this.app);
   }
 }

@@ -92,7 +92,6 @@ function invalidFieldFormat(email, password) {
 
 }
 
-
 // response.json() is a promise
 const postToGateway = (body) => {
     body.verbRedirect = "POST";
