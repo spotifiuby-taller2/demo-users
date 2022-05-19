@@ -59,6 +59,9 @@ const APP_FAV_ARTIST_LIST_URL = USERS_URL + "/favartistlist";
 const APP_FAV_ARTIST_URL = USERS_URL + "/favartist";
 const USERS_BLOCK_URL = USERS_URL + "/block";
 const USERS_UNLOCK_URL = USERS_URL + "/unlock";
+const USERS_CREATE_ADMIN_URL = USERS_URL + "/createadmin";
+const USERS_VERIFIED_URL = USERS_URL + "/verified";
+const USERS_UNVERIFIED_URL = USERS_URL + "/unverified";
 const PROFILE_URL = USERS_URL + "/profile";
 const PROFILE_PHOTO_URL = PROFILE_URL + "/photo";
 const PROFILE_VERIFICATION_VIDEO_URL = PROFILE_URL + "/verification/video";
@@ -226,5 +229,8 @@ module.exports = {
     NOTIFICATION_LIST_URL,
     PROFILE_VERIFICATION_VIDEO_URL,
     PROFILE_USER_TYPE_URL,
-    PARSE_USERS_URL
+    PARSE_USERS_URL,
+    USERS_CREATE_ADMIN_URL,
+    USERS_VERIFIED_URL,
+    USERS_UNVERIFIED_URL
 }
