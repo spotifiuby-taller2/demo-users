@@ -371,6 +371,8 @@ class InfoService {
 
                 isVerified: user.dataValues
                     .isVerified,
+                photoUrl: user.dataValues
+                    .photoUrl
             } );
         } );
 

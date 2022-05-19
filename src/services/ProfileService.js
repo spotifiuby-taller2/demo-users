@@ -301,7 +301,7 @@ class ProfileService {
       'salsa': user.salsa,
       'blues': user.blues,
       'rock': user.rock,
-      'other': user.other,
+      'others': user.other,
       'photoUrl': user.photoUrl,
       'pushNotificationToken': user.pushNotificationToken,
       'isVerified': user.isVerified,
