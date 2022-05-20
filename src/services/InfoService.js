@@ -629,7 +629,8 @@ class InfoService {
       password,
       isAdmin: true,
       isBlocked: false,
-      isExternal: false
+      isExternal: false,
+      isVerified: false
     }).catch(error => ({error: error.toString()}));
 
     if (dbResponse.error !== undefined) {
