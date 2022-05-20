@@ -1,6 +1,6 @@
 const {setBodyResponse, setErrorResponse} = require("../others/utils");
 const constants = require("../others/constants");
-const {Users} = require("../data/Users");
+const {Users, ArtistFav} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
@@ -75,7 +75,7 @@ class ProfileService {
      *
      *    responses:
      *         "200":
-     *           description: "Musical preferences updated."
+     *           description: "profile photo updated."
      *
      *         "461":
      *           description: "User does not exist."
@@ -301,12 +301,31 @@ class ProfileService {
       'salsa': user.salsa,
       'blues': user.blues,
       'rock': user.rock,
-      'other': user.other,
+      'others': user.other,
       'photoUrl': user.photoUrl,
       'pushNotificationToken': user.pushNotificationToken,
       'isVerified': user.isVerified,
       'verificationVideoUrl': user.verificationVideoUrl
     };
+
+
+    if ( user.isArtist ){
+      
+      const followers = await ArtistFav.findAll(
+        {
+          where: {
+            idArtist: user.id,
+          }
+        }
+      ).catch(err => {return { error: err.toString() }})
+      
+      if ( followers.error !== undefined ){
+        return utils.setErrorResponse(followers.error, 481, res);
+      }
+
+      profileResponse['nFollowers'] = followers.length;
+
+    }
 
     return setBodyResponse(profileResponse, 200, res);
   }
@@ -380,7 +399,7 @@ class ProfileService {
     Logger.info("Request a /users/profile/photo");
 
     const userId = req.query.userId;
-    const photoUrl = req.query.photoUrl;
+    const photoUrl = req.body.photoURL;
 
 
     const user = await Users.findOne({

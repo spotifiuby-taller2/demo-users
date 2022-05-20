@@ -264,6 +264,7 @@ class InfoService {
 
 
     /**
+     /**
      * @swagger
      * /users/notificationlist:
      *   post:
@@ -427,6 +428,7 @@ class InfoService {
         isArtist: user.dataValues.isArtist,
         isListener: user.dataValues.isListener,
         isVerified: user.dataValues.isVerified,
+        photoUrl: user.dataValues.photoUrl
       });
     });
 
@@ -477,7 +479,6 @@ class InfoService {
       Logger.error(artists.error.toString());
       return utils.setErrorResponse(artists.error, 500, res);
     }
-
     return this.getFormattedUsers(artists, res);
   }
 
@@ -641,7 +642,6 @@ class InfoService {
     return utils.setBodyResponse(response, 200, res);
 
   }
-
 
   async addFavArtist(req, res) {
     Logger.info("Request a /users/favartist");
