@@ -263,13 +263,26 @@ class ProfileService {
     Logger.info("Request a /users/profile");
 
     const userId = req.query
-      .userId;
+                      .userId;
+
+    let whereCondition;
+
+    if ( req.query
+            .adminRequest === undefined ) {
+      whereCondition = {
+                        [Op.and]: [
+                          {id: userId},
+                          {isBlocked: false}]
+                      };
+    } else {
+      whereCondition = {
+        [Op.and]: [
+          {id: userId}]
+      };
+    }
 
     const user = await Users.findOne({
-      where: {
-        [Op.and]: [{id: userId},
-          {isBlocked: false}]
-      }
+      where: whereCondition
     }).catch(error => ({
       error: error.toString()
     }));
