@@ -139,11 +139,9 @@ class SignUpService {
         const user = await Users.findOne({
                 where: {email}
             })
-            .catch(error => {
-                return {
-                    error: error.toString()
-                };
-            });
+            .catch(error => ({
+                error: error.toString()
+            }));
 
         if (user !== null) {
             if (user.error !== undefined) {
@@ -216,16 +214,13 @@ class SignUpService {
 
             Logger.info(message);
 
-            let response = {result: message, id:  id};
-
+            const response = {result: message, id};
             utils.setBodyResponse(response, 200, res);
         } catch (error) {
             Logger.error(error.toString());
 
             await NonActivatedUsers.destroy({
-                where: {
-                    id: id
-                }
+                where: {id}
             });
 
             return utils.setErrorResponse("No se pudo enviar el mensaje.",

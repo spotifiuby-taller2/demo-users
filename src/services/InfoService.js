@@ -415,9 +415,6 @@ class InfoService {
         Logger.info("Request a /users/favartistlist");
         
         const listenerId = req.query.userId;
-        const limit = Number(req.query.limit);
-
-        const queryLimit = req.query.limit ? {limit : limit}: {};
 
         const artists = await Users.findAll(
             {
@@ -426,9 +423,8 @@ class InfoService {
                     as: "idArtist",
                     where:{
                         id: listenerId
-                    },
+                    }
                 }],
-                queryLimit
             } 
         )
         .catch(error => ({error: error.toString()}));
@@ -441,7 +437,8 @@ class InfoService {
                 res);
 
         }
-    
+        
+
         return this.getFormattedUsers(artists,
                                 res);
     }
