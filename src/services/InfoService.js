@@ -377,7 +377,7 @@ class InfoService {
         } );
 
         const response = {
-            users: formattedUsers
+            list: formattedUsers
         }
 
         return setBodyResponse(response,
