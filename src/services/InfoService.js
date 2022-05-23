@@ -416,6 +416,10 @@ class InfoService {
         
         const listenerId = req.query.userId;
 
+        const limit = Number(req.query.limit);
+
+        const queryLimit = req.query.limit ? {limit : limit}: {};
+
         const artists = await Users.findAll(
             {
                 include: [{
@@ -425,6 +429,7 @@ class InfoService {
                         id: listenerId
                     }
                 }],
+                queryLimit
             } 
         )
         .catch(error => ({error: error.toString()}));
