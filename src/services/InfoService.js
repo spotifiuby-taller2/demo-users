@@ -1,10 +1,10 @@
-const {setBodyResponse} = require("../others/utils");
+const { setBodyResponse } = require("../others/utils");
 const constants = require("../others/constants");
-const {Users, ArtistFav, Notifications} = require("../data/Users");
+const { Users, ArtistFav, Notifications } = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
-const {Op} = require("sequelize");
-const {auth} = require("../services/FirebaseService");
+const { Op } = require("sequelize");
+const { auth } = require("../services/FirebaseService");
 
 class InfoService {
   defineEvents(app) {
@@ -189,7 +189,6 @@ class InfoService {
      */
     app.delete(constants.APP_FAV_ARTIST_URL, this.deleteFavArtist.bind(this));
 
-
     /**
      * @swagger
      * /users/favartist:
@@ -240,8 +239,10 @@ class InfoService {
      *         "571":
      *           description: "Error returning notification list."
      */
-    app.get(constants.NOTIFICATION_LIST_URL, this.getNotificationList.bind(this));
-
+    app.get(
+      constants.NOTIFICATION_LIST_URL,
+      this.getNotificationList.bind(this)
+    );
 
     /**
      * @swagger
@@ -271,7 +272,10 @@ class InfoService {
      *
      *
      */
-    app.delete(constants.NOTIFICATION_LIST_URL, this.deleteNotification.bind(this));
+    app.delete(
+      constants.NOTIFICATION_LIST_URL,
+      this.deleteNotification.bind(this)
+    );
 
     /**
      * @swagger
@@ -385,11 +389,10 @@ class InfoService {
     app.post(constants.USERS_UNVERIFIED_URL, this.unverifiedUser.bind(this));
   }
 
-
   getFormattedUsers(users, res) {
     const formattedUsers = [];
 
-    users.forEach(user => {
+    users.forEach((user) => {
       formattedUsers.push({
         id: user.dataValues.id,
         email: user.dataValues.email,
@@ -400,13 +403,13 @@ class InfoService {
         isArtist: user.dataValues.isArtist,
         isListener: user.dataValues.isListener,
         isVerified: user.dataValues.isVerified,
-        photoUrl: user.dataValues.photoUrl
+        photoUrl: user.dataValues.photoUrl,
       });
     });
 
     const response = {
-      list: formattedUsers
-    }
+      list: formattedUsers,
+    };
 
     return setBodyResponse(response, 200, res);
   }
@@ -422,14 +425,12 @@ class InfoService {
   async listArtists(req, res) {
     Logger.info("Request a /users/artistlist");
 
-    const users = await Users.findAll(
-      {
-        where: {
-          isArtist: true,
-          isBlocked: false
-        }
-      }
-    );
+    const users = await Users.findAll({
+      where: {
+        isArtist: true,
+        isBlocked: false,
+      },
+    });
 
     return this.getFormattedUsers(users, res);
   }
@@ -438,20 +439,22 @@ class InfoService {
     Logger.info("Request a /users/favartistlist");
 
     const listenerId = req.query.userId;
-    const queryLimit = req.query.limit ? Number(req.query.limit) : constants.MAX_LIMIT;
+    const queryLimit = req.query.limit
+      ? Number(req.query.limit)
+      : constants.MAX_LIMIT;
 
-    const artists = await Users.findAll(
-      {
-        include: [{
+    const artists = await Users.findAll({
+      include: [
+        {
           model: Users,
           as: "idArtist",
           where: {
-            id: listenerId
-          }
-        }],
-        limit: queryLimit
-      }
-    ).catch(error => ({error: error.toString()}));
+            id: listenerId,
+          },
+        },
+      ],
+      limit: queryLimit,
+    }).catch((error) => ({ error: error.toString() }));
 
     if (artists.error !== undefined) {
       Logger.error(artists.error.toString());
@@ -466,8 +469,8 @@ class InfoService {
     const users = await Users.findAll({
       where: {
         isAdmin: false,
-        isBlocked: false
-      }
+        isBlocked: false,
+      },
     });
 
     return this.getFormattedUsers(users, res);
@@ -477,94 +480,113 @@ class InfoService {
     Logger.info("Request a /users/block");
     const userId = req.body.userId;
 
-    const user = await Users.findOne(
-      {
-        where: {
-          id: userId
-        }
-      }).catch(error => error.toString());
+    const user = await Users.findOne({
+      where: {
+        id: userId,
+      },
+    }).catch((error) => error.toString());
 
     if (user === undefined || user === null || user.error !== undefined) {
       return utils.setErrorResponse("El usuario no existe", 400, res);
     }
 
     const dbResponse = await Users.update(
-      {isBlocked: true},
+      { isBlocked: true },
       {
         where: {
-          id: userId
-        }
-      }).catch(error => error.toString());
+          id: userId,
+        },
+      }
+    ).catch((error) => error.toString());
 
     if (dbResponse.error !== undefined) {
-      return utils.setErrorResponse("No se pudo actualizar al usuario", 500, res);
+      return utils.setErrorResponse(
+        "No se pudo actualizar al usuario",
+        500,
+        res
+      );
     }
     Logger.info("Usuario bloqueado: " + userId);
     const response = {
-      ok: "ok"
-    }
+      ok: "ok",
+    };
     return setBodyResponse(response, 200, res);
   }
 
   async unlockUser(req, res) {
     Logger.info("Request a /users/unlock.");
     const userId = req.body.userId;
+
     const user = await Users.findOne({
       where: {
-        id: userId
-      }
-    }).catch(error => ({
-      error: error.toString()
+        id: userId,
+      },
+    }).catch((error) => ({
+      error: error.toString(),
     }));
 
     if (user === undefined || user === null || user.error !== undefined) {
       return utils.setErrorResponse("El usuario no existe", 400, res);
     }
 
-    const dbResponse = await Users.update({
-      isBlocked: false
-    }, {
-      where: {
-        id: userId
+    const dbResponse = await Users.update(
+      {
+        isBlocked: false,
+      },
+      {
+        where: {
+          id: userId,
+        },
       }
-    }).catch(error => ({
-      error: error.toString()
+    ).catch((error) => ({
+      error: error.toString(),
     }));
 
     if (dbResponse.error !== undefined) {
-      return utils.setErrorResponse("No se pudo actualizar al usuario", 500, res);
+      return utils.setErrorResponse(
+        "No se pudo actualizar al usuario",
+        500,
+        res
+      );
     }
 
-    return utils.setBodyResponse({ok: "ok"}, 200, res);
+    return utils.setBodyResponse({ ok: "ok" }, 200, res);
   }
 
   async genericVerified(userId, verify, res) {
     const user = await Users.findOne({
       where: {
-        id: userId
-      }
-    }).catch(error => ({
-      error: error.toString()
+        id: userId,
+      },
+    }).catch((error) => ({
+      error: error.toString(),
     }));
 
     if (user === undefined || user === null || user.error !== undefined) {
       return utils.setErrorResponse("El usuario no existe", 400, res);
     }
 
-    const dbResponse = await Users.update({
-      isVerified: verify
-    }, {
-      where: {
-        id: userId
+    const dbResponse = await Users.update(
+      {
+        isVerified: verify,
+      },
+      {
+        where: {
+          id: userId,
+        },
       }
-    }).catch(error => ({
-      error: error.toString()
+    ).catch((error) => ({
+      error: error.toString(),
     }));
 
     if (dbResponse.error !== undefined) {
-      return utils.setErrorResponse("No se pudo actualizar al usuario", 500, res);
+      return utils.setErrorResponse(
+        "No se pudo actualizar al usuario",
+        500,
+        res
+      );
     }
-    return utils.setBodyResponse({ok: "ok"}, 200, res);
+    return utils.setBodyResponse({ ok: "ok" }, 200, res);
   }
 
   async unverifiedUser(req, res) {
@@ -584,15 +606,21 @@ class InfoService {
 
     if (email === undefined || email === null) {
       Logger.error("Error creating admin. Mail is mandatory");
-      utils.setErrorResponse("Error creando administrador. Mail es requerido", 500, res);
+      utils.setErrorResponse(
+        "Error creando administrador. Mail es requerido",
+        500,
+        res
+      );
       return;
     }
-    const response = await auth.createUser({
-      email,
-      emailVerified: true,
-      password,
-      disabled: false
-    }).catch(error => ({error: error.toString()}));
+    const response = await auth
+      .createUser({
+        email,
+        emailVerified: true,
+        password,
+        disabled: false,
+      })
+      .catch((error) => ({ error: error.toString() }));
 
     if (response.error !== undefined) {
       Logger.error(response.error.toString());
@@ -607,8 +635,8 @@ class InfoService {
       isAdmin: true,
       isBlocked: false,
       isExternal: false,
-      isVerified: false
-    }).catch(error => ({error: error.toString()}));
+      isVerified: false,
+    }).catch((error) => ({ error: error.toString() }));
 
     if (dbResponse.error !== undefined) {
       Logger.error(dbResponse.error.toString());
@@ -618,44 +646,54 @@ class InfoService {
 
     Logger.info("Usuario creado con email y contraseña: " + response.uid);
     return utils.setBodyResponse(response, 200, res);
-
   }
 
-
   async addFavArtist(req, res) {
-
     Logger.info("Request a /users/favartist");
 
-    const {idArtist, idListener} = req.body;
-    let response = await Users.findOne(
-      {
-        where: {[Op.and]: [{id: idArtist}, {isBlocked: false}, {isArtist: true}]}
-      }
-    );
+    const { idArtist, idListener } = req.body;
+    let response = await Users.findOne({
+      where: {
+        [Op.and]: [{ id: idArtist }, { isBlocked: false }, { isArtist: true }],
+      },
+    });
 
     if (response === null) {
       Logger.error(`No existe el artista ${idArtist}`);
 
-      return utils.setErrorResponse(`No existe el artista ${idArtist}`, 400, res);
+      return utils.setErrorResponse(
+        `No existe el artista ${idArtist}`,
+        400,
+        res
+      );
     }
 
-    response = await Users.findOne(
-      {
-        where: {[Op.and]: [{id: idListener}, {isBlocked: false}, {isListener: true}]}
-      }
-    );
+    response = await Users.findOne({
+      where: {
+        [Op.and]: [
+          { id: idListener },
+          { isBlocked: false },
+          { isListener: true },
+        ],
+      },
+    });
 
     if (response === null) {
       Logger.error(`No existe el oyente ${idListener}`);
-      return utils.setErrorResponse(`No existe el oyente ${idListener}`, 400, res);
+      return utils.setErrorResponse(
+        `No existe el oyente ${idListener}`,
+        400,
+        res
+      );
     }
 
-    response = await ArtistFav.create(
-      {
-        idArtist,
-        idListener
-      }
-    ).catch(() => ({error: "No se ha podido crear la relación Oyente tiene como favorito a artista."}));
+    response = await ArtistFav.create({
+      idArtist,
+      idListener,
+    }).catch(() => ({
+      error:
+        "No se ha podido crear la relación Oyente tiene como favorito a artista.",
+    }));
 
     if (response.error !== undefined) {
       Logger.error(response.error.toString());
@@ -663,83 +701,84 @@ class InfoService {
       return utils.setErrorResponse(response.error, 500, res);
     }
 
-    Logger.info(`El Oyente ${idListener} ha agregado como favorito a ${idArtist}.`);
-    utils.setBodyResponse({status: 'Nuevo favorito agregado'}, 201, res);
+    Logger.info(
+      `El Oyente ${idListener} ha agregado como favorito a ${idArtist}.`
+    );
+    utils.setBodyResponse({ status: "Nuevo favorito agregado" }, 201, res);
   }
 
   async deleteFavArtist(req, res) {
-
     Logger.info("Request a /users/favartist");
 
     const idListener = req.query.idListener;
     const idArtist = req.query.idArtist;
 
-    const response = await ArtistFav.destroy(
-      {
-        where: {[Op.and]: [{idListener}, {idArtist}]}
-      }
-    )
+    const response = await ArtistFav.destroy({
+      where: { [Op.and]: [{ idListener }, { idArtist }] },
+    });
 
     if (response === 0) {
       Logger.error(`El par oyente-artista que se quiere eliminar no existe`);
-      return utils.setErrorResponse(`El par oyente-artista que se quiere eliminar no existe`, 400, res);
+      return utils.setErrorResponse(
+        `El par oyente-artista que se quiere eliminar no existe`,
+        400,
+        res
+      );
     }
 
-    Logger.info(`El Oyente ${idListener} ha borrado como favorito a ${idArtist}.`);
-    utils.setBodyResponse({status: 'Favorito eliminado'}, 201, res);
+    Logger.info(
+      `El Oyente ${idListener} ha borrado como favorito a ${idArtist}.`
+    );
+    utils.setBodyResponse({ status: "Favorito eliminado" }, 201, res);
   }
 
   async getFavArtist(req, res) {
-
     Logger.info("Request a /users/favartist");
 
     const idListener = req.query.idListener;
     const idArtist = req.query.idArtist;
 
-    ArtistFav.findOne(
-      {
-        where: {[Op.and]: [{idListener}, {idArtist}]}
-      }
-    )
-      .then(user => {
+    ArtistFav.findOne({
+      where: { [Op.and]: [{ idListener }, { idArtist }] },
+    })
+      .then((user) => {
         if (user !== null) {
           Logger.info(`par (${idListener} , ${idArtist}) existe.`);
-          utils.setBodyResponse({status: true}, 201, res);
+          utils.setBodyResponse({ status: true }, 201, res);
         } else {
           Logger.info(`par (${idListener} , ${idArtist}) no existe.`);
-          utils.setBodyResponse({status: false}, 201, res);
+          utils.setBodyResponse({ status: false }, 201, res);
         }
       })
-      .catch(error => {
-
+      .catch((error) => {
         const err = error.toString();
         Logger.error(err);
-        utils.setErrorResponse(err, 500, res)
+        utils.setErrorResponse(err, 500, res);
       });
   }
 
-
   async deleteNotification(req, res) {
-
     Logger.info("Request a /users/notificationlist");
 
     const idEmissor = req.query.idEmissor;
     const idReceptor = req.query.idReceptor;
 
-    const response = await Notifications
-      .destroy({
-        where: {[Op.and]: [{idEmissor}, {idReceptor}]}
-      })
-      .catch(err => ({error: err.toString()}));
+    const response = await Notifications.destroy({
+      where: { [Op.and]: [{ idEmissor }, { idReceptor }] },
+    }).catch((err) => ({ error: err.toString() }));
 
     if (response.error !== undefined) {
-      return utils.setErrorResponse('Error al destruir la notificación', 500, res);
+      return utils.setErrorResponse(
+        "Error al destruir la notificación",
+        500,
+        res
+      );
     } else if (response === 0) {
-      return utils.setErrorResponse('La notificación no existe', 400, res);
+      return utils.setErrorResponse("La notificación no existe", 400, res);
     }
 
     Logger.info(`La notificación ha sido borrada con exito.`);
-    utils.setBodyResponse({status: 'Notificación eliminada.'}, 201, res);
+    utils.setBodyResponse({ status: "Notificación eliminada." }, 201, res);
   }
 
   async addNotification(req, res) {
@@ -748,55 +787,53 @@ class InfoService {
     const idEmissor = req.body.idEmissor;
     const idReceptor = req.body.idReceptor;
 
-    const response = await Notifications
-      .create({
-        idEmissor,
-        idReceptor
-      })
-      .catch(err => ({error: err.toString()}));
+    const response = await Notifications.create({
+      idEmissor,
+      idReceptor,
+    }).catch((err) => ({ error: err.toString() }));
 
     if (response.error !== undefined) {
       return utils.setErrorResponse(response.error, 400, res);
     }
-    Logger.info('La notificación ha sido creada con exito.');
-    utils.setBodyResponse({status: 'Notificación creada.'}, 201, res);
+    Logger.info("La notificación ha sido creada con exito.");
+    utils.setBodyResponse({ status: "Notificación creada." }, 201, res);
   }
-
 
   async getNotificationList(req, res) {
     Logger.info("Request a /users/notificationlist");
 
     const idEmissor = req.query.idEmissor;
-    const emissor = await Users.findOne(
-      {
-        where: {[Op.and]: [{id: idEmissor}, {isBlocked: false}]}
-      }
-    ).catch(err => ({error: err.toString()}));
+    const emissor = await Users.findOne({
+      where: { [Op.and]: [{ id: idEmissor }, { isBlocked: false }] },
+    }).catch((err) => ({ error: err.toString() }));
 
     if (emissor === null) {
-      return utils.setErrorResponse('No existe el emisor', 471, res);
+      return utils.setErrorResponse("No existe el emisor", 471, res);
     }
 
-    const receivers = await Users.findAll(
-      {
-        include: [{
+    const receivers = await Users.findAll({
+      include: [
+        {
           model: Users,
           as: "idEmissor",
           where: {
-            id: idEmissor
-          }
-        }],
-      }
-    ).catch(error => ({error: error.toString()}));
+            id: idEmissor,
+          },
+        },
+      ],
+    }).catch((error) => ({ error: error.toString() }));
 
     if (receivers === null) {
-      return utils.setErrorResponse('No se encontraron totificaciones', 400, res);
+      return utils.setErrorResponse(
+        "No se encontraron totificaciones",
+        400,
+        res
+      );
     }
 
-    const notifications = []
+    const notifications = [];
 
-    receivers.forEach(receiver => {
-
+    receivers.forEach((receiver) => {
       const notification = {
         idEmissor,
         idReceptor: receiver.id,
@@ -804,18 +841,18 @@ class InfoService {
         surnameEmissor: emissor.surname,
         nameReceptor: receiver.name,
         surnameReceptor: receiver.surname,
-        pushNotificationToken: receiver.pushNotificationToken
-      }
+        pushNotificationToken: receiver.pushNotificationToken,
+      };
       notifications.push(notification);
-    })
+    });
 
     const response = {
-      notifications
-    }
+      notifications,
+    };
     utils.setBodyResponse(response, 200, res);
   }
 }
 
 module.exports = {
-  InfoService
-}
+  InfoService,
+};
