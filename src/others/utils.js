@@ -1,55 +1,42 @@
 const bcrypt = require("bcrypt");
-const crypto = require('crypto');
-const constants = require('../others/constants');
-const fetch = require('node-fetch');
+const crypto = require("crypto");
+const constants = require("../others/constants");
+const fetch = require("node-fetch");
 
-function setBodyResponse(responseBody,
-                         status,
-                         res) {
-    res.status(status)
-        .json(responseBody);
+function setBodyResponse(responseBody, status, res) {
+  res.status(status).json(responseBody);
 }
 
-function setErrorResponse(error,
-                          status,
-                          res) {
+function setErrorResponse(error, status, res) {
+  const responseBody = {
+    error: error.toString(),
+  };
 
-    const responseBody = {
-        error: error.toString()
-    }
-
-    setBodyResponse(responseBody, status, res);
+  setBodyResponse(responseBody, status, res);
 }
 
 function getDate() {
-    return new Date().toISOString()
-        .substr(0, 10);
+  return new Date().toISOString().substr(0, 10);
 }
 
-function replaceAll(str,
-                    toReplace,
-                    newStr) {
-    return str.split(toReplace)
-        .join(newStr)
+function replaceAll(str, toReplace, newStr) {
+  return str.split(toReplace).join(newStr);
 }
 
 // Sync = blocks the event loop
 function getBcryptOf(toHash) {
-    return bcrypt.hashSync(toHash, constants.BASE_SALT);
+  return bcrypt.hashSync(toHash, constants.BASE_SALT);
 }
 
 function getHashOf(toHash) {
-    // Edge case: slashes cannot be used in URLs items.
-    return replaceAll(getBcryptOf(toHash),
-        "/",
-        "a");
+  // Edge case: slashes cannot be used in URLs items.
+  return replaceAll(getBcryptOf(toHash), "/", "a");
 }
 
 function getId() {
-    const base = crypto.randomBytes(20)
-        .toString('hex');
+  const base = crypto.randomBytes(20).toString("hex");
 
-    return getHashOf(base);
+  return getHashOf(base);
 }
 
 // Credits:
@@ -72,52 +59,70 @@ function getId() {
 } */
 
 function areAnyUndefined(list) {
-    return list.filter((element) => {
-        return element === undefined
-            || element.length === 0
-    }).length > 0;
+  return (
+    list.filter((element) => element === undefined || element.length === 0)
+      .length > 0
+  );
 }
 
 function invalidFieldFormat(email, password) {
+  if (password.length < constants.MIN_PASS_LEN) {
+    return true;
+  }
 
-    if (password.length < constants.MIN_PASS_LEN) {
-        return true;
-    }
+  if (!/^\w+([+.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    return true;
+  }
 
-    if (!/^\w+([+.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-        return true;
-    }
-
-    return false;
-
+  return false;
 }
 
+//LIO
 // response.json() is a promise
 const postToGateway = (body) => {
-    body.verbRedirect = "POST";
-    body.apiKey = constants.MY_API_KEY;
+  body.verbRedirect = "POST";
+  body.apiKey = constants.MY_API_KEY;
 
-    return fetch(constants.SERVICES_HOST + constants.REDIRECT_URL, {
-            method: "POST",
-            headers: constants.JSON_HEADER,
-            body: JSON.stringify(body)
-        }
-    ).then(response =>
-        response.json()
-    ).catch(error => ({
-        error: error.toString()
+  return fetch(constants.SERVICES_HOST + constants.REDIRECT_URL, {
+    method: "POST",
+    headers: constants.JSON_HEADER,
+    body: JSON.stringify(body),
+  })
+    .then((response) => response.json())
+    .catch((error) => ({
+      error: error.toString(),
     }));
-}
+};
+
+const getToGateway = (destiny, redirectParams) => {
+  const body = {};
+  body.redirectParams = redirectParams;
+  body.verbRedirect = "GET";
+  body.redirectTo = destiny;
+  body.apiKey = constants.MY_API_KEY;
+
+  return fetch(constants.SERVICES_HOST + constants.REDIRECT_URL, {
+    method: "POST",
+    headers: constants.JSON_HEADER,
+    body: JSON.stringify(body),
+  })
+    .then((response) => response.json())
+    .catch((error) => ({
+      error: error.toString(),
+    }));
+};
+//LIO
 
 module.exports = {
-    getId,
-    getBcryptOf,
-    setErrorResponse,
-    setBodyResponse,
-    replaceAll,
-    getHashOf,
-    getDate,
-    areAnyUndefined,
-    invalidFieldFormat,
-    postToGateway
-}
+  getId,
+  getBcryptOf,
+  setErrorResponse,
+  setBodyResponse,
+  replaceAll,
+  getHashOf,
+  getDate,
+  areAnyUndefined,
+  invalidFieldFormat,
+  postToGateway,
+  getToGateway,
+};
