@@ -386,6 +386,7 @@ class ProfileService {
         classic: musicalPref.classic,
         blues: musicalPref.blues,
         other: musicalPref.other,
+        electronic: musicalPref.electronic,
       },
       {
         where:
