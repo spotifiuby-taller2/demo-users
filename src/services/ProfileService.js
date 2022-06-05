@@ -251,29 +251,25 @@ class ProfileService {
      *           description: "Update push notification token failed"
      */
     app.patch(constants.PUSH_NOTIFICATION_TOKEN_URL,
-      this.setPushNotificationToken
-        .bind(this));
+      this.setPushNotificationToken.bind(this));
 
     app.patch(constants.PROFILE_VERIFICATION_VIDEO_URL,
-      this.updateVerificationVideoUrl
-        .bind(this));
+      this.updateVerificationVideoUrl.bind(this));
   }
 
   async getProfile(req, res) {
     Logger.info("Request a /users/profile");
 
-    const userId = req.query
-                      .userId;
+    const userId = req.query.userId;
 
     let whereCondition;
 
-    if ( req.query
-            .adminRequest === undefined ) {
+    if (req.query.adminRequest === undefined) {
       whereCondition = {
-                        [Op.and]: [
-                          {id: userId},
-                          {isBlocked: false}]
-                      };
+        [Op.and]: [
+          {id: userId},
+          {isBlocked: false}]
+      };
     } else {
       whereCondition = {
         [Op.and]: [
@@ -289,7 +285,7 @@ class ProfileService {
 
     if (user === null) {
       return setErrorResponse("El usuario no existe.",
-        461,
+        400,
         res);
     }
 
@@ -318,21 +314,22 @@ class ProfileService {
       'photoUrl': user.photoUrl,
       'pushNotificationToken': user.pushNotificationToken,
       'isVerified': user.isVerified,
-      'verificationVideoUrl': user.verificationVideoUrl
+      'verificationVideoUrl': user.verificationVideoUrl,
+      'subscription': user.subscription
     };
 
 
-    if ( user.isArtist ){
-      
+    if (user.isArtist) {
+
       const followers = await ArtistFav.findAll(
         {
           where: {
             idArtist: user.id,
           }
         }
-      ).catch(err => {return { error: err.toString() }})
-      
-      if ( followers.error !== undefined ){
+      ).catch(err => ({error: err.toString()}))
+
+      if (followers.error !== undefined) {
         return utils.setErrorResponse(followers.error, 481, res);
       }
 
@@ -443,7 +440,7 @@ class ProfileService {
       Logger.error(response.error.toString());
 
       utils.setErrorResponse(response.error,
-        561,
+        500,
         res);
 
       return;
@@ -472,7 +469,7 @@ class ProfileService {
       Logger.error(`No existe el usuario`);
 
       return utils.setErrorResponse(`No existe el usuario`,
-        461,
+        400,
         res);
     }
 
@@ -481,7 +478,8 @@ class ProfileService {
     utils.setBodyResponse({
         type: user.isListener ? constants.LISTENER : constants.ARTIST,
         name: user.name,
-        surname: user.surname
+        surname: user.surname,
+        subscription: user.subscription
       },
       201,
       res);
@@ -560,7 +558,7 @@ class ProfileService {
 
     if (updatedUser === null || updatedUser.error !== undefined) {
       return setErrorResponse(`No se pudo actualizar el push notification token del usuario ${userId}`,
-        462,
+        500,
         res);
     }
 
