@@ -72,7 +72,6 @@ const SIGN_UP_END_URL = SIGN_UP_URL + "/end";
 const FORGOT_PASSWORD_URL = "/forgotpassword";
 const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
-const REDIRECT_URL = "/redirect";
 
 const PROFILE_USER_BASIC_INFO_URL= PROFILE_URL + "/basicinfo";
 const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
@@ -204,7 +203,6 @@ module.exports = {
     PAYMENT_HOST,
     SERVICES_HOST,
     WALLET_URL,
-    REDIRECT_URL,
     MY_API_KEY,
     TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN,

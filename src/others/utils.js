@@ -77,7 +77,6 @@ function invalidFieldFormat(email, password) {
   return false;
 }
 
-//LIO
 // response.json() is a promise
 const postToGateway = (body) => {
   body.apiKey = constants.MY_API_KEY;
