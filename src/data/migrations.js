@@ -11,15 +11,16 @@ async function runMigrations() {
                       console.log(e);
                      } ); */
 
-  /* await queryInterface.addColumn('users',
-                                'isAdmin',{
-                                    type: Sequelize.BOOLEAN,
-                                    allowNull: false,
-                                    defaultValue: false
-                                })
-                     .catch(e => {
-                      console.log(e);
-                     } ); */
+  await queryInterface.addColumn('users',
+    'subscription', {
+      type: Sequelize.STRING(constants.MAX_STR_LEN),
+      allowNull: false,
+      unique: false,
+      defaultValue: 'free'
+    })
+    .catch(e => {
+      console.log(e);
+    });
 
   /* await queryInterface.changeColumn('users ',
     'walletId', {

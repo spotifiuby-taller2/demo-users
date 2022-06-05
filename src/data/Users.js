@@ -141,6 +141,12 @@ const Users = database.define('users', {
   },
   verificationVideoUrl: {
     type: Sequelize.STRING(constants.MAX_STR_LEN),
+  },
+  subscription: {
+    type: Sequelize.STRING(constants.MAX_STR_LEN),
+    allowNull: false,
+    unique: false,
+    defaultValue: 'free'
   }
 });
 
