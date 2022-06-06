@@ -14,6 +14,7 @@ const ForgotPassword = require("../services/ForgotPassword");
 const { swaggerConfig } = require('./swaggerConfig');
 const { InfoService } = require("../services/InfoService");
 const { ParseService } = require("../services/ParseService");
+const { MusicBandService } = require("../services/MusicBandService");
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
@@ -37,6 +38,7 @@ class App {
     this.infoService = new InfoService();
     this.profileService = new ProfileService();
     this.parseService = new ParseService();
+    this.musicalBandService = new MusicBandService();
   }
 
   async syncDB() {
@@ -78,6 +80,9 @@ class App {
         .defineEvents(this.app);
 
     this.parseService
+        .defineEvents(this.app);
+
+    this.musicalBandService
         .defineEvents(this.app);
   }
 }

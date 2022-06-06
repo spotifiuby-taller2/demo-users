@@ -80,6 +80,7 @@ const NOTIFICATION_LIST_URL = USERS_URL + "/notificationlist"
 const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
 const PARSE_USERS_URL= "/parse";
 const CHECK_URL="/check";
+const BAND_URL= USERS_URL + "/band";
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -225,5 +226,6 @@ module.exports = {
     USERS_VERIFIED_URL,
     USERS_UNVERIFIED_URL,
     MAX_LIMIT,
-    CHECK_URL
+    CHECK_URL,
+    BAND_URL
 }
