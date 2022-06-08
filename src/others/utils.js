@@ -77,7 +77,6 @@ function invalidFieldFormat(email, password) {
   return false;
 }
 
-// response.json() is a promise
 const postToGateway = (body) => {
   body.apiKey = constants.MY_API_KEY;
 
@@ -90,7 +89,7 @@ const postToGateway = (body) => {
     const gatewayResponse = await r.json();
 
     if (gatewayResponse.error !== undefined) {
-      return gatewayResponse.error;
+      return gatewayResponse;
     }
 
     return await fetch(body.redirectTo, {
@@ -110,15 +109,17 @@ const postToGateway = (body) => {
       error: error.toString()
     };
   } );
-};
+}
 
-const getToGateway = (destiny, redirectParams) => {
+const getToGateway = (destiny,
+                      redirectParams) => {
   const body = {}
   body.apiKey = constants.MY_API_KEY;
 
   const redirectParamsAux = redirectParams !== undefined ? redirectParams
       : "";
   const redirectTo = destiny + redirectParamsAux;
+  body.redirectTo = redirectTo;
 
   return fetch(constants.SERVICES_HOST + constants.CHECK_URL, {
         method: "POST",
@@ -129,7 +130,7 @@ const getToGateway = (destiny, redirectParams) => {
     const gatewayResponse = await r.json();
 
     if (gatewayResponse.error !== undefined) {
-      return gatewayResponse.error;
+      return gatewayResponse;
     }
 
     return await fetch(redirectTo, {
@@ -148,7 +149,7 @@ const getToGateway = (destiny, redirectParams) => {
       error: error.toString()
     };
   } );
-};
+}
 
 module.exports = {
   getId,
