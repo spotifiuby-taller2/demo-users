@@ -43,6 +43,7 @@ async function createBiometricSignInUser(body, res) {
       isExternal: true,
       isListener: body.isListener,
       isArtist: body.isArtist,
+      isBand: body.isBand,
       latitude: body.latitude,
       longitude: body.longitude,
       walletId: gatewayResponse.id
@@ -114,7 +115,16 @@ async function signInWithOutGoogle(req, res) {
 }
 
 async function signInWithGoogle(req, res) {
-  const {token, email, name, surname, phoneNumber, isArtist, isListener, latitude, longitude} = req.body;
+  const {
+    token, 
+    email, 
+    username, 
+    phoneNumber, 
+    isArtist, 
+    isListener, 
+    isBand ,
+    latitude, 
+    longitude} = req.body;
 
   const response = await auth.verifyIdToken(token);
 
@@ -146,10 +156,10 @@ async function signInWithGoogle(req, res) {
       isAdmin: false,
       isBlocked: false,
       isExternal: true,
-      name,
-      surname,
+      username,
       isArtist,
       isListener,
+      isBand,
       latitude,
       longitude,
       walletId: gatewayResponse.id,

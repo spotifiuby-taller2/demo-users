@@ -39,10 +39,10 @@ class ParseService {
             users.push({
                 id: user.id,
                 email: user.email,
-                name: user.name,
-                surname: user.surname,
+                username: user.username,
                 isArtist: user.isArtist,
                 isListener: user.isListener,
+                isBand: user.isBand,
                 photoUrl: user.photoUrl
             })
       }

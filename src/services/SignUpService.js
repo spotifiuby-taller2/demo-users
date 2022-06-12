@@ -105,10 +105,10 @@ class SignUpService {
             email,
             password,
             phoneNumber,
-            name,
+            username,
             isArtist,
             isListener,
-            surname,
+            isBand,
             link,
             isExternal,
             latitude,
@@ -122,7 +122,7 @@ class SignUpService {
             fields=[email, password];
         }
         else{
-            fields = [name, surname, email, phoneNumber, password];
+            fields = [username, email, phoneNumber, password];
         }
 
         if (areAnyUndefined(fields)) {
@@ -174,7 +174,6 @@ class SignUpService {
 
         const pin = Math.random().toString().slice(2, 9);
 
-
         await NonActivatedUsers.create({
             id,
             email,
@@ -183,13 +182,14 @@ class SignUpService {
             isExternal,
             pin,
             phoneNumber,
-            name,
-            surname,
+            username,
             isArtist,
             isListener,
+            isBand,
             latitude,
-            longitude
-        }).catch(error => {
+            longitude,
+        })
+            .catch(error => {
             Logger.error("No se pudo crear el usuario temporal " + error.toString());
 
             utils.setErrorResponse("Error al intentar crear la cuenta.",
@@ -289,10 +289,10 @@ class SignUpService {
             isBlocked: false,
             isExternal: tempUser.isExternal,
             phoneNumber: tempUser.phoneNumber,
-            name: tempUser.name,
-            surname: tempUser.surname,
+            username: tempUser.username,
             isArtist: tempUser.isArtist,
             isListener: tempUser.isListener,
+            isBand: tempUser.isBand,
             latitude: tempUser.latitude,
             longitude: tempUser.longitude,
             walletId: gatewayResponse.id

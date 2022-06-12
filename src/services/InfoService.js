@@ -396,12 +396,12 @@ class InfoService {
       formattedUsers.push({
         id: user.dataValues.id,
         email: user.dataValues.email,
-        name: user.dataValues.name,
-        surname: user.dataValues.surname,
+        username: user.dataValues.username,
         isBlocked: user.dataValues.isBlocked,
         isAdmin: user.dataValues.isAdmin,
         isArtist: user.dataValues.isArtist,
         isListener: user.dataValues.isListener,
+        isBand: user.dataValues.isBand,
         isVerified: user.dataValues.isVerified,
         photoUrl: user.dataValues.photoUrl,
       });
@@ -837,10 +837,8 @@ class InfoService {
       const notification = {
         idEmissor,
         idReceptor: receiver.id,
-        nameEmissor: emissor.name,
-        surnameEmissor: emissor.surname,
-        nameReceptor: receiver.name,
-        surnameReceptor: receiver.surname,
+        usernameEmissor: emissor.username,
+        usernameReceptor: receiver.username,
         pushNotificationToken: receiver.pushNotificationToken,
       };
       notifications.push(notification);

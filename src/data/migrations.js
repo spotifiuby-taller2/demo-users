@@ -22,6 +22,86 @@ async function runMigrations() {
       console.log(e);
     });
 
+    await queryInterface.addColumn('users',
+    'username', {
+      type: Sequelize.STRING(constants.NAME_MAX_LEN),
+      allowNull: false,
+      defaultValue: 'Anonimo'
+    })
+    .catch(e => {
+      console.log(e);
+    });
+
+    await queryInterface.addColumn('non_activated_users',
+      'username', {
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+    await queryInterface.removeColumn('users',
+      'name', {
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+    await queryInterface.removeColumn('users',
+      'surname', {
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+      await queryInterface.removeColumn('non_activated_users',
+      'name', {
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+    await queryInterface.removeColumn('non_activated_users',
+      'surname', {
+        type: Sequelize.STRING(constants.NAME_MAX_LEN),
+        allowNull: false,
+        defaultValue: 'Anonimo'
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+      await queryInterface.addColumn('users',
+      'isBand', {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  
+      await queryInterface.addColumn('non_activated_users',
+        'isBand', {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        })
+        .catch(e => {
+          console.log(e);
+        });
+
   /* await queryInterface.changeColumn('users ',
     'walletId', {
       type: Sequelize.INTEGER,

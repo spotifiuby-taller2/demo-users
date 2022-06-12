@@ -4,6 +4,7 @@ const {Users, ArtistFav} = require("../data/Users");
 const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
+const { ArtistsBands } = require("../data/ArtistsBands");
 
 class ProfileService {
   defineEvents(app) {
@@ -89,9 +90,9 @@ class ProfileService {
      * @swagger
      * /users/profile/basicinfo:
      *   get:
-     *    summary: get user name, surname and type.
+     *    summary: get user username, and type.
      *
-     *    description: get user name, surname and type.
+     *    description: get user username, and type.
      *
      *    parameters:
      *         - name: "id"
@@ -101,7 +102,7 @@ class ProfileService {
      *
      *    responses:
      *         "200":
-     *           description: "return user name, surname and type."
+     *           description: "return user username and type."
      *
      *         "461":
      *           description: "User does not exist."
@@ -126,12 +127,7 @@ class ProfileService {
      *           type: "string"
      *           required: true
      *
-     *         - name: "name"
-     *           in: body
-     *           type: "string"
-     *           required: false
-     *
-     *         - name: "surname"
+     *         - name: "username"
      *           in: body
      *           type: "string"
      *           required: false
@@ -261,6 +257,7 @@ class ProfileService {
     Logger.info("Request a /users/profile");
 
     const userId = req.query.userId;
+    let nMenbers = 0;
 
     let whereCondition;
 
@@ -289,14 +286,24 @@ class ProfileService {
         res);
     }
 
+    if ( user.isBand ){
+      const menbers = await ArtistsBands.findOne({
+        where: {
+          idBand: user.id,
+        }
+      });
+
+      nMenbers = menbers.length;
+    }
+
     const profileResponse = {
       'id': user.id,
       'email': user.email,
       'phoneNumber': user.phoneNumber,
-      'name': user.name,
-      'surname': user.surname,
+      'username': user.username,
       'isArtist': user.isArtist,
       'isListener': user.isListener,
+      'isBand': user.isBand,
       'isAdmin': user.isAdmin,
       'metal': user.metal,
       'rap': user.rap,
@@ -315,7 +322,8 @@ class ProfileService {
       'pushNotificationToken': user.pushNotificationToken,
       'isVerified': user.isVerified,
       'verificationVideoUrl': user.verificationVideoUrl,
-      'subscription': user.subscription
+      'subscription': user.subscription,
+      'nMenbers': nMenbers,
     };
 
 
@@ -477,8 +485,7 @@ class ProfileService {
 
     utils.setBodyResponse({
         type: user.isListener ? constants.LISTENER : constants.ARTIST,
-        name: user.name,
-        surname: user.surname,
+        username: user.username,
         subscription: user.subscription
       },
       201,

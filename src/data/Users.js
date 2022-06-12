@@ -43,12 +43,7 @@ const Users = database.define('users', {
     allowNull: false,
     defaultValue: ''
   },
-  name: {
-    type: Sequelize.STRING(constants.NAME_MAX_LEN),
-    allowNull: false,
-    defaultValue: 'Anonimo'
-  },
-  surname: {
+  username: {
     type: Sequelize.STRING(constants.NAME_MAX_LEN),
     allowNull: false,
     defaultValue: 'Anonimo'
@@ -59,6 +54,11 @@ const Users = database.define('users', {
     defaultValue: false,
   },
   isListener: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  isBand:{
     type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,

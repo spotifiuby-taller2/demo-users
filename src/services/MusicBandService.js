@@ -1,6 +1,5 @@
 const constants = require("../others/constants");
 const {Users, } = require("../data/Users");
-const {Bands} = require("../data/Bands");
 const {ArtistsBands} = require("../data/ArtistsBands")
 const Logger = require("./Logger");
 const utils = require("../others/utils");
@@ -55,7 +54,7 @@ class MusicBandService {
      *           description: "Error while getting all the band."
      */
      app.post(constants.BAND_URL,
-        this.getAllBands.bind(this));
+        this.getAllMembers.bind(this));
 
   }
 
@@ -63,13 +62,12 @@ class MusicBandService {
 
     Logger.info("Request a /users/band");
 
-    const {name, members} = req.body;
-    const bandId = utils.getId();
+    const {bandId, members} = req.body;
 
-    const finBand = await Bands.findOne(
+    const finBand = await ArtistsBands.destroy(
         {
             where: {
-                name: name
+                idband: bandId
             },
         }
     ).catch(err => ({ error: err.toString()}));
@@ -78,32 +76,14 @@ class MusicBandService {
         return utils.setErrorResponse("Ha ocurrido un error al crear la banda, intente mas tarde,",591, res );
     }
 
-    if ( finBand !== null ){
-        return utils.setErrorResponse("Ya existe una banda con ese nombre. Por favor elija otro.",491, res );
-    }
-
-    const response = await Bands.create({
-        name: name,
-        id: bandId,
-    }).catch(err => ({ error: err.toString()}));
-
-    if ( response?.error !== undefined ){
-        return utils.setErrorResponse("Ha ocurrido un error al crear la banda, intente mas tarde,",591, res );
-    }
-
     const enabledMembers = await this.filterArtists(members);
     const bandCreatedRes = await this.addMembers(enabledMembers, bandId);
 
     if ( bandCreatedRes?.error !== undefined ){
-        await Bands.destroy({
-            where:{
-                name: name,
-            }
-        })
         return utils.setErrorResponse("Ha ocurrido un error al crear la banda, intente mas tarde,",591, res );
     }
 
-    return utils.setBodyResponse({status: `Banda ${name} creada.`}, 200, res); 
+    return utils.setBodyResponse({status: `Integrantes agregados.`}, 200, res); 
 
   }
 
@@ -138,22 +118,34 @@ class MusicBandService {
     return response;
     }
 
-  async getAllBands(req, res){
+  async getAllMembers(req, res){
 
     Logger.info("Request a /users/band");
     
-    const bandList = await Bands.findAll(
+    const {userId, limit} = req.query;
+    const queryLimit = limit
+      ? Number(req.query.limit)
+      : constants.MAX_LIMIT;
+
+    const artistsList = await Users.findAll({
+      limit: queryLimit,
+      include: [
         {
-            attributes: ['id', 'photoUrl'],
-        }
-    ).catch(err => ({error: err.toString()}));
+          model: Users,
+          as: "band",
+          where: {
+            id: userId,
+          },
+        },
+      ],
+    }).catch((error) => ({ error: error.toString() }));
 
-    if ( bandList?.error !== null ){
-        return utils.setErrorResponse(
-            "Ha ocurrido un error al obtener todas las bandas, intente mas tarde,", 592, res );
-    }
+    if ( artistsList?.error !== undefined ){
+      return utils.setErrorResponse("Ha ocurrido un error al al obtener los integrantes, intente mas tarde,",591, res );
+  }
 
-    const response = {bands: bandList};
+
+    const response = {artists: artistsList};
 
     return utils.setBodyResponse(response, 201, res);
 
