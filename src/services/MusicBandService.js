@@ -53,7 +53,7 @@ class MusicBandService {
      *         "592":
      *           description: "Error while getting all the band."
      */
-     app.post(constants.BAND_URL,
+     app.get(constants.BAND_URL,
         this.getAllMembers.bind(this));
 
   }
@@ -67,12 +67,12 @@ class MusicBandService {
     const finBand = await ArtistsBands.destroy(
         {
             where: {
-                idband: bandId
+                idBand: bandId
             },
         }
     ).catch(err => ({ error: err.toString()}));
 
-    if ( finBand?.error !== undefined ){
+    if ( finBand?.error !== undefined && finBand?.error !== 'SequelizeDatabaseError: column "idband" does not exist' ){
         return utils.setErrorResponse("Ha ocurrido un error al crear la banda, intente mas tarde,",591, res );
     }
 
@@ -92,7 +92,7 @@ class MusicBandService {
 
     const response = await Users.findAll(
         {
-            where: {[Op.and]: {id: artistList, isBlocked: false, isArtist: true}}
+            where: {[Op.and]: {id: artistList, isBlocked: false, isArtist: true, isBand: false}}
         }
     );
 
@@ -107,7 +107,7 @@ class MusicBandService {
 
     let input = [];
 
-    members.forEach( async(anArtist) => {
+    members.forEach((anArtist) => {
 
          input.push({idBand: bandId, idArtist: anArtist});
         
@@ -132,12 +132,13 @@ class MusicBandService {
       include: [
         {
           model: Users,
-          as: "band",
+          as: "artist",
           where: {
             id: userId,
-          },
+          }
         },
       ],
+      
     }).catch((error) => ({ error: error.toString() }));
 
     if ( artistsList?.error !== undefined ){
@@ -145,7 +146,7 @@ class MusicBandService {
   }
 
 
-    const response = {artists: artistsList};
+    const response = {list: artistsList};
 
     return utils.setBodyResponse(response, 201, res);
 

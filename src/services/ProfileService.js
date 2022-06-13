@@ -257,7 +257,7 @@ class ProfileService {
     Logger.info("Request a /users/profile");
 
     const userId = req.query.userId;
-    let nMenbers = 0;
+    let nMembers = 0;
 
     let whereCondition;
 
@@ -287,13 +287,13 @@ class ProfileService {
     }
 
     if ( user.isBand ){
-      const menbers = await ArtistsBands.findOne({
+      const members = await ArtistsBands.findAll({
         where: {
           idBand: user.id,
         }
       });
 
-      nMenbers = menbers.length;
+      nMembers = members.length;
     }
 
     const profileResponse = {
@@ -323,7 +323,7 @@ class ProfileService {
       'isVerified': user.isVerified,
       'verificationVideoUrl': user.verificationVideoUrl,
       'subscription': user.subscription,
-      'nMenbers': nMenbers,
+      'nMembers': nMembers,
     };
 
 
