@@ -28,10 +28,10 @@ describe('SignUpService', function() {
           repeatPassword: 'long password',
           isExternal: false,
           phoneNumber: '1234',
-          name: 'name',
+          username: 'username',
           isArtist: true,
           isListener: true,
-          surname: 'surname',
+          isBand: false,
           link: 'web',
         }
       };
@@ -66,10 +66,10 @@ describe('SignUpService', function() {
           repeatPassword: 'long password',
           isExternal: false,
           phoneNumber: '1234',
-          name: 'name',
+          username: 'username',
           isArtist: true,
           isListener: true,
-          surname: 'surname',
+          isBand: false,
         }
       };
 
