@@ -2294,7 +2294,7 @@ describe('InfoService', function() {
             assert(createArtistFavMock.calledOnce);
             assert(findOneUserMock.calledTwice);
             assert(jsonMock.json.calledWith(
-                { error: "'artistfav error'" }
+                { error: "artistfav error" }
             ));
             revertRewire(); 
         });
