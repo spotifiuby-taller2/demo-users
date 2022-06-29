@@ -1,6 +1,7 @@
 # users
 
-[![Coverage Status](https://coveralls.io/repos/github/spotifiuby-taller2/demo-users/badge.svg?branch=master&t=mgYLlV)](https://coveralls.io/github/spotifiuby-taller2/demo-users?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/spotifiuby-taller2/demo-users/badge.png?branch=master&t=mgYLlV)](https://coveralls.io/github/spotifiuby-taller2/demo-users?branch=master)
+
 
 ### Instalación y configuración
 
