@@ -411,7 +411,7 @@ class InfoService {
       list: formattedUsers,
     };
 
-    return setBodyResponse(response, 200, res);
+    return utils.setBodyResponse(response, 200, res);
   }
 
   async listUsers(req, res) {
@@ -510,7 +510,7 @@ class InfoService {
     const response = {
       ok: "ok",
     };
-    return setBodyResponse(response, 200, res);
+    return utils.setBodyResponse(response, 200, res);
   }
 
   async unlockUser(req, res) {
@@ -608,7 +608,7 @@ class InfoService {
       Logger.error("Error creating admin. Mail is mandatory");
       utils.setErrorResponse(
         "Error creando administrador. Mail es requerido",
-        500,
+        400,
         res
       );
       return;
@@ -825,7 +825,7 @@ class InfoService {
 
     if (receivers === null) {
       return utils.setErrorResponse(
-        "No se encontraron totificaciones",
+        "No se encontraron notificaciones",
         400,
         res
       );
@@ -847,10 +847,9 @@ class InfoService {
     const response = {
       notifications,
     };
+
     utils.setBodyResponse(response, 200, res);
   }
 }
 
-module.exports = {
-  InfoService,
-};
+module.exports = InfoService;

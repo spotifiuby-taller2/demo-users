@@ -1,7 +1,7 @@
 const database = require('../data/database');
 const SignUpService = require('../services/SignUpService');
 const SignInService = require('../services/SignInService');
-const { ProfileService } = require('../services/ProfileService');
+const ProfileService = require('../services/ProfileService');
 const constants = require('../others/constants');
 const cors = require('cors');
 const express = require('express');
@@ -12,7 +12,7 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const ForgotPassword = require("../services/ForgotPassword");
 const { swaggerConfig } = require('./swaggerConfig');
-const { InfoService } = require("../services/InfoService");
+const InfoService = require("../services/InfoService");
 const { ParseService } = require("../services/ParseService");
 const { MusicBandService } = require("../services/MusicBandService");
 
