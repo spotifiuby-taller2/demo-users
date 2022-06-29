@@ -107,7 +107,6 @@ class ProfileService {
      *         "461":
      *           description: "User does not exist."
      */
-
     app.get(constants.PROFILE_USER_BASIC_INFO_URL,
       this.getUserBasicInfo
         .bind(this));
@@ -212,7 +211,6 @@ class ProfileService {
      *         "562":
      *           description: "Error editing user email"
      */
-
     app.patch(constants.EDIT_PROFILE_URL,
       this.editProfile
         .bind(this));
@@ -281,7 +279,7 @@ class ProfileService {
     }));
 
     if (user === null) {
-      return setErrorResponse("El usuario no existe.",
+      return utils.setErrorResponse("El usuario no existe.",
         400,
         res);
     }
@@ -338,14 +336,14 @@ class ProfileService {
       ).catch(err => ({error: err.toString()}))
 
       if (followers.error !== undefined) {
-        return utils.setErrorResponse(followers.error, 481, res);
+        return utils.setErrorResponse(followers.error, 581, res);
       }
 
       profileResponse['nFollowers'] = followers.length;
 
     }
 
-    return setBodyResponse(profileResponse, 200, res);
+    return utils.setBodyResponse(profileResponse, 200, res);
   }
 
   async updateMusicalPreferences(req, res) {
@@ -366,13 +364,13 @@ class ProfileService {
     }));
 
     if (user === null) {
-      return setErrorResponse("El usuario no existe.",
+      return utils.setErrorResponse("El usuario no existe.",
         400,
         res);
     }
 
     if (user.error !== undefined) {
-      return setErrorResponse("Error al consultar la base de datos.",
+      return utils.setErrorResponse("Error al consultar la base de datos.",
         500,
         res);
     }
@@ -412,7 +410,6 @@ class ProfileService {
     return setBodyResponse({status: 'Intereses musicales actualizados'}, 200, res);
   }
 
-
   async updatePhotoUrl(req, res) {
 
     Logger.info("Request a /users/profile/photo");
@@ -431,7 +428,7 @@ class ProfileService {
     }));
 
     if (user === null || user.error !== undefined) {
-      return setErrorResponse("El usuario no existe.",
+      return utils.setErrorResponse("El usuario no existe.",
         461,
         res);
     }
@@ -454,9 +451,8 @@ class ProfileService {
       return;
     }
 
-    return setBodyResponse({status: 'Foto de perfil actualizada'}, 200, res);
+    return utils.setBodyResponse({status: 'Foto de perfil actualizada'}, 200, res);
   }
-
 
   async getUserBasicInfo(req, res) {
 
@@ -545,7 +541,7 @@ class ProfileService {
     }));
 
     if (user === null || user.error !== undefined) {
-      return setErrorResponse("El usuario no existe.",
+      return utils.setErrorResponse("El usuario no existe.",
         400, res);
     }
 
@@ -564,13 +560,12 @@ class ProfileService {
     }));
 
     if (updatedUser === null || updatedUser.error !== undefined) {
-      return setErrorResponse(`No se pudo actualizar el push notification token del usuario ${userId}`,
+      return utils.setErrorResponse(`No se pudo actualizar el push notification token del usuario ${userId}`,
         500,
         res);
     }
 
-
-    utils.setBodyResponse({status: 'Push notification token actualizado'},
+    return utils.setBodyResponse({status: 'Push notification token actualizado'},
       201,
       res);
 
@@ -591,7 +586,7 @@ class ProfileService {
     }));
 
     if (user === null || user.error !== undefined) {
-      return setErrorResponse("El usuario no existe.", 400, res);
+      return utils.setErrorResponse("El usuario no existe.", 400, res);
     }
 
     const response = await Users.update(
@@ -607,10 +602,8 @@ class ProfileService {
       utils.setErrorResponse(response.error, 500, res);
       return;
     }
-    return setBodyResponse({status: 'Video de verificacion actualizado'}, 200, res);
+    return utils.setBodyResponse({status: 'Video de verificacion actualizado'}, 200, res);
   }
 }
 
-module.exports = {
-  ProfileService
-}
+module.exports = ProfileService

@@ -83,8 +83,8 @@ describe('SignUpService', function() {
       revertRewire();
     });
 
-    describe('createVerifiedUser', function() {
-      it("verifies an inactive user", async function() {
+  describe('createVerifiedUser', function() {
+    it("verifies an inactive user", async function() {
         const user = {
           email: 'email@email.com',
           password: 'long password',
@@ -132,7 +132,7 @@ describe('SignUpService', function() {
         revertRewire();
       });
 
-      it("Gateway error", async function() {
+    it("Gateway error", async function() {
         const user = {
           email: 'email@email.com',
           password: 'long password',
@@ -173,7 +173,7 @@ describe('SignUpService', function() {
         revertRewire();
       });
 
-      it("Create verified user error", async function() {
+    it("Create verified user error", async function() {
         const user = {
           email: 'email@email.com',
           password: 'long password',
@@ -210,7 +210,7 @@ describe('SignUpService', function() {
         revertRewire();
       });
 
-      it("Invalid pin error", async function() {
+    it("Invalid pin error", async function() {
         const user = {
           email: 'email@email.com',
           password: 'long password',
