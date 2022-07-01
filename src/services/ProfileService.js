@@ -498,7 +498,7 @@ class ProfileService {
       }).catch(err => {return {error: err.toString()}});
     
     if (user === null) return {error: 'user not exist'}
-    if ( user?.error !== undefined || user === null ) return undefined;
+    if ( user?.error !== undefined ) return undefined;
 
     const today = Date.now();
     const payDate = user.lastPaymentDate.setMonth(user.lastPaymentDate.getMonth() + 1 );
