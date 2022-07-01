@@ -514,9 +514,10 @@ describe('ProfileService', function() {
                 'redirectTo': 'url',
             };
 
-            const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
+            const updateUsersMock = sinon.fake.returns(Promise.resolve(1));
             const revertRewire = ProfileService.__set__({
-                Users: {update: updateUsersMock,},
+                Users: {
+                    update: updateUsersMock,},
                 utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};

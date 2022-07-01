@@ -536,8 +536,12 @@ class ProfileService {
     if ( isListener && body.subscription === 'premiun' ){
       paymentsRes = await this.postToPayments(userId);
       if ( paymentsRes?.error !== undefined || paymentsRes === undefined ) { 
-          delete body.subscription; 
-          message.paymenError = 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción';
+          delete body.subscription;
+          const notEnoughtMoney = 'Error: no pudo cambiar su suscription a premiun por saldo insuficiente.';
+          const anotherError = 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción';
+          ( paymentsRes?.error === constants.NOT_ENOUGHT_MONEY_PAYMENT_ERROR )?
+              message.paymenError = notEnoughtMoney
+              :message.paymenError = anotherError;
       }
       else if ( paymentsRes !== 0 ) {
         const today = new Date();
@@ -556,7 +560,6 @@ class ProfileService {
       }
     )
       .catch(error => ({error: error.toString()}));
-
 
     if (response.error !== undefined || response === 0) {
       Logger.error("No se pudo editar el perfil del usuario");

@@ -168,7 +168,9 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 
 const MAX_LIMIT = 1000000;
-const PREMIUN_COST = 0.000000000001; 
+const PREMIUN_COST = '0.000000000001';
+
+const NOT_ENOUGHT_MONEY_PAYMENT_ERROR = 'insufficient funds for intrinsic transaction cost';
 
 module.exports = {
     DB_USER, DB_PASSWORD, DB_HOST, DB_PORT,
@@ -232,4 +234,5 @@ module.exports = {
     BAND_URL,
     PREMIUN_COST,
     DEPOSIT_URL,
+    NOT_ENOUGHT_MONEY_PAYMENT_ERROR,
 }
