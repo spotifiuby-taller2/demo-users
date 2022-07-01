@@ -74,13 +74,14 @@ const LISTENER_LOC_URL = "/listener/location";
 const WALLET_URL = "/wallet";
 
 const PROFILE_USER_BASIC_INFO_URL= PROFILE_URL + "/basicinfo";
-const EDIT_PROFILE_URL = USERS_URL + "/editprodile";
+const EDIT_PROFILE_URL = USERS_URL + "/editprofile";
 const PUSH_NOTIFICATION_TOKEN_URL = PROFILE_URL + "/pushnotificationtoken";
 const NOTIFICATION_LIST_URL = USERS_URL + "/notificationlist"
 const PROFILE_USER_TYPE_URL= PROFILE_URL + "/type";
 const PARSE_USERS_URL= "/parse";
 const CHECK_URL="/check";
 const BAND_URL= USERS_URL + "/band";
+const DEPOSIT_URL = "/deposit";
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -167,6 +168,7 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 
 const MAX_LIMIT = 1000000;
+const PREMIUN_COST = 0.000000000001; 
 
 module.exports = {
     DB_USER, DB_PASSWORD, DB_HOST, DB_PORT,
@@ -227,5 +229,7 @@ module.exports = {
     USERS_UNVERIFIED_URL,
     MAX_LIMIT,
     CHECK_URL,
-    BAND_URL
+    BAND_URL,
+    PREMIUN_COST,
+    DEPOSIT_URL,
 }

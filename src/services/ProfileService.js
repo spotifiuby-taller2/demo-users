@@ -5,6 +5,7 @@ const Logger = require("./Logger");
 const utils = require("../others/utils");
 const {Op} = require("sequelize");
 const { ArtistsBands } = require("../data/ArtistsBands");
+const fetch = require("node-fetch");
 
 class ProfileService {
   defineEvents(app) {
@@ -489,16 +490,60 @@ class ProfileService {
 
   }
 
+  async postToPayments(userId){
+
+    const user = await Users.findOne(
+      {
+        where: {[Op.and]: [{id: userId}, {isBlocked: false,}]}
+      }).catch(err => {return {error: err.toString()}});
+    
+    if (user === null) return {error: 'user not exist'}
+    if ( user?.error !== undefined || user === null ) return undefined;
+
+    const today = Date.now();
+    const payDate = user.lastPaymentDate.setMonth(user.lastPaymentDate.getMonth() + 1 );
+
+    if ( today < payDate ) return 0;
+
+    const requestToPayment = {
+      senderId: user.walletId,
+      amountInEthers: constants.PREMIUN_COST,
+    }
+    return await fetch(constants.PAYMENT_HOST + constants.DEPOSIT_URL,
+      {
+        method: "POST",
+        headers: constants.JSON_HEADER,
+        body: JSON.stringify(requestToPayment)
+      }).then(res => res.json())
+        .catch(err =>{return {error: err.toString}} )
+  }
+
   async editProfile(req, res) {
 
     Logger.info("Request a /users/editprofile");
 
     const userId = req.query.userId;
     const body = req.body;
+    const isListener = req.body.isListener;
+    let paymentsRes = null; 
+    let message = {status: 'Perfil del usuario actualizado'};
 
     delete body.apiKey;
     delete body.verbRedirect;
     delete body.redirectTo;
+    delete body.isListener;
+
+    if ( isListener && body.subscription === 'premiun' ){
+      paymentsRes = await this.postToPayments(userId);
+      if ( paymentsRes?.error !== undefined || paymentsRes === undefined ) { 
+          delete body.subscription; 
+          message.paymenError = 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción';
+      }
+      else if ( paymentsRes !== 0 ) {
+        const today = new Date();
+        body.lastPaymentDate = today;
+      }
+    }
 
 
     const response = await Users.update(
@@ -513,14 +558,12 @@ class ProfileService {
       .catch(error => ({error: error.toString()}));
 
 
-    if (response.error !== undefined) {
+    if (response.error !== undefined || response === 0) {
       Logger.error("No se pudo editar el perfil del usuario");
       return utils.setErrorResponse("No se pudo editar el perfil del usuario", 461, res);
     }
 
-    utils.setBodyResponse({status: 'Perfil del usuario actualizado'},
-      201,
-      res);
+    utils.setBodyResponse(message, 201, res);
 
   }
 
