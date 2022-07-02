@@ -295,7 +295,7 @@ class SignUpService {
             isBand: tempUser.isBand,
             latitude: tempUser.latitude,
             longitude: tempUser.longitude,
-            walletId: gatewayResponse.id
+            walletId: gatewayResponse.id,
         });
 
         await NonActivatedUsers.destroy({

@@ -5,6 +5,7 @@ const ProfileService = rewire("../src/services/ProfileService");
 const setErrorResponse = require('../src/others/utils').setErrorResponse;
 const setBodyResponse = require('../src/others/utils').setBodyResponse;
 const constants = require('../src/others/constants');
+const nock = require('nock');
 
 describe('ProfileService', function() {
     describe('getProfile',  ()=>{
@@ -478,7 +479,7 @@ describe('ProfileService', function() {
 
     describe('editProfile', ()=>{
 
-        it('get user basic info ok', async ()=>{
+        it('get user basic info ok, postToPaymets not call', async ()=>{
             const profileService = new ProfileService();
 
             const body = {
@@ -514,9 +515,10 @@ describe('ProfileService', function() {
                 'redirectTo': 'url',
             };
 
-            const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
+            const updateUsersMock = sinon.fake.returns(Promise.resolve(1));
             const revertRewire = ProfileService.__set__({
-                Users: {update: updateUsersMock,},
+                Users: {
+                    update: updateUsersMock,},
                 utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
@@ -536,6 +538,113 @@ describe('ProfileService', function() {
                 {status: 'Perfil del usuario actualizado'}
             ));
             revertRewire();        
+        });
+
+        it('get user basic info ok, postToPaymets call', async ()=>{
+            const profileService = new ProfileService();
+            var scope = nock(constants.PAYMENT_HOST)
+                .persist()
+                .post(constants.DEPOSIT_URL)
+                .reply(500, 
+                    {
+                        error: 'payment error',
+                    });
+            const date = new Date();
+            const threeMonthsAgo = date.setMonth(date.getMonth() - 3);
+            const dateFixed = new Date(threeMonthsAgo);
+
+
+            const user = {
+                        'id': 1,
+                        'email': 'email@email.com',
+                        'phoneNumber': '0123456789',
+                        'username': 'username',
+                        'isArtist': false,
+                        'isListener': true,
+                        'isBand': false,
+                        'isAdmin': false,
+                        'metal': true,
+                        'rap': true,
+                        'pop': false,
+                        'classic': false,
+                        'electronic': false,
+                        'jazz': false,
+                        'reggeaton': false,
+                        'indie': false,
+                        'punk': false,
+                        'salsa': false,
+                        'blues': false,
+                        'rock': false,
+                        'others': false,
+                        'photoUrl': 'url',
+                        'pushNotificationToken': 'token',
+                        'isVerified': false,
+                        'verificationVideoUrl': 'url',
+                        'subscription': 'free',
+                        'lastPaymentDate': dateFixed,
+                    };
+
+            const body = {
+                'id': 1,
+                'email': 'email@email.com',
+                'phoneNumber': '0123456789',
+                'username': 'username',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'premiun',
+                'nMembers': 0,
+                'apikey': 'apikey',
+                'verbRedirect': 'PATCH',
+                'redirectTo': 'url',
+            };
+
+
+            const updateUsersMock = sinon.fake.returns(Promise.resolve(1));
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    update: updateUsersMock,
+                    findOne: findOneUsersMock},
+                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+              });
+            const jsonMock = {json: sinon.fake()};
+            const res = {status: sinon.fake.returns(jsonMock)};
+            const req = {
+                query: {
+                    userId: 1,
+                },
+                body: body,
+            };
+
+            await profileService.editProfile(req, res);
+
+            assert(updateUsersMock.calledOnce);
+            assert(res.status.calledWith(201));
+            assert(jsonMock.json.calledWith(
+                {status: 'Perfil del usuario actualizado', 
+                paymenError: 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción'}
+            ));
+            revertRewire();
+            nock.cleanAll();        
         });
 
         it('get user basic info error user not found', async ()=>{
@@ -597,6 +706,162 @@ describe('ProfileService', function() {
         });
 
     });
+
+    describe('postToPayment',()=>{
+        it('postToPayment fetch to payments ok', async ()=>{
+            const profileService = new ProfileService();
+            var scope = nock(constants.PAYMENT_HOST)
+                .persist()
+                .post(constants.DEPOSIT_URL)
+                .reply(200, 
+                    {
+                        ok: 'ok',
+                    });
+
+            const date = new Date();
+            const threeMonthsAgo = date.setMonth(date.getMonth() - 3);
+            const dateFixed = new Date(threeMonthsAgo);
+
+
+            const user = {
+                'id': 1,
+                'email': 'email@email.com',
+                'phoneNumber': '0123456789',
+                'username': 'username',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'free',
+                'lastPaymentDate': dateFixed,
+            };
+
+            const userId = 1;
+
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    findOne: findOneUsersMock,},
+              });
+
+            const response = await profileService.postToPayments( userId);
+
+            assert(findOneUsersMock.calledOnce);
+            assert.deepStrictEqual(response, {ok: 'ok'});
+            revertRewire();
+            nock.cleanAll();    
+        });
+
+        it('postToPayment fetch not reached for subscription not expired', async ()=>{
+            const profileService = new ProfileService();
+            var scope = nock(constants.PAYMENT_HOST)
+                .persist()
+                .post(constants.DEPOSIT_URL)
+                .reply(200, 
+                    {
+                        ok: 'ok',
+                    });
+
+            const date = new Date();
+            const threeMonthsAgo = date.setDate(date.getDate() - 3);
+            const dateFixed = new Date(threeMonthsAgo);
+
+
+            const user = {
+                'id': 1,
+                'email': 'email@email.com',
+                'phoneNumber': '0123456789',
+                'username': 'username',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'free',
+                'lastPaymentDate': dateFixed,
+            };
+
+            const userId = 1;
+
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    findOne: findOneUsersMock,},
+              });
+
+            const response = await profileService.postToPayments( userId);
+
+            assert(findOneUsersMock.calledOnce);
+            assert.deepStrictEqual(response, 0);
+            revertRewire();
+            nock.cleanAll();    
+        });
+
+        it("postToPayment error user don't exist", async ()=>{
+            const profileService = new ProfileService();
+            const userId = 1;
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    findOne: findOneUsersMock,},
+              });
+
+            const response = await profileService.postToPayments( userId);
+
+            assert(findOneUsersMock.calledOnce);
+            assert.deepStrictEqual(response, {error: 'user not exist'});
+            revertRewire();
+        });
+
+        it("postToPayment error user finding user", async ()=>{
+            const profileService = new ProfileService();
+            const userId = 1;
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve({error: 'database error'}));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    findOne: findOneUsersMock,},
+              });
+
+            const response = await profileService.postToPayments( userId);
+
+            assert(findOneUsersMock.calledOnce);
+            assert.deepStrictEqual(response, undefined);
+            revertRewire();
+        });
+    })
 
     describe('setPushNotificationToken', ()=>{
 

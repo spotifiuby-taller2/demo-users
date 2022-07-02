@@ -2,6 +2,10 @@ const database = require('./database');
 const Sequelize = require('sequelize');
 const constants = require('../others/constants');
 
+
+const today = new Date();
+const lastPayementDateDefault = today.setMonth(today.getMonth() - 1);
+
 const Users = database.define('users', {
   id: {
     primaryKey: true,
@@ -147,6 +151,12 @@ const Users = database.define('users', {
     allowNull: false,
     unique: false,
     defaultValue: 'free'
+  },
+  lastPaymentDate:{
+    type: Sequelize.DATE,
+    allowNull: true,
+    unique: false,
+    defaultValue: lastPayementDateDefault,
   }
 });
 
