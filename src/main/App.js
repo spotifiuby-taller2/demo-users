@@ -90,7 +90,7 @@ class App {
 
 const main = new App();
 
-cron.schedule('* * * * *', main.profileService.checkSuscriptions );
+cron.schedule('0 0 * * *', main.profileService.checkSuscriptions );
 
 main.syncDB()
     .then( () => {
