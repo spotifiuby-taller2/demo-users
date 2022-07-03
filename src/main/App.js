@@ -15,6 +15,7 @@ const { swaggerConfig } = require('./swaggerConfig');
 const InfoService = require("../services/InfoService");
 const { ParseService } = require("../services/ParseService");
 const { MusicBandService } = require("../services/MusicBandService");
+const cron = require('node-cron');
 
 const swaggerDoc = swaggerJsDoc(swaggerConfig);
 
@@ -89,11 +90,13 @@ class App {
 
 const main = new App();
 
+cron.schedule('* * * * *', main.profileService.checkSuscriptions );
+
 main.syncDB()
     .then( () => {
       main.defineLogLevel();
       main.defineEvents();
-      } )
+    } )
     .catch( (error) => {
       console.log(error);
     }) ;

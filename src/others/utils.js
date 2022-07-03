@@ -151,6 +151,12 @@ const getToGateway = (destiny,
   } );
 }
 
+const notMonthIntervalYet = (day) => {
+  const payDate = day.setMonth(day.getMonth() + 1);
+
+  return Date.now() < payDate;
+}
+
 module.exports = {
   getId,
   getBcryptOf,
@@ -162,5 +168,5 @@ module.exports = {
   areAnyUndefined,
   invalidFieldFormat,
   postToGateway,
-  getToGateway,
+  getToGateway, notMonthIntervalYet
 };

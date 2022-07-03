@@ -82,6 +82,7 @@ const PARSE_USERS_URL= "/parse";
 const CHECK_URL="/check";
 const BAND_URL= USERS_URL + "/band";
 const DEPOSIT_URL = "/deposit";
+const USER_WITH_WALLET_URL = "/userwithwallet";
 
 /* ====== Docker vs Development config ====== */
 let nodePort;
@@ -228,11 +229,7 @@ module.exports = {
     PARSE_USERS_URL,
     USERS_CREATE_ADMIN_URL,
     USERS_VERIFIED_URL,
-    USERS_UNVERIFIED_URL,
-    MAX_LIMIT,
-    CHECK_URL,
-    BAND_URL,
-    PREMIUN_COST,
-    DEPOSIT_URL,
-    NOT_ENOUGHT_MONEY_PAYMENT_ERROR,
+    USERS_UNVERIFIED_URL, MAX_LIMIT, CHECK_URL, BAND_URL,
+    PREMIUN_COST, DEPOSIT_URL, NOT_ENOUGHT_MONEY_PAYMENT_ERROR,
+    USER_WITH_WALLET_URL
 }
