@@ -4,12 +4,14 @@ const rewire = require("rewire");
 const ProfileService = rewire("../src/services/ProfileService");
 const setErrorResponse = require('../src/others/utils').setErrorResponse;
 const setBodyResponse = require('../src/others/utils').setBodyResponse;
+const notMonthIntervalYet = require('../src/others/utils').notMonthIntervalYet;
 const constants = require('../src/others/constants');
 const nock = require('nock');
 
 describe('ProfileService', function() {
-    describe('getProfile',  ()=>{
-        it('get user profile ok (listenner)', async ()=>{
+    afterEach(function() { return nock.cleanAll(); });
+    describe('getProfile',  function() {
+        it('get user profile ok (listenner)', async function() {
 
             const profileService = new ProfileService();
 
@@ -53,11 +55,11 @@ describe('ProfileService', function() {
 
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
                 ArtistsBand: {findAll: findAllArtistsBandsMock},
                 ArtistsFav: {findAll: findArtistFavMock},
               });
-            
+
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const req = {
@@ -75,7 +77,7 @@ describe('ProfileService', function() {
             revertRewire();
         });
 
-        it('get user profile ok (artist)', async ()=>{
+        it('get user profile ok (artist)', async function() {
 
             const profileService = new ProfileService();
             const user = {
@@ -118,11 +120,11 @@ describe('ProfileService', function() {
 
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
                 ArtistsBand: {findAll: findAllArtistsBandsMock},
                 ArtistFav: {findAll: findArtistFavMock},
               });
-            
+
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const req = {
@@ -140,7 +142,7 @@ describe('ProfileService', function() {
             revertRewire();
         });
 
-        it('get user profile ok (band)', async ()=>{
+        it('get user profile ok (band)', async function() {
             const profileService = new ProfileService();
             const user = {
                 'id': 123,
@@ -182,11 +184,11 @@ describe('ProfileService', function() {
 
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
                 ArtistsBands: {findAll: findAllArtistsBandsMock},
                 ArtistFav: {findAll: findArtistFavMock},
               });
-            
+
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const req = {
@@ -204,15 +206,15 @@ describe('ProfileService', function() {
             revertRewire();
         });
 
-        it('get user profile error user not found', async ()=>{
+        it('get user profile error user not found', async function() {
             const profileService = new ProfileService();
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
 
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
-            
+
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const req = {
@@ -272,8 +274,8 @@ describe('ProfileService', function() {
                 utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
                 ArtistFav: {findAll: findArtistFavMock},
               });
-            
-            
+
+
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const req = {
@@ -297,9 +299,9 @@ describe('ProfileService', function() {
 
     });
 
-    describe('updatePhotoUrl', ()=>{
+    describe('updatePhotoUrl', function() {
 
-        it('update photo url ok', async ()=>{
+        it('update photo url ok', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -336,7 +338,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -357,15 +359,15 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith({
                 status: "Foto de perfil actualizada",
               }));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('update photo url user not found error', async ()=>{
+        it('update photo url user not found error', async function() {
             const profileService = new ProfileService();
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -385,13 +387,13 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith({
                 error: "El usuario no existe.",
               }));
-            revertRewire();        
+            revertRewire();
         });
     });
 
-    describe('getUserBasicInfo', ()=>{
+    describe('getUserBasicInfo', function() {
 
-        it('get user basic info ok', async ()=>{
+        it('get user basic info ok', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -427,7 +429,7 @@ describe('ProfileService', function() {
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -447,15 +449,15 @@ describe('ProfileService', function() {
                 subscription: 'free',
 
             }));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('get user basic info error user not found', async ()=>{
+        it('get user basic info error user not found', async function() {
             const profileService = new ProfileService();
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -473,13 +475,13 @@ describe('ProfileService', function() {
                 error: 'No existe el usuario',
 
             }));
-            revertRewire();        
+            revertRewire();
         });
     });
 
-    describe('editProfile', ()=>{
+    describe('editProfile', function() {
 
-        it('get user basic info ok, postToPaymets not call', async ()=>{
+        it('get user basic info ok, postToPayments not call', async function() {
             const profileService = new ProfileService();
 
             const body = {
@@ -519,7 +521,7 @@ describe('ProfileService', function() {
             const revertRewire = ProfileService.__set__({
                 Users: {
                     update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -527,7 +529,7 @@ describe('ProfileService', function() {
                 query: {
                     userId: 1,
                 },
-                body: body,
+                body,
             };
 
             await profileService.editProfile(req, res);
@@ -537,15 +539,14 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {status: 'Perfil del usuario actualizado'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('get user basic info ok, postToPaymets call', async ()=>{
+        it('get user basic info ok, postToPayments call', async function() {
             const profileService = new ProfileService();
-            var scope = nock(constants.PAYMENT_HOST)
-                .persist()
+            const scope = nock(constants.PAYMENT_HOST)
                 .post(constants.DEPOSIT_URL)
-                .reply(500, 
+                .reply(500,
                     {
                         error: 'payment error',
                     });
@@ -610,7 +611,7 @@ describe('ProfileService', function() {
                 'pushNotificationToken': 'token',
                 'isVerified': false,
                 'verificationVideoUrl': 'url',
-                'subscription': 'premiun',
+                'subscription': 'premium',
                 'nMembers': 0,
                 'apikey': 'apikey',
                 'verbRedirect': 'PATCH',
@@ -618,13 +619,11 @@ describe('ProfileService', function() {
             };
 
 
-            const updateUsersMock = sinon.fake.returns(Promise.resolve(1));
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
             const revertRewire = ProfileService.__set__({
                 Users: {
-                    update: updateUsersMock,
                     findOne: findOneUsersMock},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse, notMonthIntervalYet},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -632,22 +631,19 @@ describe('ProfileService', function() {
                 query: {
                     userId: 1,
                 },
-                body: body,
+                body,
             };
 
             await profileService.editProfile(req, res);
 
-            assert(updateUsersMock.calledOnce);
-            assert(res.status.calledWith(201));
+            assert(res.status.calledWith(461));
             assert(jsonMock.json.calledWith(
-                {status: 'Perfil del usuario actualizado', 
-                paymenError: 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción'}
+                {error: 'Error en el servicio de pagos, no se pudo efectuar el cambio de subcripción'}
             ));
             revertRewire();
-            nock.cleanAll();        
         });
 
-        it('get user basic info error user not found', async ()=>{
+        it('get user basic info error user not found', async function() {
             const profileService = new ProfileService();
             const body = {
                 'id': 1,
@@ -684,7 +680,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve({error: 'database error'}));
             const revertRewire = ProfileService.__set__({
                 Users: {update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -692,7 +688,7 @@ describe('ProfileService', function() {
                 query: {
                     userId: 1,
                 },
-                body: body,
+                body,
             };
 
             await profileService.editProfile(req, res);
@@ -702,18 +698,17 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {error: "No se pudo editar el perfil del usuario"}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
     });
 
-    describe('postToPayment',()=>{
-        it('postToPayment fetch to payments ok', async ()=>{
+    describe('postToPayment',function() {
+        it('postToPayment fetch to payments ok', async function() {
             const profileService = new ProfileService();
-            var scope = nock(constants.PAYMENT_HOST)
-                .persist()
+            const scope = nock(constants.PAYMENT_HOST)
                 .post(constants.DEPOSIT_URL)
-                .reply(200, 
+                .reply(200,
                     {
                         ok: 'ok',
                     });
@@ -757,6 +752,7 @@ describe('ProfileService', function() {
 
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
             const revertRewire = ProfileService.__set__({
+                utils: {notMonthIntervalYet},
                 Users: {
                     findOne: findOneUsersMock,},
               });
@@ -766,15 +762,13 @@ describe('ProfileService', function() {
             assert(findOneUsersMock.calledOnce);
             assert.deepStrictEqual(response, {ok: 'ok'});
             revertRewire();
-            nock.cleanAll();    
         });
 
-        it('postToPayment fetch not reached for subscription not expired', async ()=>{
+        it('postToPayment fetch not reached for subscription not expired', async function() {
             const profileService = new ProfileService();
-            var scope = nock(constants.PAYMENT_HOST)
-                .persist()
+            const scope = nock(constants.PAYMENT_HOST)
                 .post(constants.DEPOSIT_URL)
-                .reply(200, 
+                .reply(200,
                     {
                         ok: 'ok',
                     });
@@ -818,6 +812,7 @@ describe('ProfileService', function() {
 
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
             const revertRewire = ProfileService.__set__({
+                utils: {notMonthIntervalYet},
                 Users: {
                     findOne: findOneUsersMock,},
               });
@@ -827,10 +822,9 @@ describe('ProfileService', function() {
             assert(findOneUsersMock.calledOnce);
             assert.deepStrictEqual(response, 0);
             revertRewire();
-            nock.cleanAll();    
         });
 
-        it("postToPayment error user don't exist", async ()=>{
+        it("postToPayment error user don't exist", async function() {
             const profileService = new ProfileService();
             const userId = 1;
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
@@ -846,7 +840,7 @@ describe('ProfileService', function() {
             revertRewire();
         });
 
-        it("postToPayment error user finding user", async ()=>{
+        it("postToPayment error user finding user", async function() {
             const profileService = new ProfileService();
             const userId = 1;
             const findOneUsersMock = sinon.fake.returns(Promise.resolve({error: 'database error'}));
@@ -863,9 +857,9 @@ describe('ProfileService', function() {
         });
     })
 
-    describe('setPushNotificationToken', ()=>{
+    describe('setPushNotificationToken', function() {
 
-        it('set user push notification token ok', async ()=>{
+        it('set user push notification token ok', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -902,7 +896,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -923,16 +917,16 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {status: 'Push notification token actualizado'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('set user push notification token error user not found', async ()=>{
+        it('set user push notification token error user not found', async function() {
             const profileService = new ProfileService();
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
             const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -953,10 +947,10 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {error: 'El usuario no existe.'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('set user push notification token error updating user', async ()=>{
+        it('set user push notification token error updating user', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -993,7 +987,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve({error: 'error updating user'}));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -1014,13 +1008,13 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {error: `No se pudo actualizar el push notification token del usuario ${req.query.userId}`}
             ));
-            revertRewire();        
+            revertRewire();
         });
     });
 
-    describe('updateVerificationVideoUrl', ()=>{
+    describe('updateVerificationVideoUrl', function() {
 
-        it('update artist verification video url ok', async ()=>{
+        it('update artist verification video url ok', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -1057,7 +1051,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -1076,17 +1070,17 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {status: 'Video de verificacion actualizado'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('update artist verification video url error user not found', async ()=>{
+        it('update artist verification video url error user not found', async function() {
             const profileService = new ProfileService();
 
             const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
             const updateUsersMock = sinon.fake.returns(Promise.resolve(0));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -1105,10 +1099,10 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {error: 'El usuario no existe.'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
-        it('update artist verification video url error updating verification video url', async ()=>{
+        it('update artist verification video url error updating verification video url', async function() {
             const profileService = new ProfileService();
 
             const user = {
@@ -1145,7 +1139,7 @@ describe('ProfileService', function() {
             const updateUsersMock = sinon.fake.returns(Promise.resolve({error: 'error updating database'}));
             const revertRewire = ProfileService.__set__({
                 Users: {findOne: findOneUsersMock, update: updateUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
+                utils: {setBodyResponse, setErrorResponse},
               });
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
@@ -1164,7 +1158,7 @@ describe('ProfileService', function() {
             assert(jsonMock.json.calledWith(
                 {error: 'error updating database'}
             ));
-            revertRewire();        
+            revertRewire();
         });
 
     });
