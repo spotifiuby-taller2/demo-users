@@ -680,10 +680,12 @@ class ProfileService {
                 }
             }
         ).catch(error => {
-            error: error.toString()
+            return {
+                error: error.toString()
+            }
         } );
 
-        if (user.error !== undefined) {
+        if (user === undefined || user.error !== undefined) {
             Logger.error(user.error.toString());
 
             return utils.setErrorResponse("Usuario no encontrada",
