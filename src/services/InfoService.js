@@ -764,17 +764,20 @@ class InfoService {
     const idReceptor = req.query.idReceptor;
 
     const response = await Notifications.destroy({
-      where: { [Op.and]: [{ idEmissor }, { idReceptor }] },
+      where: { [Op.and]: [{ idEmissor: idEmissor }, { idReceptor:  idReceptor }] },
     }).catch((err) => ({ error: err.toString() }));
 
-    if (response.error !== undefined) {
+    if (response?.error !== undefined) {
       return utils.setErrorResponse(
         "Error al destruir la notificación",
         500,
         res
       );
-    } else if (response === 0) {
-      return utils.setErrorResponse("La notificación no existe", 400, res);
+    }
+
+    if ( response === 0 ){
+      Logger.info(`La notificación no existe.`);
+      return utils.setBodyResponse({ status: "Notificación no existe." }, 201, res);
     }
 
     Logger.info(`La notificación ha sido borrada con exito.`);
@@ -786,6 +789,24 @@ class InfoService {
 
     const idEmissor = req.body.idEmissor;
     const idReceptor = req.body.idReceptor;
+
+    const notificación = await Notifications.findOne(
+      {
+        where: {
+          [Op.and]: 
+            [{idEmissor: idEmissor},{idReceptor: idReceptor,}]
+        }
+      }
+    ).catch((err) => ({ error: err.toString() }));
+
+    if ( notificación !== null ){
+      Logger.info("La notificación ya existe.");
+      return utils.setBodyResponse({ status: "Notificación ya existe." }, 201, res);
+    }
+
+    if (notificación?.error !== undefined) {
+      return utils.setErrorResponse(notificación.error, 400, res);
+    }
 
     const response = await Notifications.create({
       idEmissor,
@@ -840,6 +861,7 @@ class InfoService {
         usernameEmissor: emissor.username,
         usernameReceptor: receiver.username,
         pushNotificationToken: receiver.pushNotificationToken,
+        photoUrl: receiver.photoUrl,
       };
       notifications.push(notification);
     });

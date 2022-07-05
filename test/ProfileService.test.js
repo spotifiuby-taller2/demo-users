@@ -232,70 +232,6 @@ describe('ProfileService', function() {
               }));
             revertRewire();
         });
-        //TODO
-        /**
-        it('get user profile error finding artist followers', async ()=>{
-            const profileService = new ProfileService();
-            const user = {
-                'id': 1,
-                'email': 'email@email.com',
-                'phoneNumber': '0123456789',
-                'username': 'username',
-                'isArtist': false,
-                'isListener': true,
-                'isBand': false,
-                'isAdmin': false,
-                'metal': true,
-                'rap': true,
-                'pop': false,
-                'classic': false,
-                'electronic': false,
-                'jazz': false,
-                'reggeaton': false,
-                'indie': false,
-                'punk': false,
-                'salsa': false,
-                'blues': false,
-                'rock': false,
-                'others': false,
-                'photoUrl': 'url',
-                'pushNotificationToken': 'token',
-                'isVerified': false,
-                'verificationVideoUrl': 'url',
-                'subscription': 'free',
-                'nMembers': 0,
-            };
-
-            const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
-            const findArtistFavMock = sinon.fake.returns(Promise.resolve({error: 'database error'}))
-
-            const revertRewire = ProfileService.__set__({
-                Users: {findOne: findOneUsersMock,},
-                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse},
-                ArtistFav: {findAll: findArtistFavMock},
-              });
-
-
-            const jsonMock = {json: sinon.fake()};
-            const res = {status: sinon.fake.returns(jsonMock)};
-            const req = {
-                query: {
-                    userId: 1,
-                }
-            }
-
-            await profileService.getProfile(req, res);
-
-            assert(findOneUsersMock.calledOnce);
-            assert(findArtistFavMock.calledOnce);
-            assert(res.status.calledWith(581));
-            assert(jsonMock.json.calledWith({
-                error: 'database error'}
-            ));
-            revertRewire();
-        });**/
-
-
 
     });
 
@@ -1161,5 +1097,252 @@ describe('ProfileService', function() {
             revertRewire();
         });
 
+    });
+
+    describe('getUserWithWallet', function() {
+
+        it('get user with wallet ok', async function() {
+            const profileService = new ProfileService();
+
+            const user = {
+                'id': 1,
+                'email': 'email@email.com',
+                'phoneNumber': '0123456789',
+                'username': 'username',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'free',
+                'walletId': 100,
+            };
+
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(user));
+            const revertRewire = ProfileService.__set__({
+                Users: {findOne: findOneUsersMock,},
+                utils: {setBodyResponse, setErrorResponse},
+              });
+            const jsonMock = {json: sinon.fake()};
+            const res = {status: sinon.fake.returns(jsonMock)};
+            const req = {
+                query: {
+                    walletId: 100,
+                },
+            };
+
+            await profileService.getUserWithWallet(req, res);
+
+            assert(findOneUsersMock.calledOnce);
+            assert(res.status.calledWith(200));
+            assert(jsonMock.json.calledWith(
+                {userId: 1}
+            ));
+            revertRewire();
+        });
+
+        it('get user with wallet error user not found', async function() {
+            const profileService = new ProfileService();
+
+            const findOneUsersMock = sinon.fake.returns(Promise.resolve(null));
+            const revertRewire = ProfileService.__set__({
+                Users: {findOne: findOneUsersMock,},
+                utils: {setBodyResponse, setErrorResponse},
+              });
+            const jsonMock = {json: sinon.fake()};
+            const res = {status: sinon.fake.returns(jsonMock)};
+            const req = {
+                query: {
+                    walletId: 100,
+                },
+            };
+
+            await profileService.getUserWithWallet(req, res);
+
+            assert(findOneUsersMock.calledOnce);
+            assert(res.status.calledWith(500));
+            assert(jsonMock.json.calledWith(
+                {error: 'Usuario no encontrado'}
+            ));
+            revertRewire();
+        });
+
+    });
+
+    describe('checkSuscriptions', function() {
+
+        it('check all suscriptions ok', async function() {
+            const profileService = new ProfileService();
+            const scope1 = nock(constants.PAYMENT_HOST)
+                .post(constants.DEPOSIT_URL, {
+                    senderId: 200,
+                    amountInEthers: constants.PREMIUN_COST,
+                })
+                .reply(400,
+                    {
+                        error: 'saldo insuficiente',
+                    });
+                
+
+            const scope2 = nock(constants.PAYMENT_HOST)
+                .post(constants.DEPOSIT_URL, {
+                    senderId: 300,
+                    amountInEthers: constants.PREMIUN_COST,
+                })
+                .reply(200,
+                    {
+                        ok: 'ok',
+                    });
+            
+            const today = new Date();
+            const date1 = new Date(today.setDate(today.getDate() - 1));
+            const date2 = new Date(today.setDate(today.getDate() - 90));
+
+            const user1 = {
+                'id': 1,
+                'email': 'email@email.com',
+                'phoneNumber': '11111111',
+                'username': 'username1',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'premium',
+                'walletId': 100,
+                'lastPaymentDate': date1,
+                get: args => user1,
+            };
+
+            const user2 = {
+                'id': 2,
+                'email': 'email@email.com',
+                'phoneNumber': '22222222',
+                'username': 'username2',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'premium',
+                'walletId': 200,
+                'lastPaymentDate': date2,
+                get: args => user2,
+            };
+
+            const user3 = {
+                'id': 3,
+                'email': 'email@email.com',
+                'phoneNumber': '33333333',
+                'username': 'username3',
+                'isArtist': false,
+                'isListener': true,
+                'isBand': false,
+                'isAdmin': false,
+                'metal': true,
+                'rap': true,
+                'pop': false,
+                'classic': false,
+                'electronic': false,
+                'jazz': false,
+                'reggeaton': false,
+                'indie': false,
+                'punk': false,
+                'salsa': false,
+                'blues': false,
+                'rock': false,
+                'others': false,
+                'photoUrl': 'url',
+                'pushNotificationToken': 'token',
+                'isVerified': false,
+                'verificationVideoUrl': 'url',
+                'subscription': 'premium',
+                'walletId': 300,
+                'lastPaymentDate': date2,
+                get: args=>user3,
+            };
+
+            const users = [user1, user2, user3]
+
+            const findAllUsersMock = sinon.fake.returns(Promise.resolve(users));
+            const updateUsersMock = sinon.fake.returns(Promise.resolve(1));
+            const revertRewire = ProfileService.__set__({
+                Users: {
+                    findAll: findAllUsersMock,
+                    update: updateUsersMock},
+            });
+
+            await profileService.checkSuscriptions();
+
+            assert(findAllUsersMock.calledOnce);
+            assert(updateUsersMock.calledTwice);
+            assert(updateUsersMock.calledWithMatch(
+                {
+                    subscription: "free",
+                }, 
+                {
+                    where: {
+                       id: user2.id,
+                    }
+                }));
+            assert(updateUsersMock.neverCalledWith(
+                {
+                    subscription: "free",
+                }, 
+                {
+                    where: {
+                       id: user3.id,
+                    }
+                }));
+            revertRewire();
+        });
     });
 });
