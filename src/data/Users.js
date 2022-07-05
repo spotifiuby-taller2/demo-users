@@ -188,7 +188,6 @@ const Notifications = database.define('notifications', {
     type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
     allowNull: false,
     validate: {notEmpty: true},
-    primaryKey: true,
     references: {
       model: Users, // <----- name of the table
       key: 'id'
@@ -198,7 +197,6 @@ const Notifications = database.define('notifications', {
     type: Sequelize.STRING(constants.FIREBASE_MAX_LEN),
     allowNull: false,
     validate: {notEmpty: true},
-    primaryKey: true,
     references: {
       model: Users, // <----- name of the table
       key: 'id'

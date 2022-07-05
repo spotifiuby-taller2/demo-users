@@ -43,7 +43,7 @@ class App {
   }
 
   async syncDB() {
-    if (! constants.isDevelopment) {
+    if (! constants.isDevelopment ) {
         await runMigrations();
     }
 

@@ -1446,10 +1446,10 @@ describe('InfoService', function() {
 
             await infoService.deleteNotification(req, res);
 
-            assert(res.status.calledWith(400));
+            assert(res.status.calledWith(201));
             assert(destroyNotificationMock.calledOnce);
             assert(jsonMock.json.calledWith(
-                { error: "La notificación no existe" }
+                { status: "Notificación no existe." }
             ));
             revertRewire(); 
         });
@@ -1526,6 +1526,7 @@ describe('InfoService', function() {
                 'subscription': 'free',
                 'nMembers': 0,
                 'isBlocked': false,
+                'photoUrl': 'photoUrl1'
             };
 
             const receiver = {
@@ -1557,6 +1558,7 @@ describe('InfoService', function() {
                 'subscription': 'free',
                 'nMembers': 0,
                 'isBlocked': false,
+                'photoUrl': 'photoUrl2',
             };
 
             const receivers = [receiver];
@@ -1586,6 +1588,7 @@ describe('InfoService', function() {
                                 usernameEmissor: 'usernameOne',
                                 usernameReceptor: 'usernameTwo',
                                 pushNotificationToken: 'tokenTwo',
+                                photoUrl: 'photoUrl2'
                             },
                         ]
             }
@@ -1737,9 +1740,12 @@ describe('InfoService', function() {
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const createNotificationsMock = sinon.fake.returns(Promise.resolve(1));
+            const findOneNotificationsMock = sinon.fake.returns(Promise.resolve(null));
 
             const revertRewire = InfoService.__set__({
-                Notifications: {create: createNotificationsMock,},
+                Notifications: {
+                    create: createNotificationsMock,
+                    findOne: findOneNotificationsMock},
                 utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse },
               });
 
@@ -1747,6 +1753,7 @@ describe('InfoService', function() {
 
             assert(res.status.calledWith(201));
             assert(createNotificationsMock.calledOnce);
+            assert(findOneNotificationsMock.calledOnce);
             assert(jsonMock.json.calledWith(
                 { status: "Notificación creada." }
             ));
@@ -1767,9 +1774,11 @@ describe('InfoService', function() {
             const jsonMock = {json: sinon.fake()};
             const res = {status: sinon.fake.returns(jsonMock)};
             const createNotificationsMock = sinon.fake.returns(Promise.resolve({error: 'notifications error'}));
-
+            const findOneNotificationsMock = sinon.fake.returns(Promise.resolve(null));
             const revertRewire = InfoService.__set__({
-                Notifications: {create: createNotificationsMock,},
+                Notifications: {
+                    create: createNotificationsMock,
+                    findOne: findOneNotificationsMock,},
                 utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse },
               });
 
@@ -1777,8 +1786,42 @@ describe('InfoService', function() {
 
             assert(res.status.calledWith(400));
             assert(createNotificationsMock.calledOnce);
+            assert(findOneNotificationsMock.calledOnce);
             assert(jsonMock.json.calledWith(
                 { error: "notifications error" }
+            ));
+            revertRewire(); 
+        });
+
+        it('addNotification already exist', async ()=>{
+
+            const infoService = new InfoService();
+
+            const req = {
+                body: {
+                    idEmissor: 1,
+                    idReceptor: 2,
+                },
+            };
+
+            const jsonMock = {json: sinon.fake()};
+            const res = {status: sinon.fake.returns(jsonMock)};
+            const createNotificationsMock = sinon.fake.returns(Promise.resolve({error: 'notifications error'}));
+            const findOneNotificationsMock = sinon.fake.returns(Promise.resolve({idEmissor: 1, idReceptor: 2}));
+            const revertRewire = InfoService.__set__({
+                Notifications: {
+                    create: createNotificationsMock,
+                    findOne: findOneNotificationsMock,},
+                utils: {setBodyResponse: setBodyResponse, setErrorResponse: setErrorResponse },
+              });
+
+            await infoService.addNotification(req, res);
+
+            assert(res.status.calledWith(201));
+            assert(createNotificationsMock.notCalled);
+            assert(findOneNotificationsMock.calledOnce);
+            assert(jsonMock.json.calledWith(
+                { status: "Notificación ya existe." }
             ));
             revertRewire(); 
         });
