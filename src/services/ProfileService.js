@@ -685,10 +685,10 @@ class ProfileService {
             }
         } );
 
-        if (user === undefined || user.error !== undefined) {
-            Logger.error(user.error.toString());
+        if (user === null || user?.error !== undefined) {
+            Logger.error(user?.error.toString());
 
-            return utils.setErrorResponse("Usuario no encontrada",
+            return utils.setErrorResponse("Usuario no encontrado",
                 500,
                 res);
         }
@@ -716,7 +716,7 @@ class ProfileService {
 
                             } );
 
-        if (premiumUsers === undefined || premiumUsers.error !== undefined) {
+        if (premiumUsers === null || premiumUsers?.error !== undefined) {
             Logger.error("Error al chequear suscripciones.");
 
             Logger.error( err.toString() );
@@ -724,8 +724,8 @@ class ProfileService {
             return;
         }
 
-        const filteredUsers = premiumUsers.filter(usr => ! utils.notMonthIntervalYet(usr.lastPaymentDate) )
-                                          .map(usr => usr.get({plain: true}));
+        const filteredUsers = premiumUsers.filter(user => ! utils.notMonthIntervalYet(user.lastPaymentDate) )
+                                          .map(user => user.get({plain: true}));
 
         await Promise.all(filteredUsers.map( async usr => {
                 if ( (await paySuscription(usr.walletId) ).error !== undefined ) {
