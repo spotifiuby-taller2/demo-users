@@ -158,7 +158,6 @@ if (isDevelopment) {
 
 const firebaseJson = require("./firebase_production.json");
 
-const SENDGRID_API_KEY = "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";
 const MY_API_KEY = "72b60f6945b9beccf2a92c7da5f5c1963f4ec68240a1814b4ec5273cac5e7a44";
 
 const BASE_SALT = '$2b$10$sfW8rHWvJcda/4cMOq.p5.';
@@ -191,7 +190,6 @@ module.exports = {
     TIMEZONE,
     SYMBOL_MAX_LEN,
     TIMESTAMP_MAX_LEN,
-    SENDGRID_API_KEY,
     RESET_DATABASE,
     isDevelopment,
     LOG_LEVEL,
